@@ -1,0 +1,17 @@
+{
+  "name": "productivity-plugins",
+  "owner": {
+    "name": "productivity-plugins"
+  },
+  "metadata": {
+    "description": "Productivity plugins for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "comms-assistant",
+      "source": "./comms-assistant",
+      "description": "Draft and summarise Slack communications using MCP tools",
+      "version": "0.1.0"
+    }
+  ]
+}
