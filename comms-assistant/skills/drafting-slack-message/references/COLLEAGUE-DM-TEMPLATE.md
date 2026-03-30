@@ -14,9 +14,7 @@ For drafting a direct message to a colleague. The tone should be friendly yet pr
 The draft message must follow this structure in Slack mrkdwn:
 
 ```
-Hi {Colleague's first name},
-
-{Message body — short, concise, warm. Get to the point quickly while maintaining a friendly tone. Typically 1-3 sentences.}
+Hi {Colleague's first name}, {Message body — short, concise, warm. Get to the point quickly while maintaining a friendly tone. Typically 1-3 sentences.}
 ```
 
 ## Tone Rules
