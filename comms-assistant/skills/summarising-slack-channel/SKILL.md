@@ -12,7 +12,7 @@ description: >-
   summary — even if they don't explicitly say "summarise". Make sure to use this
   skill whenever the user asks about Slack channel activity, wants to review
   discussions, or needs to extract insights from Slack message history.
-version: "0.4.1"
+version: "0.5.0"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A
 ---
@@ -132,6 +132,8 @@ Question: [The question that the Slack message is discussing in a sentence.]
 Answer: [A paragraph summarizing the discussion or resolution. If a specific technical solution, command, or key point is mentioned, quote it directly from the text using "double quotes" with the Slack username.]
 
 URLs: [List all URLs found — such as Google Docs, Slides, or any URLs — separating each URL with space | space. If no URLs exist, state "None".]
+
+Slack URL: [Direct link to the original Slack message. Construct from: https://dd.slack.com/archives/{channel_id}/p{message_ts_without_dot} — where {channel_id} is the resolved channel ID from Step 1 and {message_ts_without_dot} is the message timestamp with the dot removed.]
 ```
 
 Use a horizontal rule `---` to separate summaries of different Slack messages.

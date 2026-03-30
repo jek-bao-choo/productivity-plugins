@@ -27,6 +27,8 @@ Answer: {A paragraph summarizing the discussion or resolution, informed by threa
 
 URLs: {url1 | url2 | url3} or "None" if no URLs exist.
 
+Slack URL: https://dd.slack.com/archives/{channel_id}/p{message_ts_without_dot}
+
 ---
 
 Date: {YYYY-MM-DD}
@@ -36,6 +38,8 @@ Question: {Next question within the same theme.}
 Answer: {Summary paragraph with quoted specifics and attribution.}
 
 URLs: {url1} or "None"
+
+Slack URL: https://dd.slack.com/archives/{channel_id}/p{message_ts_without_dot}
 
 ---
 
@@ -50,6 +54,8 @@ Question: {Question in this theme group.}
 Answer: {Summary paragraph.}
 
 URLs: {url1} or "None"
+
+Slack URL: https://dd.slack.com/archives/{channel_id}/p{message_ts_without_dot}
 
 ---
 
