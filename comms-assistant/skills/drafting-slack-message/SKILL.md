@@ -1,97 +1,98 @@
 ---
 name: drafting-slack-message
 description: >-
-  This skill should be used when the user wants to draft a Slack message without sending
-  it immediately. It applies when the user says "draft a reply to the thread in #channel",
-  "compose a message for #announcements", "help me write a response to {person}",
-  "prepare a message for the team channel", or "draft a follow-up in #project-updates".
-  It also applies when the user mentions drafting, composing, writing, or preparing a
-  Slack message — even if they don't explicitly say "draft". IMPORTANT: This skill
-  creates drafts only. It must NEVER send a message directly. Always use
-  slack_send_message_draft, never slack_send_message.
-version: "0.1.0"
+  This skill should be used when the user wants to draft a Slack message using a
+  specific template. It applies when the user says "draft a PoC status update",
+  "write a status update from my sales notes", "update the team on PoC progress",
+  "draft a message to [colleague]", "write a DM to [person]", or "message [name]
+  about...". It also applies when the user mentions drafting, composing, writing,
+  or preparing a Slack message — even if they don't explicitly say "draft". This
+  skill supports multiple message templates (PoC status updates, colleague DMs, and
+  more in the future). All messages are sent to the user's own Slack DM for manual
+  copy-paste to the intended destination. IMPORTANT: This skill must NEVER send
+  messages to anyone other than the user themselves. Always use slack_send_message
+  with channel_id U093Q9Z3SKU (the user's own DM).
+version: "0.2.0"
 author: productivity-plugins
-tags: slack, draft, message, compose, reply
+tags: slack, draft, message, compose, template, poc, status, dm
 ---
 
-# Slack Message Drafting
+# Slack Message Drafting (Template-Based)
 
-Draft a Slack message or thread reply without sending it. The draft is saved to Slack for the user to review and send manually.
+Draft a Slack message using a structured template. All drafts are sent to the user's own Slack DM (Jek Bao Choo) so the user can review, copy, and paste to the intended channel or person.
 
-## Critical Constraint
+## Critical Constraints
 
-**This skill MUST only create drafts using `slack_send_message_draft`. It MUST NEVER use `slack_send_message` to send messages directly.** The user must review and send drafts manually from Slack.
+- **NEVER send messages to anyone other than the user.** Always use channel_id `U093Q9Z3SKU` (Jek Bao Choo's user ID) when calling `slack_send_message`. The user will copy-paste the message from their self-chat to the intended destination.
+- **NEVER use `slack_send_message` with any channel_id other than `U093Q9Z3SKU`.**
 
 ## Prerequisites
 
 The following Slack MCP tools must be available:
-- `slack_search_channels`
-- `slack_read_channel`
-- `slack_read_thread`
-- `slack_send_message_draft`
+- `slack_send_message` — to send the composed message to the user's self-DM
 
 ## Workflow
 
-### Step 1 — Understand the context
+### Step 1 — Determine the template
 
-Determine what the user wants to say, to whom, and in which channel or thread.
+Based on the user's request, select the appropriate template:
 
-- If the user references a specific conversation, note the channel and thread details.
-- If the intent is unclear, ask the user to clarify the target channel and message purpose.
+| User intent | Template |
+|---|---|
+| PoC update, status update, sales notes, proof of concept, team update, customer/prospect meeting notes | `references/POC-STATUS-UPDATE-TEMPLATE.md` |
+| Message to a colleague, DM, direct message, writing to a specific person | `references/COLLEAGUE-DM-TEMPLATE.md` |
 
-### Step 2 — Find the target channel
+If the intent is ambiguous, ask the user which type of message they want to draft.
 
-Use `slack_search_channels` to resolve the channel ID from the channel name.
+> **Adding new templates:** Create a new file in `references/` following the same structure (Purpose, Input Required, Message Format, Rules, Checklist) and add a row to the table above.
 
-- If multiple matches, present them and ask the user to confirm.
+### Step 2 — Gather input
 
-### Step 3 — Read relevant context (if replying)
+Read the selected template file from `references/` to understand the required inputs and format.
 
-If drafting a thread reply:
-- Use `slack_read_thread` with the parent message timestamp to understand the full thread.
+Collect the information needed for the selected template:
 
-If drafting a new message:
-- Use `slack_read_channel` to understand recent channel context and tone.
+- **PoC Status Update**: Accept the user's sales notes. Determine the communication mode (Zoom / Ms Teams / Email) and date — infer from the notes if possible, otherwise ask.
+- **Colleague DM**: Determine the colleague's name and the message intent — ask if not already clear from the user's request.
 
-### Step 4 — Compose the draft
+### Step 3 — Compose the draft
 
-Write the message content following the review format in `references/DRAFT-MESSAGE-TEMPLATE.md`.
+Format the message strictly according to the selected template:
 
-- Match the tone and style of the channel.
-- Use Slack mrkdwn formatting (bold, lists, links, mentions).
-- Keep the message concise and clear.
+- For **PoC Status Update**: Extract attendees, achievements, blockers, and next steps from the sales notes. Summarize concisely. Do not fabricate information — only use what can be inferred from the provided notes.
+- For **Colleague DM**: Draft a message that starts with "Hi", is friendly yet professional, short and warm.
 
-### Step 5 — Confirm with user
+Use Slack mrkdwn formatting throughout. Avoid using " — " or " - " to connect clauses within sentences. These dash patterns are a telltale sign of AI-generated writing. Write short, direct sentences instead.
 
-Present the composed draft to the user for review before saving. Show:
-- The target channel and thread (if applicable)
-- The full draft content
-- A checklist for review
+### Step 4 — Confirm with user
+
+Present the composed draft for review. Show:
+- Which template was used
+- The full draft content formatted as it will appear in Slack
+- A reminder that it will be sent to the user's own Slack DM
 
 Iterate until the user is satisfied with the draft.
 
-### Step 6 — Save as draft
+### Step 5 — Send to self-DM
 
-Use `slack_send_message_draft` with:
-- `channel_id` — the resolved channel ID
-- `message` — the confirmed draft content
-- `thread_ts` — the parent message timestamp (only for thread replies)
+Use `slack_send_message` with:
+- `channel_id`: `U093Q9Z3SKU`
+- `message`: the confirmed draft content
 
-Report the Slack web client URL so the user can find their draft in **Drafts & Sent**.
+After sending, share the message link and remind the user: "Message sent to your self-DM. Copy and paste it to the intended destination."
 
 ## Output Format
 
-Follow the review format in `references/DRAFT-MESSAGE-TEMPLATE.md` when presenting drafts to the user.
+Follow the template file selected in Step 1. See the `references/` directory for all available templates:
+- `references/POC-STATUS-UPDATE-TEMPLATE.md` — PoC status update for internal team
+- `references/COLLEAGUE-DM-TEMPLATE.md` — Direct message to a colleague
 
 ## Scope Guardrails
 
-- **NEVER use `slack_send_message`** — only `slack_send_message_draft`.
-- Always present the draft to the user and get confirmation before saving.
-- If a draft already exists for that channel, inform the user (Slack allows only one attached draft per channel).
-- Cannot draft in externally shared (Slack Connect) channels.
+- **NEVER send to anyone other than self** — only use channel_id `U093Q9Z3SKU` with `slack_send_message`.
+- Always present the draft to the user and get confirmation before sending.
+- Every draft must match a known template. If the user's request doesn't match any template, ask for clarification.
 
 ## Failure Handling
 
-- **Channel not found**: Suggest searching with `slack_search_channels` using alternative terms.
-- **Draft already exists**: Inform the user they have an existing draft in that channel that must be sent or deleted first.
-- **Externally shared channel**: Inform the user that drafts cannot be created in Slack Connect channels.
+- **No matching template**: Ask the user which template type fits their needs, or whether they'd like to describe a new template format.
