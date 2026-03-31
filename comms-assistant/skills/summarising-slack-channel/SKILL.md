@@ -12,7 +12,7 @@ description: >-
   summary — even if they don't explicitly say "summarise". Make sure to use this
   skill whenever the user asks about Slack channel activity, wants to review
   discussions, or needs to extract insights from Slack message history.
-version: "0.5.0"
+version: "0.5.1"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A
 ---
@@ -62,7 +62,7 @@ Use `slack_search_channels` with the user's channel name to resolve the channel 
 
 ### Step 2 — Retrieve messages
 
-Use `slack_read_channel` with the resolved channel ID and the timeframe converted to `oldest` and `latest` Unix timestamps.
+Use `slack_read_channel` with the resolved channel ID and the timeframe converted to `oldest` and `latest` Unix timestamps. Use the default detailed response format — it includes a `Message TS` field per message (e.g., `Message TS: 1774886575.033929`) that is required for constructing Slack URLs in Phase 3. Preserve each message's `Message TS` value throughout processing.
 
 **Handling large result sets:** Channel history can be very large (100+ messages, 90K+ characters). When the result is too large to process in a single read:
 - Read the saved result file in sequential chunks using offset and limit parameters.
@@ -133,7 +133,7 @@ Answer: [A paragraph summarizing the discussion or resolution. If a specific tec
 
 URLs: [List all URLs found — such as Google Docs, Slides, or any URLs — separating each URL with space | space. If no URLs exist, state "None".]
 
-Slack URL: [Direct link to the original Slack message. Construct from: https://dd.slack.com/archives/{channel_id}/p{message_ts_without_dot} — where {channel_id} is the resolved channel ID from Step 1 and {message_ts_without_dot} is the message timestamp with the dot removed.]
+Slack URL: [Direct link to the original Slack message. Take the `Message TS` value from the Step 2 `slack_read_channel` output (detailed format), remove the dot, and prepend with `p`. Example: `Message TS: 1774886575.033929` in channel `C4W013KEU` → `https://dd.slack.com/archives/C4W013KEU/p1774886575033929`. Preserve all digits — do not truncate or round.]
 ```
 
 Use a horizontal rule `---` to separate summaries of different Slack messages.
