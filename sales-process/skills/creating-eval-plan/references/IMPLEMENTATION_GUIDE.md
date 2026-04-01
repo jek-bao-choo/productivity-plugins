@@ -10,7 +10,7 @@
 
 ## Environment Summary
 
-<!-- Populate from customer discovery / TMAP scoping. Be specific about versions. -->
+<!-- Populate from customer discovery / Evaluation Plan scoping. Be specific about versions. -->
 
 | Component | Details |
 |---|---|
@@ -27,7 +27,7 @@
 
 ## Table of Contents
 
-<!-- Auto-generate from TMAP phases. One entry per Phase / sub-section. -->
+<!-- Auto-generate from Evaluation Plan phases. One entry per Phase / sub-section. -->
 
 1. [Phase 0 — Scoping & Alignment](#phase-0--scoping--alignment)
 2. [Phase 1 — Sign Up for a Datadog Account](#phase-1--sign-up-for-a-datadog-account)
@@ -43,7 +43,7 @@
 
 ### Technical Scope
 
-<!-- Populate from TMAP Phase 1 / Scoping rows -->
+<!-- Populate from Evaluation Plan Phase 1 / Scoping rows -->
 
 | Area | Scope |
 |---|---|
@@ -56,10 +56,10 @@
 
 ### Success Criteria Checklist
 
-<!-- Convert TMAP Success Criteria fields into checkboxes -->
+<!-- Convert Evaluation Plan Success Criteria fields into checkboxes -->
 
-- [ ] <success criteria 1 from TMAP>
-- [ ] <success criteria 2 from TMAP>
+- [ ] <success criteria 1 from Evaluation Plan>
+- [ ] <success criteria 2 from Evaluation Plan>
 - [ ] ...
 
 ### Prerequisites Checklist
@@ -92,9 +92,9 @@
 ## Phase 2 — Datadog Setup & Data Collection
 
 <!-- ============================================================
-     GENERATION RULES — how to render each TMAP section:
+     GENERATION RULES — how to render each Evaluation Plan section:
 
-     For EACH sub-section under Phase 2 in the TMAP CSV:
+     For EACH sub-section under Phase 2 in the Evaluation Plan CSV:
 
      1. Create a ### heading with the section number and title.
         Include specific versions in titles, e.g.:
@@ -121,11 +121,11 @@
 
      6. After each section, add a validation block:
 
-        > **✅ Validate:** <success criteria from the TMAP>
+        > **✅ Validate:** <success criteria from the Evaluation Plan>
 
      ============================================================ -->
 
-### 2.X <Section Title from TMAP>
+### 2.X <Section Title from Evaluation Plan>
 
 <!-- Step-by-step for each item at depth 3+ -->
 
@@ -146,7 +146,7 @@ Reference: [docs link](https://docs.datadoghq.eu/...)
 
 Reference: [docs link](https://docs.datadoghq.eu/...)
 
-> **✅ Validate:** <success criteria collected from this section's TMAP rows>
+> **✅ Validate:** <success criteria collected from this section's Evaluation Plan rows>
 
 #### References
 
