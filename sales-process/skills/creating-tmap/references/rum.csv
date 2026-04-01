@@ -1,0 +1,10 @@
+Depth,Title,Description,Success Criteria
+1,Real User Monitoring (RUM),,
+1.1,RUM Browser,https://docs.datadoghq.eu/real_user_monitoring/browser/,RUM sessions visible in RUM Explorer
+1.2,RUM Session Replay,https://docs.datadoghq.eu/real_user_monitoring/session_replay/,Session replays recording and playable
+1.3,RUM Android,https://docs.datadoghq.eu/real_user_monitoring/android/?tab=kotlin,Android sessions visible
+1.4,RUM iOS,https://docs.datadoghq.eu/real_user_monitoring/ios/?tab=swift,iOS sessions visible
+1.5,RUM React Native,https://docs.datadoghq.eu/real_user_monitoring/reactnative/,React Native sessions visible
+1.6,Connecting RUM & Traces (front-end / back-end correlation),https://docs.datadoghq.eu/real_user_monitoring/connect_rum_and_traces/?tab=browserrum,RUM sessions linked to backend APM traces
+1.7,[Optional] Modifying RUM Data & Context,https://docs.datadoghq.eu/real_user_monitoring/browser/modifying_data_and_context/?tab=npm,Custom attributes added to RUM events
+1.8,(Informational) RUM Data Collected,https://docs.datadoghq.eu/real_user_monitoring/browser/data_collected/,

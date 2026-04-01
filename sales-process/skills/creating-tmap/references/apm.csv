@@ -1,0 +1,38 @@
+Depth,Title,Description,Success Criteria
+1,APM (Application Performance Monitoring),,
+1.1,Java APM,,
+1.1.1,Install the Datadog Java Tracing Client,https://docs.datadoghq.eu/tracing/setup_overview/setup/java?tab=containers,Traces visible in APM
+1.1.2,Configure Java Runtime Metrics,https://docs.datadoghq.eu/tracing/metrics/runtime_metrics/?tab=java,Runtime metrics flowing
+1.1.3,Profiling Java Applications,https://docs.datadoghq.eu/tracing/profiler/enabling/java/?tab=commandarguments,Profiles visible in Continuous Profiler
+1.1.4,Connect Java Logs and Traces,https://docs.datadoghq.eu/tracing/connect_logs_and_traces/java/?tab=log4j2,Logs correlated with traces
+1.1.5,Unified Service Tagging,https://docs.datadoghq.eu/getting_started/tagging/unified_service_tagging/?tab=kubernetes,env/service/version tags visible on all spans
+1.2,Python APM,,
+1.2.1,Install the Datadog Python Tracing Client,https://docs.datadoghq.eu/tracing/setup_overview/setup/python,Traces visible in APM
+1.2.2,Configure Python Runtime Metrics,https://docs.datadoghq.eu/tracing/metrics/runtime_metrics/?tab=python,Runtime metrics flowing
+1.2.3,Profiling Python Applications,https://docs.datadoghq.eu/profiler/enabling/python,Profiles visible in Continuous Profiler
+1.2.4,Connect Python Logs and Traces,https://docs.datadoghq.eu/tracing/other_telemetry/connect_logs_and_traces/python,Logs correlated with traces
+1.2.5,Unified Service Tagging,https://docs.datadoghq.eu/getting_started/tagging/unified_service_tagging/?tab=kubernetes,env/service/version tags visible on all spans
+1.3,Node.js APM,,
+1.3.1,Install the Datadog Node.js Tracing Client,https://docs.datadoghq.eu/tracing/setup_overview/setup/nodejs/?tab=containers,Traces visible in APM
+1.3.2,Tracing ECS Applications,https://docs.datadoghq.eu/agent/amazon_ecs/apm/?tab=ec2metadataendpoint,ECS traces flowing
+1.3.3,Instrumenting Node.js Lambda Applications,https://docs.datadoghq.eu/serverless/installation/nodejs/?tab=datadogcli,Lambda traces flowing
+1.3.4,Configure Node.js Runtime Metrics,https://docs.datadoghq.eu/tracing/runtime_metrics/nodejs/,Runtime metrics flowing
+1.3.5,Profiling Node.js Applications,https://docs.datadoghq.eu/tracing/profiler/enabling/nodejs/?tab=environmentvariables,Profiles visible in Continuous Profiler
+1.3.6,Connect Node.js Logs and Traces,https://docs.datadoghq.eu/tracing/connect_logs_and_traces/nodejs/,Logs correlated with traces
+1.3.7,Unified Service Tagging,https://docs.datadoghq.eu/getting_started/tagging/unified_service_tagging/?tab=kubernetes,env/service/version tags visible on all spans
+1.4,.NET APM,,
+1.4.1,Install the Datadog .NET Tracing Client,https://docs.datadoghq.eu/tracing/setup_overview/setup/dotnet,Traces visible in APM
+1.4.2,Configure .NET Runtime Metrics,https://docs.datadoghq.eu/tracing/runtime_metrics/dotnet/,Runtime metrics flowing
+1.4.3,Profiling .NET Applications,https://docs.datadoghq.eu/tracing/profiler/enabling/dotnet/?tab=internetinformationservicesiis,Profiles visible in Continuous Profiler
+1.4.4,Connect .NET Logs and Traces,https://docs.datadoghq.eu/tracing/connect_logs_and_traces/dotnet/?tab=serilog,Logs correlated with traces
+1.4.5,Unified Service Tagging,https://docs.datadoghq.eu/getting_started/tagging/unified_service_tagging/?tab=kubernetes,env/service/version tags visible on all spans
+1.5,Go APM,,
+1.5.1,Install the Datadog Go Tracing Client,https://docs.datadoghq.eu/tracing/setup_overview/setup/go,Traces visible in APM
+1.5.2,Profiling Go Applications,https://docs.datadoghq.eu/profiler/enabling/go,Profiles visible in Continuous Profiler
+1.5.3,Connect Go Logs and Traces,https://docs.datadoghq.eu/tracing/other_telemetry/connect_logs_and_traces/go,Logs correlated with traces
+1.5.4,Unified Service Tagging,https://docs.datadoghq.eu/getting_started/tagging/unified_service_tagging/?tab=kubernetes,env/service/version tags visible on all spans
+1.6,APM General,,
+1.6.1,(Informational) APM Glossary,https://docs.datadoghq.eu/tracing/visualization/,
+1.6.2,(Informational) Deployment Version Tracking,https://docs.datadoghq.eu/tracing/deployment_tracking/,
+1.6.3,(Informational) Watchdog Root Cause Analysis,https://docs.datadoghq.eu/watchdog/rca/,
+1.6.4,Synthetics & CI/CD Integration,https://docs.datadoghq.eu/synthetics/cicd_integrations,CI/CD pipeline tests passing

@@ -1,0 +1,38 @@
+Depth,Title,Description,Success Criteria
+1,Infrastructure Monitoring,,
+1.1,Host Based Agent - Linux,,
+1.1.1,Deploy Datadog Agent,https://docs.datadoghq.eu/agent/basic_agent_usage/linux/,Agent installed and reporting metrics
+1.1.2,(Recommended) Add Tags,https://docs.datadoghq.eu/getting_started/tagging/assigning_tags,Tags visible on hosts in Datadog
+1.1.3,(Recommended) Enable Process Monitoring,https://docs.datadoghq.eu/infrastructure/process/?tab=linuxwindows#installation,Processes visible in Live Processes
+1.1.4,(Optional) Set Datadog Region,https://docs.datadoghq.eu/getting_started/site/,
+1.1.5,(Optional) Enable Logs,https://docs.datadoghq.eu/logs/log_collection/?tab=host,Logs flowing into Log Explorer
+1.1.6,(Optional) Enable CNM,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/setup,Network data visible
+1.1.7,(Debug) Set Datadog Agent to Debug,https://docs.datadoghq.eu/agent/troubleshooting/debug_mode/,
+1.1.8,(Debug) Verify outbound traffic is allowed,https://docs.datadoghq.eu/agent/configuration/network/,
+1.1.9,(Debug) Add Datadog IPs to the Allowed Range,https://ip-ranges.datadoghq.eu/,
+1.2,Host Based Agent - Windows,,
+1.2.1,Deploy Datadog Agent,https://docs.datadoghq.eu/agent/basic_agent_usage/windows/,Agent installed and reporting metrics
+1.2.2,(Recommended) Add Tags,https://docs.datadoghq.eu/getting_started/tagging/assigning_tags,Tags visible on hosts in Datadog
+1.2.3,(Recommended) Enable Process Monitoring,https://docs.datadoghq.eu/infrastructure/process/?tab=linuxwindows#installation,Processes visible in Live Processes
+1.2.4,(Optional) Enable Logs,https://docs.datadoghq.eu/logs/log_collection/?tab=host,Logs flowing into Log Explorer
+1.2.5,(Debug) Set Datadog Agent to Debug,https://docs.datadoghq.eu/agent/troubleshooting/debug_mode/,
+1.3,AWS Integration,,
+1.3.1,Enable AWS Integration,https://docs.datadoghq.eu/integrations/aws,AWS metrics visible in Datadog
+1.3.2,(Pick One) Deploy via CloudFormation,https://docs.datadoghq.eu/getting_started/integrations/aws/,Integration configured successfully
+1.3.3,(Pick One) Deploy via Terraform,https://docs.datadoghq.eu/integrations/guide/aws-terraform-setup/,Integration configured successfully
+1.3.4,(Informational) Agent Overhead,https://docs.datadoghq.eu/agent/basic_agent_usage/?tab=agentv6v7#agent-overhead,
+1.4,Azure Integration,,
+1.4.1,(Pick One) Enable Azure via Terraform,https://docs.datadoghq.eu/integrations/guide/azure-programmatic-management/?tab=windows,Azure metrics visible in Datadog
+1.4.2,(Pick One) Enable Azure via Azure CLI,https://docs.datadoghq.eu/integrations/guide/azure-manual-setup/?tab=azurecli,Azure metrics visible in Datadog
+1.4.3,(US5 - Pick One) Enable Azure Native via Terraform,,Azure Native integration configured
+1.4.4,(US5 - Pick One) Enable Azure Native via UI,,Azure Native integration configured
+1.5,GCP Integration,,
+1.5.1,(Pick One) Enable GCP Project,,GCP metrics visible in Datadog
+1.5.2,(Pick One) Enable GCP Organization / Folder,,GCP metrics visible in Datadog
+1.6,Kubernetes / OpenShift,,
+1.6.1,(Pick One) Install Datadog via Helm,,Cluster Agent and Node Agents running
+1.6.2,(Pick One) Install Datadog via Operator,,Cluster Agent and Node Agents running
+1.6.3,Enable Log Collection,https://docs.datadoghq.eu/agent/kubernetes/log/?tab=helm,Container logs flowing
+1.6.4,Enable Live Container Metrics,https://docs.datadoghq.eu/infrastructure/livecontainers/configuration/?tab=helm,Container metrics visible
+1.6.5,Enable Live Processes,https://docs.datadoghq.eu/infrastructure/process/?tab=linuxwindows,Processes visible
+1.6.6,Enable Kubernetes Event Collection,https://docs.datadoghq.eu/agent/kubernetes/configuration/?tab=operator#event-collection,K8s events flowing

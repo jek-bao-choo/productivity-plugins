@@ -1,0 +1,20 @@
+Depth,Title,Description,Success Criteria
+1,Cloud Security,,
+1.1,Cloud Security Posture Management (CSPM),https://docs.datadoghq.eu/security/cloud_security_management/misconfigurations/,Misconfigurations detected and visible
+1.1.1,Enable CSPM for AWS,,AWS misconfigurations scanned
+1.1.2,Enable CSPM for Azure,,Azure misconfigurations scanned
+1.1.3,Enable CSPM for GCP,,GCP misconfigurations scanned
+1.1.4,Review Compliance Frameworks,,Compliance posture visible
+1.1.5,Create Custom Rules,,Custom CSPM rules active
+1.2,Cloud Workload Security (CWS),https://docs.datadoghq.eu/security/cloud_workload_security/,Workload security signals generated
+1.2.1,Enable CWS on Linux Hosts,,CWS events flowing
+1.2.2,Enable CWS on Kubernetes,,Container workload signals visible
+1.2.3,Review OOTB Detection Rules,,Rules active and generating signals
+1.2.4,Create Custom Detection Rules,,Custom CWS rules active
+1.3,Application Security Management (ASM),https://docs.datadoghq.eu/security/application_security/,Application threats detected
+1.3.1,Enable ASM on APM-instrumented Services,,ASM signals flowing
+1.3.2,Review Threat Detection Rules,,Threats detected in test scenarios
+1.3.3,IP Blocking and Attack Prevention,,Blocking rules tested
+1.3.4,Vulnerability Management,,Vulnerabilities detected in services
+1.4,Identity Risks,,
+1.4.1,Review Identity Risk Findings,,Identity risks identified

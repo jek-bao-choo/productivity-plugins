@@ -1,0 +1,17 @@
+Depth,Title,Description,Success Criteria
+1,Phase 0: Scoping & Alignment,,
+1.1,Technical Scope Validated,,All parties agree on evaluation scope
+1.2,Success Criteria Confirmed,,Written success criteria documented
+1.3,Trial Kicked Off,,Trial active and data flowing
+2,Phase 1: Sign Up for a Datadog Account,,
+2.1,Sign Up for a Datadog Account,https://www.datadoghq.eu/,Account created in the correct Datadog region
+2.2,Get API Key For Agent Installation,https://app.datadoghq.eu/organization-settings/api-keys,API Key retrieved
+3,Phase 2: Datadog Setup & Data Collection,,INSERT SOLUTION MODULES HERE
+4,Phase 3: Datadog UI,,
+4.1,Dashboards & Visualizations,,At least 2 custom dashboards created
+4.2,Alerting & Monitoring,,At least 3 monitors configured
+4.3,SLOs,,At least 1 SLO created
+5,Phase 4: POC Review,,
+5.1,End of POC Review,,Technical win confirmed
+5.2,POC Playback / Showback,,Results presented to stakeholders
+5.3,Commercial Alignment,,Pricing and next steps agreed

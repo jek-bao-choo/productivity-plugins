@@ -1,0 +1,34 @@
+Depth,Title,Description,Success Criteria
+1,Pre-POV,,Alignment on requirements & timelines
+1.1,Align on Technical Scope,,
+1.2,Align on Success Criteria,,
+1.3,Align on Timelines,,
+2,Execute POV,,Configure and validate all requirements & product capabilities
+2.1,Ingest & Enrich Logs,https://docs.datadoghq.eu/getting_started/security/cloud_siem/,Logs ingested and enriched from all required sources
+2.1.1,Log Setup,,
+2.1.1.1,[Customer Source 1] - Direct Integration,,Logs flowing from source
+2.1.1.2,[Customer Source 2],,Logs flowing from source
+2.1.1.3,[Customer Source 3],,Logs flowing from source
+2.1.1.4,[Customer Source 4] - AWS,,Logs flowing from source
+2.1.1.5,[Custom Internal Source A],,Logs flowing from source
+2.1.2,Reorder Index in Logs Configuration,,Index priority configured
+2.2,Detect & Monitor,,Surfaces any abnormal or malicious activity in the form of signals
+2.2.1,Validate OOTB Rules for Managed Integrations,https://docs.datadoghq.eu/security/default_rules/?category=cat-cloud-siem#cat-cloud-siem-log-detection,OOTB rules generating signals
+2.2.2,Create Custom Detection Rules,,Custom rules triggering on test data
+2.2.3,Validate Coverage Gaps using MITRE ATT&CK Map,,Coverage gaps identified and documented
+2.3,Triage & Investigate,,"Triage & investigate using signal explorer, risk insights & investigator tools"
+2.3.1,Explore Threats in Detail or in Bulk,"Cloud SIEM's Risk Insights consolidates multiple data sources into a profile representing a single security entity. https://app.datadoghq.eu/security/siem/risk-insights",Risk Insights reviewed
+2.3.2,Explore Context on an Indicator of Compromise,"Indicators of Compromise (IOC) show evidence that your systems have experienced a security breach. IOC Explorer: https://app.datadoghq.eu/security/siem/ioc-explorer",IOC Explorer reviewed
+2.3.3,Review Investigator,"The Cloud SIEM Investigator provides a graphical interface for you to pivot from one affected entity to another, so that you can see user behavior and its impact on your environment.",Investigator walkthrough completed
+2.4,Respond & Report,,Take action from signals
+2.4.1,Build a SOAR Workflow,"SOAR includes ready-to-use customizable blueprints to help you build workflows for remediating threats. https://docs.datadoghq.eu/actions/workflows/build/#build-a-workflow-from-a-blueprint",At least 1 SOAR workflow configured
+2.5,POV Check-in #1,,
+2.6,POV Check-in #2,,
+3,Post POV,,
+3.1,POV Playback,,Outcome on technical validation
+3.2,Commercial Alignment,,
+3.2.1,Confirm cost based on PoV Workloads,,Cost estimate documented
+3.2.2,Quantify cost impact of remaining log sources to onboard,,Projected cost documented
+3.3,Disable Log Ingestion,,
+4,Out of Scope / Future Considerations,,
+4.1,Datadog Cross Account Integration,https://docs.datadoghq.eu/account_management/org_settings/cross_org_visibility/,

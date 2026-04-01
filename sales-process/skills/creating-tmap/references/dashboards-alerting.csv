@@ -1,0 +1,19 @@
+Depth,Title,Description,Success Criteria
+1,Dashboards & Visualizations,,
+1.1,(Informational) Using Tags,https://docs.datadoghq.eu/getting_started/tagging/using_tags?tab=assignment,
+1.2,Getting Started With Dashboards,https://docs.datadoghq.eu/getting_started/dashboards/,
+1.3,Build Custom Dashboards,https://docs.datadoghq.eu/dashboards/,At least 2 custom dashboards created
+1.4,Create Service Level Objectives,https://app.datadoghq.eu/slo,At least 1 SLO created
+1.5,Overlay Events on Timeseries Graphs,https://docs.datadoghq.eu/graphing/dashboards/widgets/#overlay-events-on-your-graph,Events overlay working
+1.6,Annotate Graphs and Collaborate,https://www.datadoghq.eu/blog/real-time-graph-annotations/#add-graph-annotations-instantly,
+1.7,Host Map - Explore Tags and Aggregate Data,https://docs.datadoghq.eu/graphing/infrastructure/hostmap/#overview,Host map populated
+2,Alerting & Monitoring,,
+2.1,Datadog Alerting Overview,https://docs.datadoghq.eu/monitors/,
+2.2,Watchdog AI,https://docs.datadoghq.eu/watchdog/#overview,Watchdog alerts reviewed
+2.3,Create Monitors (alerting),https://docs.datadoghq.eu/monitors/monitor_types/,At least 3 monitors created
+2.4,Monitor Based SLOs,https://docs.datadoghq.eu/monitors/service_level_objectives/monitor/#overview,Monitor-based SLO created
+2.5,Manage Monitors,https://docs.datadoghq.eu/monitors/manage_monitor/,Monitors organized with tags
+2.6,Customize Notification Messages,https://docs.datadoghq.eu/monitors/notifications/?tab=is_alertis_warning#advanced-variable-usage,Custom notifications tested
+2.7,Leverage Outlier Detection,https://docs.datadoghq.eu/monitors/monitor_types/outlier/,Outlier monitor created
+2.8,Leverage Anomaly Detection,https://docs.datadoghq.eu/monitors/monitor_types/anomaly/,Anomaly monitor created
+2.9,Apply Metric Forecasting,https://docs.datadoghq.eu/monitors/monitor_types/forecasts/#forecast-algorithms,Forecast monitor created

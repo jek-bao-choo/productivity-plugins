@@ -1,0 +1,9 @@
+Depth,Title,Description,Success Criteria
+1,Bits AI for SRE,,
+1.1,Investigate Issues with BitsAI SRE,https://docs.datadoghq.eu/bits_ai/bits_ai_sre/investigate_issues/,Issues investigated via BitsAI
+1.2,Set up BitsAI Dev Agent,https://docs.datadoghq.eu/bits_ai/bits_ai_dev_agent/setup,Dev Agent configured
+1.3,Suggested Code Fixes from BitsAI Dev Agent (requires Dev Agent),https://docs.datadoghq.eu/bits_ai/bits_ai_sre/take_action,Code fix suggestions received
+1.4,"BitsAI SRE Integrations (Github, Case Management, ServiceNow, On-call)",https://docs.datadoghq.eu/bits_ai/bits_ai_sre/configure,Integrations connected
+1.5,MCP Server Setup,https://docs.datadoghq.eu/bits_ai/mcp_server/setup?tab=cursor,MCP Server connected
+1.6,[Informational] BitsAI SRE Knowledge Sources,https://docs.datadoghq.eu/bits_ai/bits_ai_sre/knowledge_sources,
+1.7,[Informational] Chat with BitsAI SRE,https://docs.datadoghq.eu/bits_ai/bits_ai_sre/chat_bits_ai_sre,
