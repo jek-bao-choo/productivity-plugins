@@ -1,22 +1,22 @@
 ---
-name: creating-tmap
+name: creating-eval-plan
 description: >-
-  Generate modular Technical Mutual Activity Plan (TMAP) CSV files for Datadog
-  Home Run POC/Trial management. Combines solution-area modules (Infrastructure,
-  APM, Logs, Cloud SIEM, LLM Observability, NDM, RUM, Synthetics, CCM, Security,
-  DBM, Incident Management, BitsAI, Service Management) into a 4-column CSV
-  (Depth, Title, Description, Success Criteria) ready for upload to Home Run.
-  Use when the user asks to create a TMAP, technical mutual activity plan, mutual
-  action plan, POC plan, trial plan, Home Run template, or mentions "TMAP",
-  "eval plan", "POC plan", "Home Run CSV", or "trial template".
-version: "0.3.0"
+  Generate modular Evaluation Plan CSV files for Datadog Home Run POC/Trial
+  management. Combines solution-area modules (Infrastructure, APM, Logs, Cloud
+  SIEM, LLM Observability, NDM, RUM, Synthetics, CCM, Security, DBM, Incident
+  Management, BitsAI, Service Management) into a 4-column CSV (Depth, Title,
+  Description, Success Criteria) ready for upload to Home Run. Use when the user
+  asks to create an evaluation plan, eval plan, POC plan, trial plan, Home Run
+  template, or mentions "evaluation plan", "eval plan", "POC plan", "Home Run
+  CSV", or "trial template".
+version: "0.4.0"
 author: productivity-plugins
-tags: tmap, technical-mutual-activity-plan, poc, home-run, csv, sales
+tags: eval-plan, evaluation-plan, poc, home-run, csv, sales
 ---
 
-# Technical Mutual Activity Plan (TMAP) Generator
+# Evaluation Plan Generator
 
-Generate modular TMAP CSV files for Datadog Home Run by combining solution-area template modules. Output is a 4-column CSV ready for direct upload to Home Run.
+Generate modular Evaluation Plan CSV files for Datadog Home Run by combining solution-area template modules. Output is a 4-column CSV ready for direct upload to Home Run.
 
 ## CSV Schema
 
@@ -31,7 +31,7 @@ The Home Run CSV upload requires exactly 4 columns:
 
 ## Available Solution Modules
 
-Each module is a standalone CSV template in `references/`. Read the relevant template files when composing a TMAP. Template URLs default to EU region (datadoghq.eu); substitute the correct domain based on the customer's Datadog region.
+Each module is a standalone CSV template in `references/`. Read the relevant template files when composing an Evaluation Plan. Template URLs default to EU region (datadoghq.eu); substitute the correct domain based on the customer's Datadog region.
 
 | Module File | Solution Area | When to Include |
 |---|---|---|
@@ -60,7 +60,7 @@ Each module is a standalone CSV template in `references/`. Read the relevant tem
 Ask the user (or infer from context):
 
 1. **Customer name** — for file naming
-2. **Datadog region** — which Datadog site will the customer use? This determines all URLs in the TMAP:
+2. **Datadog region** — which Datadog site will the customer use? This determines all URLs in the Evaluation Plan:
    - **EU** → `datadoghq.eu` (e.g. `https://www.datadoghq.eu/`, `https://app.datadoghq.eu/`, `https://docs.datadoghq.eu/`, `https://ip-ranges.datadoghq.eu/`)
    - **US1** → `datadoghq.com` (e.g. `https://www.datadoghq.com/`, `https://app.datadoghq.com/`, `https://docs.datadoghq.com/`, `https://ip-ranges.datadoghq.com/`)
    - **US5** → `us5.datadoghq.com` (e.g. `https://us5.datadoghq.com/`, `https://docs.datadoghq.com/`)
@@ -89,7 +89,7 @@ Read the relevant template CSV files from the `references/` directory based on t
 - Read each solution module needed
 - Insert modules into Phase 2 (Datadog Setup & Data Collection) of the wrapper
 
-### Step 3: Compose the TMAP
+### Step 3: Compose the Evaluation Plan
 
 Combine the selected modules into a single CSV with proper depth renumbering:
 
@@ -134,12 +134,12 @@ Combine the selected modules into a single CSV with proper depth renumbering:
 Write the final CSV to the customer's working directory:
 
 ```
-temp_working/CUSTOMERS/<CUSTOMER_NAME>/tmap_<solution-area>.csv
+eval-plan/<CUSTOMER_NAME>/evalplan_<solution-area>.csv
 ```
 
 Or for comprehensive plans:
 ```
-temp_working/CUSTOMERS/<CUSTOMER_NAME>/tmap_comprehensive.csv
+eval-plan/<CUSTOMER_NAME>/evalplan_comprehensive.csv
 ```
 
 **CSV output rules:**
@@ -160,20 +160,20 @@ After generating the CSV:
 
 ### Step 6: Generate Implementation Guide (Markdown)
 
-After validating the CSV, generate a customer-facing **Implementation Guide** in Markdown. This document is designed to be shared directly with the customer team so they can follow the TMAP step-by-step without needing Datadog Home Run access.
+After validating the CSV, generate a customer-facing **Implementation Guide** in Markdown. This document is designed to be shared directly with the customer team so they can follow the Evaluation Plan step-by-step without needing Datadog Home Run access.
 
 **Read the template first:** `references/IMPLEMENTATION_GUIDE.md` — this is the structural reference with embedded generation rules in HTML comments.
 
 Write the guide to:
 ```
-temp_working/CUSTOMERS/<CUSTOMER_NAME>/IMPLEMENTATION_GUIDE.md
+eval-plan/<CUSTOMER_NAME>/IMPLEMENTATION_GUIDE.md
 ```
 
 **Formatting principles:**
 - Write for the **customer engineer** who will execute — not the Datadog SE
 - Use plain language; avoid Datadog internal jargon
 - Each step: a short sub-heading + 1–3 sentence instruction + config snippet (only when it materially helps) + docs link
-- Group steps into phases that match the TMAP hierarchy
+- Group steps into phases that match the Evaluation Plan hierarchy
 - Include doc links inline so the reader can click-through immediately
 - Add success criteria as a `> **✅ Validate:**` block at the end of each sub-section
 - Omit `[Informational]` items from steps — fold them into a `#### References` list at the section end
