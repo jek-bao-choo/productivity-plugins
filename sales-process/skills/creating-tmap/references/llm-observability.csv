@@ -1,0 +1,52 @@
+Depth,Title,Description,Success Criteria
+1,Pre-POV — LLM Observability,,Alignment on requirements & timelines
+1.1,Identify AI Applications in Scope,"List all LLM-powered applications to instrument. Document: application name / cloud platform / app stack / LLM provider / database.",Applications inventory documented
+1.2,Align on Success Criteria,"Define 3-5 success criteria. Recommended: SC1: Performance Monitoring / SC2: Evaluation & Quality / SC3: Development Lifecycle Tracking / SC4: Experiments & Comparison",Success criteria agreed
+1.3,Align on Timelines,,POV timeline agreed
+1.4,Confirm LLM Request Volume Estimates,,Volume estimates documented for BOQ scoping
+2,Execute POV — Instrumentation,,Full telemetry coverage across AI stack
+2.1,SDK Installation & Auto-Instrumentation,,
+2.1.1,Install ddtrace for Python,https://docs.datadoghq.eu/llm_observability/setup/auto_instrumentation/?tab=python,LLM spans visible in LLM Observability
+2.1.2,Install ddtrace for Node.js,https://docs.datadoghq.eu/llm_observability/setup/auto_instrumentation/?tab=nodejs,LLM spans visible in LLM Observability
+2.1.3,(Alternative) OpenTelemetry for LLMObs,https://docs.datadoghq.eu/llm_observability/instrumentation/otel_instrumentation/,OTel traces ingested
+2.2,LLM Provider Integration,,
+2.2.1,OpenAI Integration,"Auto-instrumented via ddtrace. Captures: prompts / completions / tool calls / token usage / cost.",OpenAI LLM calls traced
+2.2.2,Anthropic Integration,"Auto-instrumented via ddtrace.",Anthropic LLM calls traced
+2.2.3,Google Gen AI SDK (Vertex AI / Gemini) Integration,"Auto-instrumented via ddtrace. Supports google.generativeai and vertexai SDKs.",Gemini LLM calls traced
+2.2.4,AWS Bedrock Integration,"Auto-instrumented via ddtrace.",Bedrock LLM calls traced
+2.2.5,LangChain / LangGraph Integration,"Auto-instrumented via ddtrace.",LangChain chains and agents traced
+2.2.6,Amazon Strands Agent Integration,"Auto-instrumented via ddtrace.",Strands agent workflows traced
+2.3,Custom Instrumentation,,
+2.3.1,Annotate Workflows / Tasks / Agents,"Use @llmobs.workflow / @llmobs.task / @llmobs.agent decorators for custom span hierarchy.",Custom span tree visible in traces
+2.3.2,Annotate LLM Spans,"Use LLMObs.annotate() to add metadata / tags / custom fields to spans.",Annotations visible on spans
+2.3.3,Correlate LLMObs with APM Traces,"Set DD_LLMOBS_AGENTLESS_ENABLED or configure trace correlation. https://docs.datadoghq.eu/llm_observability/setup/sdk/python/#correlate-llm-observability-traces-with-apm-traces",LLMObs spans linked to APM traces
+2.4,MCP Clients Monitoring,https://docs.datadoghq.eu/llm_observability/monitoring/mcp_clients/,MCP calls traced as tool spans
+3,Execute POV — SC1: Performance Monitoring,,"How is my LLM/Agent performing? How can I monitor it?"
+3.1,Validate LLM Tracing,"Verify traces in LLM Observability Traces page. Filter by ml_app. Confirm: request count / error rate / p95 latency / cost.",All LLM calls traced with full metadata
+3.2,Token Usage & Cost Tracking,"Verify input tokens / output tokens / estimated cost per call. Aggregate by ml_app / env / model_name.",Cost metrics visible per model and app
+3.3,Agentic Workflow Visibility,"For multi-step agents: verify full span tree showing workflow → task → llm_call → tool hierarchy.",Complete span tree visible for agent workflows
+3.4,Create LLMObs Monitors,"Configure monitors for: error rate spikes / latency anomalies / cost outliers / token budget alerts.",Monitors alerting on test scenarios
+3.5,LLMObs Dashboard,"Build custom dashboard with key LLM metrics: requests / errors / latency / cost / tokens by ml_app and model.",Dashboard populated with live data
+4,Execute POV — SC2: Evaluation & Quality,,"How can I evaluate response quality and define custom scoring?"
+4.1,OOTB Managed Evaluations,"Requires OpenAI / Anthropic / Bedrock API keys (BYOK). Includes: Hallucination Detection / Prompt Injection / Toxicity / Sensitive Data (PII) / Sentiment / Failure to Answer / Topic Relevance. https://docs.datadoghq.eu/llm_observability/evaluations/",OOTB eval scores visible on traces
+4.2,Custom LLM-as-a-Judge Evaluations,"Framework-agnostic. Define: judge prompt / output type (Boolean/Score/Categorical/JSON) / pass-fail thresholds. Supports: OpenAI / Anthropic / Bedrock / Vertex AI (Gemini) / Azure OpenAI / AI Gateway. https://docs.datadoghq.eu/llm_observability/evaluations/custom_llm_as_a_judge_evaluations",Custom eval scores visible on traces
+4.3,RAGAS Integration (for RAG pipelines),"Supported metrics: Faithfulness / Answer Relevancy / Context Precision. https://docs.datadoghq.eu/llm_observability/ragas_evaluations/",RAGAS metrics ingested and visible
+4.4,Computational Evaluations,"Regex match / field extraction correctness / structured output validation. Submit via SDK: https://docs.datadoghq.eu/llm_observability/submit_evaluations/",Computational eval scores visible
+4.5,Human Annotation & Ground Truth,"Annotate traces with human feedback in LLMObs UI. Save approved outputs to Dataset (Input + Expected Output + Metadata).",Ground truth dataset created with 50+ samples
+4.6,Cluster Visualization for Drift Detection,"Use prompt-response cluster visualizations to identify quality drifts and isolate low-quality outputs.",Clusters visualized and anomalies identified
+5,Execute POV — SC3: Development Lifecycle,,"How do I track performance across code/prompt changes?"
+5.1,Prompt Management & Versioning,"Track prompt templates as versioned artifacts with prompt_id. Per-version metrics: requests / latency / tokens / cost / eval scores. https://docs.datadoghq.eu/llm_observability/prompt_management/",Prompt versions tracked with per-version metrics
+5.2,APM Deployment Version Correlation,"Set DD_VERSION to deployment tag. All spans (APM + LLMObs) tagged with version. Compare versions in APM. https://docs.datadoghq.eu/tracing/deployment_tracking/",Deployment markers visible on LLMObs dashboards
+5.3,Quality Regression Monitors,"Configure monitors that alert when eval scores drop after deployment or prompt version change.",Regression alert triggered on test scenario
+6,Execute POV — SC4: Experiments & Comparison,,"How do I run systematic experiments to compare models/prompts?"
+6.1,Build Dataset from Production Traces,"Save annotated production traces as versioned Dataset (Input + Expected Output + Metadata). https://docs.datadoghq.eu/llm_observability/experiments/",Dataset created with 100+ samples
+6.2,Define Task Function,"Python function: input → LLM call → output → score. Attach evaluators.",Task function running successfully
+6.3,Run Experiment,"Configure: model / temperature / prompt version / system instructions. Run via LLMObs.run_experiment(). Parallel execution with error handling.",Experiment completed with results
+6.4,Compare Results in UI,"Side-by-side: Run A vs Run B on eval_score / accuracy / latency_p95 / cost. Scatter plot: cost vs quality. Select winner.",Comparison completed and winner identified
+6.5,LLM Playground,"Quickly test prompt tweaks / swap models / fine-tune parameters before running full experiments.",Playground tested with sample inputs
+7,Post POV,,
+7.1,POV Playback / Showback,,Technical validation outcomes presented
+7.2,Commercial Alignment,,
+7.2.1,Confirm LLM Request Volume for Pricing,"LLMObs pricing: minimum 100K LLM requests at $80/month. Additional: $8 per 10K requests.",Volume confirmed and pricing estimated
+7.2.2,Review Sensitive Data Scanner Inclusion,"SDS included with LLMObs for PII redaction in LLM traces.",SDS requirements reviewed
+7.3,Define Production Rollout Plan,,Rollout timeline and owner agreed

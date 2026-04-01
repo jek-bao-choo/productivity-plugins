@@ -1,0 +1,22 @@
+Depth,Title,Description,Success Criteria
+1,Network Monitoring,,
+1.1,Cloud Network Monitoring (CNM),,
+1.1.1,CNM Setup,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/setup/,Network data flowing
+1.1.2,Overview Page,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/overview_page/,Overview page populated
+1.1.3,Network Analytics,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/network_analytics/,Analytics queries working
+1.1.4,Network Map,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/network_map/,Network map rendering
+1.1.5,Supported Cloud Services,https://docs.datadoghq.eu/network_monitoring/cloud_network_monitoring/supported_cloud_services/,
+1.2,Network Device Monitoring (NDM),,
+1.2.1,NDM Setup,https://docs.datadoghq.eu/network_monitoring/devices/setup,SNMP devices discovered and reporting
+1.2.2,NDM Terms and Concepts,https://docs.datadoghq.eu/network_monitoring/devices/glossary,
+1.2.3,Profiles,https://docs.datadoghq.eu/network_monitoring/devices/profiles,Device profiles applied
+1.2.4,Device Topology Map,https://docs.datadoghq.eu/network_monitoring/devices/device_topology_map,Topology map rendering
+1.2.5,SNMP Metrics Reference,https://docs.datadoghq.eu/network_monitoring/devices/data,SNMP metrics flowing
+1.2.6,Configure SNMP Traps,,SNMP traps received
+1.2.7,Configure Network Device Config Management,,Config changes tracked
+1.2.8,Troubleshooting,https://docs.datadoghq.eu/network_monitoring/devices/troubleshooting,
+1.3,NetFlow Monitoring,,
+1.3.1,Enable Netflow,https://docs.datadoghq.eu/network_monitoring/netflow/,Netflow data visible
+1.3.2,Netflow Monitors,https://docs.datadoghq.eu/monitors/types/netflow,Netflow monitor configured
+1.3.3,Network Path,https://docs.datadoghq.eu/network_monitoring/network_path/,Network paths visible
+1.4,DNS Monitoring,https://docs.datadoghq.eu/network_monitoring/dns/,DNS metrics visible

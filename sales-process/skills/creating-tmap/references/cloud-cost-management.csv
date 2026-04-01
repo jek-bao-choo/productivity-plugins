@@ -1,0 +1,18 @@
+Depth,Title,Description,Success Criteria
+1,Cloud Cost Management,,
+1.1,Setup,,
+1.1.1,AWS Setup,"Setup Documentation: https://docs.datadoghq.eu/cloud_cost_management/setup/aws/ - Requires Datadog AWS Integration and Cost & Usage Report in S3",Cost data flowing into Datadog
+1.1.2,AWS Container Cost Allocation,"https://docs.datadoghq.eu/cloud_cost_management/cost_allocation/container_cost_allocation/?tab=aws - Requires specific Datadog agent versions. No cross-org visibility for container CCM data.",Container costs allocated
+1.1.3,Azure Setup,"https://docs.datadoghq.eu/cloud_cost_management/setup/azure/?tab=billingaccounts - Requires Datadog Azure Integration and Amortized + Actual Cost Reports",Cost data flowing into Datadog
+1.1.4,GCP Setup,"https://docs.datadoghq.eu/cloud_cost_management/setup/google_cloud/ - Requires Google Cloud Integration and Detailed GCP Cost and Usage Report with GCP Storage Bucket",Cost data flowing into Datadog
+1.1.5,Oracle (OCI) Setup,"https://docs.datadoghq.eu/cloud_cost_management/setup/oracle/ - Requires OCI tenancy and OCI integration",Cost data flowing into Datadog
+1.1.6,SaaS Cost Integrations,"https://docs.datadoghq.eu/cloud_cost_management/setup/saas_costs/ - Supported: Snowflake / Databricks / OpenAI / Anthropic / Github / Confluent Cloud / MongoDB / Elastic / Fastly / Twilio",SaaS cost data flowing
+1.2,Cost Allocation,,
+1.2.1,Tag Pipelines,"https://docs.datadoghq.eu/cloud_cost_management/tags/tag_pipelines/ - Create ruleset and tag rules for cost allocation",Tags visible and used in reports
+1.2.2,Container / BigQuery Cost Allocation,"https://docs.datadoghq.eu/cloud_cost_management/cost_allocation - Check specific agent requirements for container allocation",Costs correctly allocated
+1.2.3,Custom Cost Allocation,https://docs.datadoghq.eu/cloud_cost_management/custom_allocation_rules?tab=even,Costs allocated correctly
+1.2.4,Cost Recommendations,https://docs.datadoghq.eu/cloud_cost_management/recommendations,Recommendations reviewed
+1.3,Operationalizing Cost Data,,
+1.3.1,Reports,,Create up to 2 custom reports
+1.3.2,Dashboards,,Create up to 2 custom cost dashboards
+1.3.3,Cost Monitors,https://docs.datadoghq.eu/cloud_cost_management/#create-a-cost-monitor,Create up to 3 cost monitors

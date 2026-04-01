@@ -12,6 +12,12 @@
       "source": "./comms-assistant",
       "description": "Draft and summarise Slack communications using MCP tools",
       "version": "0.1.0"
+    },
+    {
+      "name": "sales-process",
+      "source": "./sales-process",
+      "description": "Sales process tools: Technical Mutual Activity Plans (TMAPs), and more",
+      "version": "0.1.0"
     }
   ]
 }

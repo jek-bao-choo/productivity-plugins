@@ -1,0 +1,24 @@
+Depth,Title,Description,Success Criteria
+1,Log Management,,
+1.1,Log Collection Setup,,
+1.1.1,[Informational] Getting Started With Logs,https://docs.datadoghq.eu/getting_started/logs/?tab=ussite,
+1.1.2,[Informational] Log Collection and Integrations,https://docs.datadoghq.eu/logs/log_collection/?tab=host,
+1.1.3,Host Agent Log Collection,https://docs.datadoghq.eu/agent/logs/?tab=tailfiles,Host logs flowing into Log Explorer
+1.1.4,Send AWS Services Logs,https://docs.datadoghq.eu/logs/guide/send-aws-services-logs-with-the-datadog-lambda-function/?tab=awsconsole,AWS logs flowing
+1.1.5,Send Azure Logs,https://docs.datadoghq.eu/integrations/azure/?tab=azurecliv20#log-collection,Azure logs flowing
+1.1.6,Send GCP Logs,https://docs.datadoghq.eu/integrations/google_cloud_platform/#log-collection,GCP logs flowing
+1.1.7,Windows Event Logs,https://docs.datadoghq.eu/integrations/win32_event_log/,Windows events visible
+1.1.8,Network Device - Syslog Collection,https://docs.datadoghq.eu/integrations/syslog_ng/,Syslog messages flowing
+1.1.9,All Datadog Log Integrations,https://docs.datadoghq.eu/integrations/#cat-log-collection,
+1.2,Log Configuration,,
+1.2.1,[Informational] Logging Without Limits Guide,https://docs.datadoghq.eu/logs/guide/getting-started-lwl/,
+1.2.2,[Informational] Log Attributes and Aliasing,https://docs.datadoghq.eu/logs/log_configuration/attributes_naming_convention/,
+1.2.3,Define Indexes & Exclusion Filters,https://docs.datadoghq.eu/logs/log_configuration/indexes/,Indexes configured with exclusion filters
+1.2.4,[Informational] Add Custom Metadata to Logs - Enrichment Tables,https://docs.datadoghq.eu/logs/guide/enrichment-tables/?tab=manualupload,
+1.2.5,[Informational] Monitor Log Usage,https://docs.datadoghq.eu/logs/guide/logs-monitors-on-volumes/,
+1.3,Log Storage & Archiving,,
+1.3.1,Log Explorer - Query Logs (Hot Storage),https://docs.datadoghq.eu/logs/explorer/,Logs queryable in Log Explorer
+1.3.2,Configure Log Archive via Online Archives (Warm Storage),https://www.datadoghq.eu/blog/online-archives-datadog/,Online Archives configured
+1.3.3,Configure Log Archive via S3 Bucket (Cold Storage),https://docs.datadoghq.eu/logs/archives/?tab=awss3,Archive configured and logs flowing to S3
+1.4,Log Insights,,
+1.4.1,(Informational) Watchdog Insights for Logs,https://docs.datadoghq.eu/logs/explorer/watchdog_insights/#overview,

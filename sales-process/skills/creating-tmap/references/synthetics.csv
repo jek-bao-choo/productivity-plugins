@@ -1,0 +1,20 @@
+Depth,Title,Description,Success Criteria
+1,Synthetic Monitoring,,
+1.1,API Tests,,
+1.1.1,API: HTTP Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/http_tests/?tab=requestoptions,HTTP test created and passing
+1.1.2,API: Multistep API Tests,https://docs.datadoghq.eu/synthetics/multistep?tab=requestoptions,Multistep test created and passing
+1.1.3,API: DNS Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/dns_tests/,DNS test created and passing
+1.1.4,API: ICMP Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/icmp_tests/,ICMP test created and passing
+1.1.5,API: SSL Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/ssl_tests/,SSL test created and passing
+1.1.6,API: TCP Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/tcp_tests/,TCP test created and passing
+1.1.7,API: UDP Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/udp_tests/,UDP test created and passing
+1.1.8,API: WebSocket Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/websocket_tests/?tab=requestoptions,WebSocket test created
+1.1.9,API: gRPC Synthetic Tests,https://docs.datadoghq.eu/synthetics/api_tests/grpc_tests/?tab=unarycall,gRPC test created
+1.2,Browser Tests,,
+1.2.1,Synthetics - Browser Tests,https://docs.datadoghq.eu/synthetics/browser_tests/?tab=requestoptions,Browser test recording and passing
+1.2.2,Search and Manage Synthetic Tests,https://docs.datadoghq.eu/synthetics/search/,Tests organized and searchable
+1.3,Private Locations,,
+1.3.1,Private Locations API Tests,https://docs.datadoghq.eu/synthetics/private_locations?tab=docker,Private location deployed and tests running
+1.4,Informational,,
+1.4.1,(Informational) Synthetic Dashboards,https://docs.datadoghq.eu/synthetics/dashboards/,
+1.4.2,(Informational) Data Collected,https://docs.datadoghq.eu/synthetics/dashboards/,

@@ -1,0 +1,15 @@
+Depth,Title,Description,Success Criteria
+1,Service Management,,
+1.1,Service Catalog,https://docs.datadoghq.eu/service_catalog/,Services registered in catalog
+1.1.1,Register Services,"Register services with ownership / team / links / documentation.",Services visible with metadata
+1.1.2,Service Scorecards,"Define and track service quality standards.",Scorecards configured
+1.2,Case Management,https://docs.datadoghq.eu/service_management/case_management/,Cases created from signals/monitors
+1.2.1,Create Cases from Signals,,Cases linked to security signals
+1.2.2,Jira / ServiceNow Integration,,Cases synced to ITSM
+1.3,On-Call,https://docs.datadoghq.eu/service_management/on-call/,On-call schedules configured
+1.3.1,Configure On-Call Schedules,,Schedules active
+1.3.2,Escalation Policies,,Escalation policies tested
+1.3.3,Integrations (Slack / Teams / PagerDuty),,"Notifications delivered to channels"
+1.4,Workflows (SOAR),https://docs.datadoghq.eu/actions/workflows/,Workflows triggered and executing
+1.4.1,Build Automated Workflow,,At least 1 workflow running
+1.4.2,Use Blueprint Templates,https://docs.datadoghq.eu/actions/workflows/build/#build-a-workflow-from-a-blueprint,Blueprint deployed

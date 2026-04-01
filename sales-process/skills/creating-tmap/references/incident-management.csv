@@ -1,0 +1,10 @@
+Depth,Title,Description,Success Criteria
+1,Incident Management,,
+1.1,Setup and Configuration,https://docs.datadoghq.eu/incident_response/incident_management/setup_and_configuration,Incident Management configured
+1.2,"Incident Management Integrations (Teams, ServiceNow, Confluence, Jira and more)",https://docs.datadoghq.eu/incident_response/incident_management/#integrations,Integrations connected and tested
+1.3,[Informational] Incident Investigation,https://docs.datadoghq.eu/incident_response/incident_management/investigate,
+1.4,[Informational] Declare an Incident,https://docs.datadoghq.eu/incident_response/incident_management/investigate/declare,
+1.5,[Informational] Incident Timeline,https://docs.datadoghq.eu/incident_response/incident_management/investigate/timeline,
+1.6,[Informational] Hands-On Incident Management Example,https://learn.datadoghq.eu/courses/intro-to-incident-management,
+1.7,[Informational] Using Test Incidents for Training and Testing,https://docs.datadoghq.eu/incident_response/incident_management/guides/test_incidents/,
+1.8,[Informational] Guided Walkthrough of an Incident Workflow,https://docs.datadoghq.eu/getting_started/incident_management/,
