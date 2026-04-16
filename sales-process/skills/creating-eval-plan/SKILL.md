@@ -41,6 +41,7 @@ Each module is a standalone CSV template in `references/`. Read the relevant tem
 | `cloud-siem.csv` | Cloud SIEM | Security log ingestion, detection rules, investigation, SOAR workflows |
 | `synthetics.csv` | Synthetic Monitoring | API tests, browser tests, private locations |
 | `rum.csv` | Real User Monitoring | Browser RUM, mobile RUM, session replay, RUM-APM correlation |
+| `productanalytics.csv` | Product Analytics | Get data-driven insights into user behavior and product usage so you can improve user experiences and product outcomes. |
 | `network-monitoring.csv` | Network Monitoring | CNM/NPM, NDM (SNMP), NetFlow, DNS monitoring |
 | `cloud-cost-management.csv` | Cloud Cost Management | AWS/Azure/GCP/OCI cost, SaaS costs, cost allocation, tag pipelines |
 | `incident-management.csv` | Incident Management | Incident workflows, integrations, timeline, response |
