@@ -1,0 +1,12 @@
+Depth,Title,Description,Success Criteria
+1,Product Analytics,,
+1.1,Activate Product Analytics,Activate Product Analytics in Datadog UI https://docs.datadoghq.com/product_analytics/,Product Analytics enabled and accessible in Datadog UI
+1.2,Create Charts (Templates),Turn user data into actionable insights (using pre-built templates) https://docs.datadoghq.com/product_analytics/charts/chart_basics/,Charts created from templates with user data visible
+1.3,Pathways (Sankey Visualization),Analyze multiple user journeys simultaneously https://docs.datadoghq.com/product_analytics/charts/pathways/,Pathway diagrams rendering user journey data
+1.4,Funnel Analysis,Ability to create user journey funnel charts https://docs.datadoghq.com/product_analytics/charts/funnel_analysis,Funnel charts displaying user journey conversion steps
+1.5,Retention Analysis,Measures how often users are successfully returning to a page or action https://docs.datadoghq.com/product_analytics/charts/retention_analysis/,Retention charts showing user return patterns
+1.6,Query Data in Analytics Explorer,Explore aggregated data to understand how your product is being used https://docs.datadoghq.com/product_analytics/charts/analytics_explorer,Aggregated product usage data queryable in Analytics Explorer
+1.7,Segments,Segment based on user behaviour and/or user profile https://docs.datadoghq.com/product_analytics/segmentation/,User segments created and applied to analytics
+1.7.1,[Future] Segment with External Data,Segment based on External Data (Reference Table or CSV) https://docs.datadoghq.com/product_analytics/segmentation/#using-external-or-third-party-data,External data source linked and segments filtering correctly
+1.8,User Profiles,Data about users from RUM SDK https://docs.datadoghq.com/real_user_monitoring/application_monitoring/browser/advanced_configuration/?tab=npm#identify-user-session,User profiles populated with RUM SDK data
+1.8.1,Enrich User Profiles with Custom Attributes,Use custom attributes to enrich profiles https://docs.datadoghq.com/product_analytics/profiles/#user-profiles,Custom attributes visible on user profiles
