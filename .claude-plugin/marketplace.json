@@ -18,6 +18,12 @@
       "source": "./sales-process",
       "description": "Sales process tools: Technical Mutual Activity Plans (TMAPs), and more",
       "version": "0.1.0"
+    },
+    {
+      "name": "product-demo",
+      "source": "./product-demo",
+      "description": "Product demo content generation tools",
+      "version": "0.1.0"
     }
   ]
 }
