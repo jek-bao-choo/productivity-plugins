@@ -1,5 +1,5 @@
 ---
-name: create-pptx
+name: create-demo-pptx
 description: >-
   Create a Datadog-branded product demo PowerPoint (.pptx) from meeting notes,
   built on the bundled 2026 Datadog Presentation Template. Use when the user asks
