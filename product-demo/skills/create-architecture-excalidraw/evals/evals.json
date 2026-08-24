@@ -1,0 +1,47 @@
+{
+  "skill_name": "create-architecture-excalidraw",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "k8s-eks-privatelink",
+      "prompt": "I have discovery notes from a call with Acme Corp: they run a Kubernetes cluster on AWS EKS in ap-southeast-1, all their microservices talk to each other via REST, they have a React frontend, and they mentioned needing PrivateLink because of a strict security policy. Can you design a Datadog architecture diagram for their monitoring setup and put it in Excalidraw?",
+      "expected_output": "A layered blueprint (Infra/App/UI) with EKS cluster using Cluster Agent, REST service traces, React RUM, PrivateLink drawn as an explicit overlay node between the customer VPC and Datadog intake, region set to AP (ap-southeast-1), and either a live Excalidraw canvas or a valid fallback .excalidraw JSON file.",
+      "files": [],
+      "assertions": [
+        "blueprint.md exists and explicitly mentions PrivateLink as a distinct network element",
+        "blueprint.md specifies the AP region (ap-southeast-1 or AP) for Datadog intake, not US or EU",
+        "blueprint.md recommends the Datadog Cluster Agent (not just the plain Agent) for the EKS/Kubernetes layer",
+        "blueprint.md includes RUM for the React frontend under the UI/End-User layer",
+        "diagram.excalidraw is valid JSON with a top-level 'elements' array, OR notes.md explains a live Excalidraw MCP call was made instead"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "vague-notes-clarification",
+      "prompt": "Here are my rough meeting notes: 'Customer has a mix of VMs and Lambda functions, currently using Splunk for logs, wants to move to Datadog, no idea yet on compliance or region.' Turn this into an architecture blueprint and diagram showing how metrics, traces and logs would flow to Datadog.",
+      "expected_output": "The skill should explicitly ask clarifying questions about intake region and compliance/data-residency before finalizing the design, rather than silently guessing a region. Collection methods should distinguish Datadog Agent (VMs) from API/serverless-appropriate collection (Lambda).",
+      "files": [],
+      "assertions": [
+        "clarifying_questions.md exists and is non-empty",
+        "clarifying_questions.md explicitly asks about the Datadog intake region (EU/US/AP)",
+        "clarifying_questions.md explicitly asks about compliance or data-residency requirements",
+        "blueprint.md distinguishes the collection method for VMs (Datadog Agent) from Lambda (API-based or serverless-appropriate collection), not a single one-size-fits-all method",
+        "diagram.excalidraw is valid JSON with a top-level 'elements' array, OR notes.md explains a live Excalidraw MCP call was made instead"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "azure-gdpr-proxy-csv",
+      "prompt": "Attached is a list of our services: payment-api, order-api, inventory-db, legacy-vm-cluster. We're on Azure, EU region required for GDPR, using a proxy for all outbound traffic. Build me the Datadog monitoring architecture diagram.",
+      "expected_output": "A diagram/blueprint with EU region intake, proxy drawn as an explicit node in the data-flow path (not implicit), and services mapped with reasonable collection methods (Agent for legacy-vm-cluster, appropriate methods for the APIs/db).",
+      "files": [],
+      "assertions": [
+        "blueprint.md explicitly draws/lists the proxy as its own node in the data-flow path, not just a passing mention",
+        "blueprint.md specifies EU region for Datadog intake, tied to the GDPR requirement",
+        "blueprint.md maps all four named services (payment-api, order-api, inventory-db, legacy-vm-cluster) individually rather than treating them as one generic group",
+        "blueprint.md assigns a distinct, sensible collection method to legacy-vm-cluster (Datadog Agent) versus the APIs/db",
+        "diagram.excalidraw is valid JSON with a top-level 'elements' array, OR notes.md explains a live Excalidraw MCP call was made instead"
+      ]
+    }
+  ]
+}
