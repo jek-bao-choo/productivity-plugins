@@ -2,9 +2,11 @@
 
 Product demo content generation tools for Claude Code.
 
+**Plugin version:** 0.3.0
+
 ## Skills
 
-### create-demo-pptx
+### create-demo-pptx (v0.2.0)
 
 Create a Datadog-branded product demo PowerPoint from meeting notes, built on the bundled 2026 Datadog Presentation Template. Follows a fixed 20-slide customer-demo flow and runs a mandatory visual QA loop. Finishes by invoking the `create-architecture-excalidraw` skill on the same discovery notes to also produce a matching Datadog architecture diagram.
 
@@ -15,7 +17,7 @@ Create a Datadog-branded product demo PowerPoint from meeting notes, built on th
 
 **Prerequisites:** `python3`, `markitdown[pptx]`, `Pillow`, LibreOffice (`soffice`), and Poppler (`pdftoppm`). The editing scripts and template are bundled under `skills/create-demo-pptx/scripts/` and `skills/create-demo-pptx/assets/`.
 
-### create-architecture-excalidraw
+### create-architecture-excalidraw (v0.2.0)
 
 Design an end-to-end Datadog monitoring architecture from sales discovery notes and technical plans, and render it as a diagram in Excalidraw. Covers Infrastructure/Application/UI layers, metrics/traces/logs data flow to the Datadog SaaS intake (EU/US/AP), collection methods (Agent, Cluster Agent, OpenTelemetry Collector, API integrations), and security/networking overlays (proxy, firewall, PrivateLink).
 
