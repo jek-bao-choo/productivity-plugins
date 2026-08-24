@@ -1,0 +1,19 @@
+{
+  "skill_name": "create-demo-pptx",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "globalretail-full-technical-notes",
+      "prompt": "I just came back from a discovery call with GlobalRetail Inc. Notes: Currently on Prometheus + Grafana + ELK, evaluating Datadog vs New Relic. Three challenges: (1) no unified observability across their AWS EKS clusters in us-east-1 and a fleet of legacy VMs, (2) no distributed tracing for their checkout and payment microservices, (3) slow incident response due to fragmented logs across tools. Use cases: APM for the checkout flow, Kubernetes monitoring via Cluster Agent, centralized log management for the VM fleet. Target state: full Datadog stack replacing Prometheus/Grafana/ELK. Competitor in eval: New Relic. Expected ROI: reduce MTTR by 40%. Presenter: Jane Doe. Customer contact: John Smith, VP Engineering. Meeting date: 2026-08-20. Include the reference resources slide. Need an architecture diagram for the Kubernetes monitoring use case slide. Output file: globalretail_demo.pptx. Build me the demo deck.",
+      "expected_output": "A slide plan and (tooling permitting) a finished pptx following the standard flow, AND (only for the version with Step 6) a mandatory final invocation of create-architecture-excalidraw using the same original notes as-is, producing an architecture blueprint/diagram for the EKS + VM + checkout microservices environment.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "azure-vm-minimal-notes",
+      "prompt": "Rough notes from a quick call: customer runs everything on Azure VMs, wants better log monitoring, has no APM yet, and is complaining loudly about Splunk licensing costs. Two challenges: costly Splunk logs, and no APM/tracing at all. One use case so far: log management to replace Splunk. Presenter: me. No date set yet, no competitor named, no ROI numbers given. Build a demo deck from this.",
+      "expected_output": "The skill should ask clarifying questions per Step 1 (missing customer name, ROI, etc.) per its normal behavior, then build a plan. For the version with Step 6, it should still mandatorily invoke create-architecture-excalidraw on the same original raw notes afterward, even though the notes are technically thin — that skill has its own clarifying-questions step for gaps like region/compliance.",
+      "files": []
+    }
+  ]
+}
