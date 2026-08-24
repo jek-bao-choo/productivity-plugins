@@ -6,7 +6,7 @@ Product demo content generation tools for Claude Code.
 
 ### create-demo-pptx
 
-Create a Datadog-branded product demo PowerPoint from meeting notes, built on the bundled 2026 Datadog Presentation Template. Follows a fixed 20-slide customer-demo flow and runs a mandatory visual QA loop.
+Create a Datadog-branded product demo PowerPoint from meeting notes, built on the bundled 2026 Datadog Presentation Template. Follows a fixed 20-slide customer-demo flow and runs a mandatory visual QA loop. Finishes by invoking the `create-architecture-excalidraw` skill on the same discovery notes to also produce a matching Datadog architecture diagram.
 
 **Example prompts:**
 - "Create a demo deck from these meeting notes for ACME Corp"
