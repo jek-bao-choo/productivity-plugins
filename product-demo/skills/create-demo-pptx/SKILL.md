@@ -36,6 +36,7 @@ Copy this checklist and track progress:
 - [ ] Step 3: Generate any needed images (mock-ups / diagrams)
 - [ ] Step 4: Build the deck (unpack → duplicate → edit → clean → pack)
 - [ ] Step 5: Visual Check Loop (mandatory) → fix → re-verify
+- [ ] Step 6: Generate the architecture diagram (invoke create-architecture-excalidraw)
 ```
 
 ### Step 1 — Ask clarifying questions first
@@ -105,6 +106,23 @@ overflow, and truncation are invisible until rendered — this step is not optio
 
 Detailed issue checklist, font-size table, and fix snippets are in
 [references/editing-and-qa.md](references/editing-and-qa.md).
+
+### Step 6 — Generate the architecture diagram
+
+The deck isn't the only thing these discovery notes are good for. Once the deck passes
+Step 5, the same meeting notes almost always carry enough technical detail (environments,
+services, compliance, network constraints) to also sketch the customer's monitoring
+architecture — so this is a mandatory final step, not an optional add-on.
+
+Invoke the `create-architecture-excalidraw` skill via the `Skill` tool, passing it the
+original discovery/meeting notes from Step 1 as-is. Don't pre-filter or summarize them —
+that skill has its own clarifying-questions step and will ask about anything it still
+needs (intake region, compliance requirements, collection-method preferences) that the
+notes don't cover.
+
+The end result of one request is both deliverables: the finished `.pptx` and an
+Excalidraw architecture diagram (or its `.excalidraw` JSON fallback) built from the same
+notes.
 
 ## Resources
 
