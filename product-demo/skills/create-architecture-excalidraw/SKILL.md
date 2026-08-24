@@ -14,7 +14,7 @@ description: >-
   even if they don't say "Excalidraw" or "diagram" explicitly — e.g. "help me
   plan how we'd monitor this customer's environment" or "what would the
   observability setup look like for this account".
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # Create Datadog Architecture Diagram in Excalidraw
