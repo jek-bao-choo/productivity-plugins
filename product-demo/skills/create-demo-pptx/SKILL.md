@@ -7,7 +7,7 @@ description: >-
   "turn my meeting notes into slides", or mentions producing a customer demo
   presentation. Follows a fixed 20-slide customer-demo flow and includes a
   mandatory visual QA loop.
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # Create Datadog Demo PPTX
