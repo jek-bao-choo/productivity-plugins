@@ -24,6 +24,12 @@
       "source": "./product-demo",
       "description": "Product demo content generation tools",
       "version": "0.3.0"
+    },
+    {
+      "name": "poc-process",
+      "source": "./poc-process",
+      "description": "Proof of Concept artifact generation tools",
+      "version": "0.1.0"
     }
   ]
 }
