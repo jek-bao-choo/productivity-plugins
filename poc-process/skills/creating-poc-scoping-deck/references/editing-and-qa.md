@@ -82,16 +82,11 @@ reference listing all five sites, and the US1 row legitimately contains
 rows and no US1 — which looks plausible enough to survive a skim. Change the *hyperlink
 targets* and the footnote, and leave the table alone.
 
-A better way to signal the choice is to move the `RECOMMENDED` badge from the US1 row
-to the prospect's row, so the table stays accurate and still points them at the right
-site:
-
-```json
-{
-  "United States (US1-East)RECOMMENDED": "United States (US1-East)",
-  "Europe(EU-1)": "Europe (EU-1)  RECOMMENDED"
-}
-```
+Leave the table entirely alone. Moving the `RECOMMENDED` badge to the prospect's row
+seems tidier but makes things worse: the badge is a separately styled red run, so
+moving it as plain text loses the colour, and the extra line pushes the table past its
+container and clips the Japan row. The footnote below the table is the right place to
+state which site this deck targets.
 
 `https://docs.datadoghq.com/...` and `https://help.datadoghq.com/` are site-independent
 — leave them alone.
@@ -105,7 +100,10 @@ strings you will almost certainly want to change are stored across multiple runs
 - slide 10's presenter footnote, which concatenates to
   `note: All hyperlinks shown in this document are linked to US1.Please change to your relevant data center if required.`
   (no space after `US1.` once the runs are joined)
-- slide 14's run-on subtitle, `How to get help Raising a Datadog support ticket`
+Slide 14's subtitle looks like a third case and is not — see "Things that look broken
+and are not" in `slide-map.md`. Its two lines are separated by an `<a:br/>`, so joining
+the runs produces a convincing-looking run-on sentence. `fill_deck.py` refuses to
+collapse a paragraph containing a line break, and reports it as a miss.
 
 Route every text edit through `fill_deck.py --apply`, whose keys are arbitrary strings
 rather than bracketed tokens. It matches across runs and reports a zero-hit key, so a

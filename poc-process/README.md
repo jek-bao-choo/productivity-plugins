@@ -8,7 +8,7 @@ PoC working state is kept as local markdown files in the repo under `pocs/<custo
 
 ## Skills
 
-### creating-poc-scoping-deck (v0.1.1)
+### creating-poc-scoping-deck (v0.1.2)
 
 Turn discovery notes into the Datadog-branded deck you present to a prospect to scope a Proof of Concept, built on the bundled 2026 PoC Scoping Template. Reads meeting notes in `.gdoc`, `.md`, `.txt`, `.docx`, `.xlsx` and `.pdf`, fills the template's placeholders with content grounded in those notes, and asks rather than invents when the notes fall short. Alongside the deck it writes a `scoping.md` summary and an `open-questions.md` list, so every remaining blank is a question you can send to the prospect. Also adds the tech-stack and timeline slides the template promises but omits, and rewrites the deck's URLs for the prospect's Datadog site.
 
