@@ -1,0 +1,41 @@
+{
+  "skill_name": "creating-poc-scoping-deck",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "northwind-full-discovery-multiformat",
+      "prompt": "Build me the PoC scoping deck for Northwind Bank. My notes are in evals/files/northwind-discovery.md, the incident numbers they shared are in evals/files/northwind-incident-history.xlsx, and there's a follow-up note in evals/files/northwind-followup.pdf. I'm Sam Rivera, the SE; Priya Raman is the AE. Our emails are sam@datadoghq.com and priya@datadoghq.com.",
+      "expected_output": "A packed .pptx under pocs/northwind-bank/ plus scoping.md and open-questions.md. The notes cover almost everything, so expect: slide 1 and 19 naming Northwind Bank, Priya Raman and Sam Rivera (with the hardcoded 'Jek Bao Choo' on slide 1 replaced); slide 3 grounded in the Splunk/CloudWatch split and the four-tool correlation problem; slide 4 carrying the three stated use cases with testable criteria; slide 5 filled with 64 incidents x 12 FTEs x 18 hours = ~13,824 before and 9 hours after, with the arithmetic actually multiplying out and the percentage matching; slide 8 with each email under the matching name (the anchor case - priya@ must NOT land in the champion's block); Dana Osei as champion with 'VP of Engineering' corrected to Head of Platform; cadence set to Tuesdays/Thursdays on Slack across both slides 6 and 17; EU1 selected from the stated EU-only data residency, with slide 10/12/15 URLs rewritten to app.datadoghq.eu and the stale US1 footnote fixed; slide 13 (RUM) dropped since RUM is explicitly out of scope; and a tech-stack slide added covering EKS 1.29, Java 17 / Spring Boot 3.2, Python 3.11, PostgreSQL 15, with versions. Embedded fonts must survive the repack. Few open questions should remain - mainly phone numbers and the DevOps/SRE titles.",
+      "files": [
+        "evals/files/northwind-discovery.md",
+        "evals/files/northwind-incident-history.xlsx",
+        "evals/files/northwind-followup.pdf"
+      ],
+      "assertions": [
+        "A .pptx file is produced and unzips with 18 slides (19 minus the dropped RUM slide)",
+        "ppt/fonts/*.fntdata files survive the repack (10 of them) and embeddedFontLst is still present in ppt/presentation.xml",
+        "Slide 1 contains 'Northwind Bank' and no longer contains the literal 'Jek Bao Choo'",
+        "Slide 8 contains no literal 'VP of Engineering' and each email address sits in the same shape as its matching person's name, with priya@datadoghq.com in the Datadog panel rather than the prospect panel",
+        "Slide 5 MTTD figures multiply out: incidents x FTEs x hours equals the stated total for both the before and after rows, and the percentage reduction matches those totals",
+        "The deck's datadoghq URLs on slides 10, 12 and 15 point at the EU1 site, in both the visible text and the slide rels Target attributes",
+        "A tech-stack slide exists naming EKS 1.29, Java 17 and PostgreSQL 15 with version numbers",
+        "scoping.md and open-questions.md both exist under pocs/ and are non-empty",
+        "Every bracketed token still present in the packed deck has a corresponding question in open-questions.md"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "thin-notes-must-ask-not-invent",
+      "prompt": "Quick one - can you put together a PoC scoping deck? All I've got is this: talked to Meridian Logistics today, they're fed up with how long it takes to find anything in their logs and someone mentioned Datadog to them. Sounded keen. That's about it, no other details yet.",
+      "expected_output": "The skill must ask clarifying questions rather than filling the deck with plausible-sounding invented data. The notes contain a prospect name and one vague pain and nothing else - no incident counts, no contacts, no region, no tech stack, no dates, no success criteria. Expect a batched round of questions covering at minimum the MTTD inputs and the contact roster (the two areas flagged as never covered by discovery notes), plus the Datadog site and whether RUM is in scope. If it proceeds to build, slide 5's MTTD numbers and slide 8's roster must remain bracketed rather than populated with invented figures, the tech-stack and timeline slides must be skipped rather than added empty, and open-questions.md must be substantial.",
+      "files": [],
+      "assertions": [
+        "The skill asks clarifying questions before building, and the questions cover the MTTD inputs and the contact roster",
+        "No invented incident counts, FTE numbers, hours, phone numbers or person names appear anywhere in the output",
+        "If a deck is produced, slide 5's MTTD tokens and slide 8's roster tokens are still bracketed",
+        "The tech-stack and timeline slides are not added, since the notes contain no stack or dates",
+        "open-questions.md lists every unfilled token as an answerable question addressed to the prospect"
+      ]
+    }
+  ]
+}
