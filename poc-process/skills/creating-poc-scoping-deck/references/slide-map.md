@@ -43,7 +43,7 @@ that does not end with an agreed MAP has not done its job.
 | 11 | Step 2: Integrate with cloud providers | `Title + Content_gradient bg` | none |
 | 12 | Step 3: Install the Datadog Agents | `Title + Content_gradient bg` | region URLs |
 | 13 | Step 4: Add the Datadog RUM SDKs | `Title + Content_gradient bg` | drop if RUM is out of scope |
-| 14 | Divider — "Support" | `Divider_2` | subtitle is a run-on (see Defects) |
+| 14 | Divider — "Support" | `Divider_2` | none (the subtitle only looks run-on; see below) |
 | 15 | Step 5: How to raise a support ticket | `Title + Content_gradient bg` | region URLs |
 | 16 | Divider — "Next steps" | `Callout_pink` | none |
 | 17 | Next steps — cadence | `Title + Content_gradient bg` | 3 `…` blanks |
@@ -100,23 +100,45 @@ so always confirm both.
 
 Fix these while the deck is unpacked; they are template bugs, not prospect content.
 
-Apply the text ones with `fill_deck.py --apply` rather than `sed`. Both strings below
-are split across runs, so a raw find-and-replace matches nothing and reports success.
+Apply the text one with `fill_deck.py --apply` rather than `sed`. It is split across
+runs, so a raw find-and-replace matches nothing and reports success.
 
-- **Slide 10** — two badge groups (`1.`, `2.`) are positioned at x = −0.38in, off the
-  canvas. They never render. Delete them or move them on-slide.
-- **Slide 10** — footnote reads `note: All hyperlinks shown in this document are linked
-  to US1.Please change to your relevant data center if required.` (that is the exact
-  concatenated text — there is no space after `US1.`). Once you have set the region
-  this instruction-to-the-presenter is stale; rewrite or remove it.
+- **Slide 10** — the footnote is stale once you have set the region. It is three
+  `<a:br/>`-separated lines in one paragraph, so target the lines individually rather
+  than the whole thing; `fill_deck.py` refuses a whole-paragraph edit here, by design:
+
+  ```json
+  {
+    "All hyperlinks shown in this document are linked to US1.": "All hyperlinks in this deck point to the Datadog EU1 site (app.datadoghq.eu),",
+    "Please change to your relevant data center if required.": "matching the prospect's data residency requirement."
+  }
+  ```
 - **Slide 10** — the data-centre table lists all five sites and its US1 row contains
   `https://app.datadoghq.com/`. Never blanket-replace that URL on this slide; you will
-  silently end up with two EU rows and no US1. See `editing-and-qa.md`.
+  silently end up with two EU rows and no US1. Leave the table alone entirely, red
+  `RECOMMENDED` badge included — it is a generic reference, and the footnote below it
+  is what states the site this deck targets. See `editing-and-qa.md`.
 - **Slide 15** — the slide-number placeholder sits at (12.37, 6.78) instead of
   (12.95, 7.12) like every other slide.
 - **Slides 3 and 8** — an empty duplicate sub-header text box.
-- **Slide 14** — subtitle reads `How to get help Raising a Datadog support ticket`, two
-  sentences run together. Separate them.
+
+## Things that look broken and are not
+
+Verified by rendering the template. Do not "fix" these.
+
+- **Slide 14's subtitle.** Concatenated it reads
+  `How to get help Raising a Datadog support ticket`, which looks like two sentences
+  run together. It is actually two correctly styled lines separated by an `<a:br/>`,
+  which contributes no character when runs are joined. Merging them flattens a
+  two-tier heading into one wrapped line. `fill_deck.py` now refuses this edit rather
+  than performing it silently.
+- **Slide 10's `1.` and `2.` badges.** Their group `<a:xfrm>` carries
+  `chOff x="-347400"`, which is the group's *internal* coordinate origin, not a slide
+  position. The groups themselves sit at x = 2.24in and x = 8.09in and render exactly
+  where intended, annotating the Free Trial button and the signup form.
+
+The general lesson: concatenated paragraph text and raw EMU offsets both mislead. When
+something looks like a template bug, render the slide before changing it.
 
 ## Branding — do not change
 

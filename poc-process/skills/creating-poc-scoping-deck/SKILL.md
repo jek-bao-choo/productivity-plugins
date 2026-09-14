@@ -9,7 +9,7 @@ description: >-
   meeting with a prospect, or wants success criteria, roles, cadence and MTTD
   value framed as slides. Asks clarifying questions rather than inventing
   customer data, and also writes a scoping summary and an open-questions list.
-version: "0.1.1"
+version: "0.1.2"
 author: Jek Bao
 tags: poc, scoping, pptx, presentation, datadog, prospect, discovery, meeting notes
 ---

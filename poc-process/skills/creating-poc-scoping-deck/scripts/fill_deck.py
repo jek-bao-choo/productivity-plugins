@@ -23,6 +23,15 @@ Replacement strategy, in order of preference:
      first run and the remaining runs are emptied. The paragraph inherits the first
      run's formatting, which is the right call for the bracketed placeholders in this
      template because they are uniformly formatted.
+  3. Except when the paragraph contains an <a:br/>. There the runs are deliberately
+     separate lines with their own sizes, so merging them would flatten a two-tier
+     heading into one wrapped line — and it would look like the edit worked. Such a
+     paragraph is skipped and reported as a miss.
+
+Note when reading concatenated paragraph text: <a:br/> leaves no character behind, so
+a two-line heading joins into what looks like a run-on sentence. Slide 14's
+"How to get help Raising a Datadog support ticket" is two properly styled lines, not
+a typo. Check the render before "fixing" anything that only looks wrong concatenated.
 
 Map format (fill.json) — a JSON object of token to replacement:
 
@@ -82,6 +91,7 @@ PARA_RE = re.compile(r"<a:p>.*?</a:p>", re.DOTALL)
 TEXT_RE = re.compile(r"<a:t(\s[^>]*)?>(.*?)</a:t>|<a:t\s*/>", re.DOTALL)
 # <p:sp> never nests inside another <p:sp>, so a non-greedy match is safe here.
 SHAPE_RE = re.compile(r"<p:sp>.*?</p:sp>", re.DOTALL)
+BR_RE = re.compile(r"<a:br\s*/?>")
 
 ANCHOR_SEP = " >> "
 
@@ -217,6 +227,19 @@ def fill_paragraph(block, token, take):
         if not replaced:
             return block, 0
         return rewrite(block, spans, new_runs), replaced
+
+    if BR_RE.search(block):
+        # The paragraph holds a line break, so its runs are deliberately distinct
+        # lines with their own sizes — a two-tier heading, typically. Collapsing them
+        # into the first run would silently flatten the styling into one wrapped line,
+        # which looks like a successful edit. Refuse instead; the caller sees a miss.
+        print(
+            f"  paragraph containing a line break has {token!r} split across runs — "
+            "skipped, since merging would flatten the line styling. Target a single "
+            "line's exact text instead.",
+            file=sys.stderr,
+        )
+        return block, 0
 
     # The token straddles runs. Rebuild the paragraph text into the first run.
     replaced = 0
