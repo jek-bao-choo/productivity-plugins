@@ -100,11 +100,18 @@ so always confirm both.
 
 Fix these while the deck is unpacked; they are template bugs, not prospect content.
 
+Apply the text ones with `fill_deck.py --apply` rather than `sed`. Both strings below
+are split across runs, so a raw find-and-replace matches nothing and reports success.
+
 - **Slide 10** — two badge groups (`1.`, `2.`) are positioned at x = −0.38in, off the
   canvas. They never render. Delete them or move them on-slide.
 - **Slide 10** — footnote reads `note: All hyperlinks shown in this document are linked
-  to US1. Please change to your relevant data center if required.` Once you have set
-  the region, this instruction-to-the-presenter is stale; rewrite or remove it.
+  to US1.Please change to your relevant data center if required.` (that is the exact
+  concatenated text — there is no space after `US1.`). Once you have set the region
+  this instruction-to-the-presenter is stale; rewrite or remove it.
+- **Slide 10** — the data-centre table lists all five sites and its US1 row contains
+  `https://app.datadoghq.com/`. Never blanket-replace that URL on this slide; you will
+  silently end up with two EU rows and no US1. See `editing-and-qa.md`.
 - **Slide 15** — the slide-number placeholder sits at (12.37, 6.78) instead of
   (12.95, 7.12) like every other slide.
 - **Slides 3 and 8** — an empty duplicate sub-header text box.

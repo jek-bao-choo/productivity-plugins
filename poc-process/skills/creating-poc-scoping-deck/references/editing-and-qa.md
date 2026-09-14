@@ -76,8 +76,60 @@ will display one address and navigate to another.
 grep -o 'Target="[^"]*datadoghq[^"]*"' unpacked/ppt/slides/_rels/slide1{0,2,5}.xml.rels
 ```
 
+**Do not blanket-replace `app.datadoghq.com` across slide 10.** That slide's table is a
+reference listing all five sites, and the US1 row legitimately contains
+`https://app.datadoghq.com/`. A global replace rewrites it, leaving a table with two EU
+rows and no US1 — which looks plausible enough to survive a skim. Change the *hyperlink
+targets* and the footnote, and leave the table alone.
+
+A better way to signal the choice is to move the `RECOMMENDED` badge from the US1 row
+to the prospect's row, so the table stays accurate and still points them at the right
+site:
+
+```json
+{
+  "United States (US1-East)RECOMMENDED": "United States (US1-East)",
+  "Europe(EU-1)": "Europe (EU-1)  RECOMMENDED"
+}
+```
+
 `https://docs.datadoghq.com/...` and `https://help.datadoghq.com/` are site-independent
 — leave them alone.
+
+## Editing any text, not just placeholders
+
+Run-splitting is not a placeholder problem — it is a property of this whole deck. Two
+strings you will almost certainly want to change are stored across multiple runs, so
+`sed` and `str.replace` on the raw XML silently do nothing:
+
+- slide 10's presenter footnote, which concatenates to
+  `note: All hyperlinks shown in this document are linked to US1.Please change to your relevant data center if required.`
+  (no space after `US1.` once the runs are joined)
+- slide 14's run-on subtitle, `How to get help Raising a Datadog support ticket`
+
+Route every text edit through `fill_deck.py --apply`, whose keys are arbitrary strings
+rather than bracketed tokens. It matches across runs and reports a zero-hit key, so a
+failed edit is visible instead of silent:
+
+```json
+{
+  "How to get help Raising a Datadog support ticket": "How to get help: raising a Datadog support ticket"
+}
+```
+
+To get the exact string to match, read the concatenated paragraph text rather than
+trusting what the slide looks like:
+
+```bash
+python3 -c "
+from xml.etree import ElementTree
+A='{http://schemas.openxmlformats.org/drawingml/2006/main}'
+r=ElementTree.parse('unpacked/ppt/slides/slide14.xml').getroot()
+for p in r.iter(A+'p'):
+    t=''.join(x.text or '' for x in p.iter(A+'t'))
+    if t.strip(): print(repr(t))
+"
+```
 
 ## Removing a slide
 

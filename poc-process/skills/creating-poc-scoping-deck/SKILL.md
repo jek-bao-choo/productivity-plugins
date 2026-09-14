@@ -9,7 +9,7 @@ description: >-
   meeting with a prospect, or wants success criteria, roles, cadence and MTTD
   value framed as slides. Asks clarifying questions rather than inventing
   customer data, and also writes a scoping summary and an open-questions list.
-version: "0.1.0"
+version: "0.1.1"
 author: Jek Bao
 tags: poc, scoping, pptx, presentation, datadog, prospect, discovery, meeting notes
 ---
@@ -198,6 +198,12 @@ embarrassing failure this skill can produce.
 Then set the region, apply the template's own defect fixes, and pack. Commands, the
 site URL table, and the defect list are in
 [references/editing-and-qa.md](references/editing-and-qa.md).
+
+Use `fill_deck.py` for **every** text edit, not just the bracketed ones — its keys are
+arbitrary strings. Run-splitting affects ordinary prose too, so `sed` on slide 10's
+footnote or slide 14's subtitle matches nothing and reports no error. And do not
+blanket-replace `app.datadoghq.com` on slide 10: its table lists all five sites, and a
+global replace leaves two EU rows and no US1.
 
 ```bash
 py "$SKILL/scripts/clean.py" unpacked/
