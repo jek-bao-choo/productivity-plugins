@@ -16,8 +16,8 @@
     {
       "name": "sales-process",
       "source": "./sales-process",
-      "description": "Sales process tools: Technical Mutual Activity Plans (TMAPs), and more",
-      "version": "0.1.0"
+      "description": "Sales process tools: RFP/RFI Responses, Lead Qualification, and more",
+      "version": "0.2.0"
     },
     {
       "name": "product-demo",
@@ -28,8 +28,8 @@
     {
       "name": "poc-process",
       "source": "./poc-process",
-      "description": "Proof of Concept artifact generation tools",
-      "version": "0.2.0"
+      "description": "Proof of Concept artifact generation tools: Evaluation Plans, TMAPs, Success Criteria, and Scoping Decks",
+      "version": "0.3.0"
     }
   ]
 }
