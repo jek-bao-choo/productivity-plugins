@@ -22,3 +22,18 @@ Summarise recent activity in a Slack channel. Produces a structured summary with
 - "Summarise #general"
 - "What happened in #engineering today?"
 - "Catch me up on #announcements"
+
+### drafting-gmail
+
+Draft an email from a structured template. There is no Gmail MCP, so the finished email (with a `Subject:` line) is sent to your own Slack self-DM after you confirm it, ready to copy and paste into Gmail. Templates live in `skills/drafting-gmail/references/`:
+- `POC-STATUS-UPDATE-EMAIL-TEMPLATE.md`: PoC status updates and follow-ups after a meeting or call
+- `DIRECT-EMAIL-TEMPLATE.md`: a direct email to a colleague, prospect or customer about a specific topic
+
+To add a template, create a new file in `references/` with the same structure and add a row to the template table in `SKILL.md`.
+
+**Note:** the skill only ever sends to a hardcoded Slack user ID (`U093Q9Z3SKU`). Change it in `SKILL.md` before using the skill under another Slack account.
+
+**Example prompts:**
+- "Draft a PoC update email to ACME after today's call"
+- "Write a follow-up email to my colleague about the trial timeline"
+- "Compose a thank you email to the prospect for the workshop"
