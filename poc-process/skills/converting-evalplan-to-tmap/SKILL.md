@@ -1,6 +1,7 @@
 ---
 name: "converting-evalplan-to-tmap"
 description: "Convert Evaluation Plan CSV files (creating-eval-plan 4-column output or Homerun 10-column export) into a TMAP (Technical Mutual Activity Plan) XLSX. Default output is Jek's customer-facing 5-column layout (Configuration Item, Responsible Party, Target Completion Date as Excel Short Date, Status with In Progress/Blocked/Complete colours, Notes) with descriptive track sections and a lean task list; the official 7-column ENT/MM template is produced only when asked for by name. Use when the user asks to convert an eval plan to TMAP, generate or update a TMAP XLSX, convert CSV to TMAP, or mentions \"TMAP\", \"mutual action plan\", \"Tech Config Plan\" or \"convert eval plan to xlsx\"."
+version: "0.2.0"
 ---
 
 # Evaluation Plan to TMAP Converter

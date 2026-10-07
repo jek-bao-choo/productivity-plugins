@@ -19,7 +19,7 @@ Generate a modular Evaluation Plan CSV for Datadog Home Run PoC/Trial management
 - "Generate an eval plan for Cloud SIEM evaluation"
 - "Build a comprehensive evaluation plan covering APM, Logs, and Infrastructure for CustomerX"
 
-### converting-evalplan-to-tmap
+### converting-evalplan-to-tmap (v0.2.0)
 
 Convert an Evaluation Plan CSV (the 4-column `creating-eval-plan` output or a 10-column Home Run export) into a TMAP (Technical Mutual Activity Plan) XLSX. The default output is a lean, customer-facing 5-column layout (Configuration Item, Responsible Party, Target Completion Date, Status, Notes) with descriptive track sections. The official 7-column ENT/MM template is produced only when asked for by name.
 
