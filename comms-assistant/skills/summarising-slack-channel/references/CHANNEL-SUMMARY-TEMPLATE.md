@@ -19,27 +19,27 @@
 
 ---
 
-Date: {YYYY-MM-DD — the date the Slack message was posted}
+DATE: {YYYY-MM-DD — the date the Slack message was posted}
 
-Question: {The question that the Slack message is discussing in a sentence.}
+QUESTION: {The question that the Slack message is discussing in a sentence.}
 
-Answer: {A paragraph summarizing the discussion or resolution, informed by thread replies where available. If a specific technical solution, command, or key point is mentioned, quote it directly from the text using "double quotes" with the Slack username. For example: According to @jane, "you need to set DD_APM_ENABLED=true in the agent configuration" to resolve the traces not appearing in APM. If the discussion did not reach a conclusion after checking thread replies, state: "The discussion is ongoing/unresolved."}
+ANSWER: {A paragraph summarizing the discussion or resolution, informed by thread replies where available. If a specific technical solution, command, or key point is mentioned, quote it directly from the text using "double quotes" with the Slack username. For example: According to @jane, "you need to set DD_APM_ENABLED=true in the agent configuration" to resolve the traces not appearing in APM. If the discussion did not reach a conclusion after checking thread replies, state: "The discussion is ongoing/unresolved."}
 
-URLs: {url1 | url2 | url3} or "None" if no URLs exist.
+EXTERNAL_URLs: {url1 | url2 | url3} or "None" if no URLs exist.
 
-Slack URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
+SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
 
 ---
 
-Date: {YYYY-MM-DD}
+DATE: {YYYY-MM-DD}
 
-Question: {Next question within the same theme.}
+QUESTION: {Next question within the same theme.}
 
-Answer: {Summary paragraph with quoted specifics and attribution.}
+ANSWER: {Summary paragraph with quoted specifics and attribution.}
 
-URLs: {url1} or "None"
+EXTERNAL_URLs: {url1} or "None"
 
-Slack URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
+SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
 
 ---
 
@@ -47,15 +47,15 @@ Slack URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without
 
 ---
 
-Date: {YYYY-MM-DD}
+DATE: {YYYY-MM-DD}
 
-Question: {Question in this theme group.}
+QUESTION: {Question in this theme group.}
 
-Answer: {Summary paragraph.}
+ANSWER: {Summary paragraph.}
 
-URLs: {url1} or "None"
+EXTERNAL_URLs: {url1} or "None"
 
-Slack URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
+SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
 
 ---
 

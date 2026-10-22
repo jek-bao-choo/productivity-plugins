@@ -12,7 +12,7 @@ description: >-
   summary — even if they don't explicitly say "summarise". Make sure to use this
   skill whenever the user asks about Slack channel activity, wants to review
   discussions, or needs to extract insights from Slack message history.
-version: "0.5.1"
+version: "0.5.2"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A
 ---
@@ -125,15 +125,15 @@ This gives the reader a quick orientation before diving into individual Q&A bloc
 For every substantive message or distinct question, output this structure:
 
 ```
-Date: [Date the Slack message was posted, in YYYY-MM-DD format]
+DATE: [Date the Slack message was posted, in YYYY-MM-DD format]
 
-Question: [The question that the Slack message is discussing in a sentence.]
+QUESTION: [The question that the Slack message is discussing in a sentence.]
 
-Answer: [A paragraph summarizing the discussion or resolution. If a specific technical solution, command, or key point is mentioned, quote it directly from the text using "double quotes" with the Slack username.]
+ANSWER: [A paragraph summarizing the discussion or resolution. If a specific technical solution, command, or key point is mentioned, quote it directly from the text using "double quotes" with the Slack username.]
 
-URLs: [List all URLs found — such as Google Docs, Slides, or any URLs — separating each URL with space | space. If no URLs exist, state "None".]
+EXTERNAL_URLs: [List all URLs found — such as Google Docs, Slides, or any URLs — separating each URL with space | space. If no URLs exist, state "None".]
 
-Slack URL: [Direct link to the original Slack message. Take the `Message TS` value from the Step 2 `slack_read_channel` output (detailed format), remove the dot, and prepend with `p`. Example: `Message TS: 1774886575.033929` in channel `C4W013KEU` → `https://{workspace-domain}/archives/C4W013KEU/p1774886575033929`. Preserve all digits — do not truncate or round.]
+SLACK_URL: [Direct link to the original Slack message. Take the `Message TS` value from the Step 2 `slack_read_channel` output (detailed format), remove the dot, and prepend with `p`. Example: `Message TS: 1774886575.033929` in channel `C4W013KEU` → `https://{workspace-domain}/archives/C4W013KEU/p1774886575033929`. Preserve all digits — do not truncate or round.]
 ```
 
 Use a horizontal rule `---` to separate summaries of different Slack messages.
