@@ -36,33 +36,28 @@ The following Slack MCP tools must be available:
 
 ## Phase 1: Parameter Validation
 
-Before beginning any analysis, verify the user has provided both required parameters:
+Resolve the channel and retrieval period before beginning analysis.
 
-1. **Timeframe** (e.g., "the past 5 days" or "since 2024-03-01")
-2. **Slack channel name** (e.g., "#support-engineering")
+1. **Channel:** If the user provides a Slack channel ID, use it directly. If both an ID and a name are provided, the ID takes precedence. If no ID is provided, use the channel name and resolve it to an ID. If neither is provided, ask for a channel ID or name. Apply this rule separately to each requested channel.
+2. **Timeframe:** Use the user's date period when provided. Interpret relative starting dates such as "yesterday" or "three days ago" as the start of that GMT calendar day through the current retrieval time today (the latest available Slack messages). Preserve an explicitly supplied end date or time; an end date without a time includes that full day, capped at the current retrieval time.
+3. **Default timeframe:** When no date period is provided, retrieve from 00:00 GMT yesterday through the current retrieval time today. If today is Monday, start at 00:00 GMT on the preceding Friday instead. Determine today's weekday in GMT. Business working days are Monday through Friday; the Friday start includes the intervening weekend.
 
-If the timeframe is missing, stop immediately and say:
-
-> "To provide an accurate summary, please specify how many days of Slack history I should analyze or provide a starting date (YYYY-MM-DD)."
-
-If the Slack channel name is missing, stop immediately and say:
-
-> "Please provide the name of the Slack channel."
-
-If both are present, proceed to Phase 2.
+Use GMT (UTC+00:00) for calendar-day boundaries unless the user explicitly supplies another timezone. State the resolved period and timezone in the summary overview. Capture the current retrieval time once and use it consistently across all requested channels; do not stop to request a missing timeframe.
 
 ## Phase 2: Processing Logic & Context Isolation
 
-### Step 1 — Find the channel
+### Step 1 — Resolve the channel
 
-Use `slack_search_channels` with the user's channel name to resolve the channel ID.
+If a channel ID is provided, pass it directly to `slack_read_channel`; do not search by name or require a name before retrieval. Use the name returned in channel metadata for display and filenames when available, otherwise use the channel ID.
+
+If no channel ID is provided, use `slack_search_channels` with the user's channel name to resolve the channel ID.
 
 - If multiple matches, present them and ask the user to confirm.
 - If no matches, suggest alternative search terms.
 
 ### Step 2 — Retrieve messages
 
-Use `slack_read_channel` with the resolved channel ID and the timeframe converted to `oldest` and `latest` Unix timestamps. Use the default detailed response format — it includes a `Message TS` field per message (e.g., `Message TS: 1774886575.033929`) that is required for constructing Slack URLs in Phase 3. Preserve each message's `Message TS` value throughout processing.
+Use `slack_read_channel` with the provided or resolved channel ID and the Phase 1 timeframe converted to `oldest` and `latest` Unix timestamps. Use the default detailed response format — it includes a `Message TS` field per message (e.g., `Message TS: 1774886575.033929`) that is required for constructing Slack URLs in Phase 3. Preserve each message's `Message TS` value throughout processing.
 
 **Handling large result sets:** Channel history can be very large (100+ messages, 90K+ characters). When the result is too large to process in a single read:
 - Read the saved result file in sequential chunks using offset and limit parameters.
@@ -154,13 +149,15 @@ Place a `## Theme: {theme name}` heading before each group of related Q&A blocks
 
 After displaying the summary to the user, save the complete summary content to a markdown file in the current working directory.
 
-**Filename format:** `{channel-name}-{YYYY-MM-DD}-to-{YYYY-MM-DD}.md`
+**Filename format:** `{section-name}-{channel-name}-{YYYY-MM-DD}-to-{YYYY-MM-DD}.md`
+
+- `{section-name}` is supplied by the user (e.g., `ANNOUNCEMENT`, `AI`, or `OPENTELEMETRY`). Preserve its capitalization; do not infer it from summary themes. If missing, ask for the section name before saving the file. Use the supplied section for its associated channels.
 
 - `{channel-name}` is the Slack channel name without the `#` prefix (e.g., `support-cloud-cost-management`)
 - The first `{YYYY-MM-DD}` is the date of the **earliest** Slack message in the summarised set
 - The second `{YYYY-MM-DD}` is the date of the **latest** Slack message in the summarised set
 
-**Example:** If summarising #support-cloud-cost-management with messages from 2026-03-24 to 2026-03-26, the file is `support-cloud-cost-management-2026-03-24-to-2026-03-26.md`.
+**Example:** If the user supplies section `ANNOUNCEMENT` and requests a summary of #support-cloud-cost-management with messages from 2026-03-24 to 2026-03-26, the file is `ANNOUNCEMENT-support-cloud-cost-management-2026-03-24-to-2026-03-26.md`.
 
 The file should contain the exact same markdown content that was displayed to the user — the summary overview, theme headings, and all Q&A blocks. After saving, report the file path to the user so they know where to find it.
 
