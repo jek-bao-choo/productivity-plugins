@@ -10,23 +10,24 @@ description: >-
   or "email". This skill supports multiple email templates (PoC status update emails,
   direct emails, and more in the future). Since no Gmail MCP is available, the composed
   email is sent to the user's Slack self-DM for copy-paste into Gmail.
-version: "0.1.0"
+version: "0.2.0"
 author: productivity-plugins
 tags: gmail, email, draft, compose, poc, status, follow-up
 ---
 
 # Gmail Email Drafting (Template-Based)
 
-Compose an email using a structured template. Since no Gmail MCP is available, the finished email is sent to the user's Slack self-DM (Jek Bao Choo) for copy-paste into Gmail.
+Compose an email using a structured template. Since no Gmail MCP is available, the finished email is sent to the user's own Slack self-DM for copy-paste into Gmail.
 
 ## Critical Constraints
 
-- **NEVER send to anyone other than the user.** Always use channel_id `U093Q9Z3SKU` (Jek Bao Choo's user ID) when calling `slack_send_message`.
-- **NEVER use `slack_send_message` with any channel_id other than `U093Q9Z3SKU`.**
+- **NEVER send to anyone other than the user.** Resolve the signed in user's own Slack user ID at runtime (Step 5) and use only that ID as the `channel_id` when calling `slack_send_message`.
+- **NEVER hardcode a Slack user ID** in this skill. It lives in a public repo.
 
 ## Prerequisites
 
 The following Slack MCP tools must be available:
+- `slack_read_user_profile` — to look up the signed in user's own Slack user ID
 - `slack_send_message` — to deliver the composed email to the user's self-DM
 
 ## Workflow
@@ -73,8 +74,10 @@ Iterate until the user is satisfied with the email.
 
 ### Step 5 — Send to Slack self-DM
 
-Use `slack_send_message` with:
-- `channel_id`: `U093Q9Z3SKU`
+Call `slack_read_user_profile` with no `user_id` to get the signed in user's own profile, and take the user ID from it. Do not guess or reuse an ID from elsewhere.
+
+Then use `slack_send_message` with:
+- `channel_id`: the user ID from the profile lookup
 - `message`: the confirmed email content (including the Subject line)
 
 After sending, share the message link and remind the user: "Email sent to your Slack self-DM. Copy and paste it into Gmail."
@@ -87,7 +90,7 @@ Follow the template file selected in Step 1. See the `references/` directory for
 
 ## Scope Guardrails
 
-- **NEVER send to anyone other than self** — only use channel_id `U093Q9Z3SKU` with `slack_send_message`.
+- **NEVER send to anyone other than self** — only use the user ID returned by `slack_read_user_profile` as the channel_id with `slack_send_message`.
 - Always present the email to the user and get confirmation before sending.
 - Every email must match a known template. If the user's request doesn't match any template, ask for clarification.
 - Always include a subject line in the output.
