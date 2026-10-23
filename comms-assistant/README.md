@@ -34,7 +34,7 @@ Draft an email from a structured template. There is no Gmail MCP, so the finishe
 
 To add a template, create a new file in `references/` with the same structure and add a row to the template table in `SKILL.md`.
 
-**Note:** the skill only ever sends to a hardcoded Slack user ID (`{your-slack-user-id}`). Change it in `SKILL.md` before using the skill under another Slack account.
+**Note:** the skill only ever sends to your own Slack self-DM. Your Slack user ID is looked up from your Slack profile at runtime, so nothing personal is stored in this repo.
 
 **Example prompts:**
 - "Draft a PoC update email to ACME after today's call"
