@@ -10,8 +10,8 @@
     {
       "name": "comms-assistant",
       "source": "./comms-assistant",
-      "description": "Draft and summarise Slack communications using MCP tools",
-      "version": "0.2.0"
+      "description": "Draft and summarise Slack communications and build a daily TIL FAQ newsletter using MCP tools",
+      "version": "0.3.0"
     },
     {
       "name": "sales-process",
