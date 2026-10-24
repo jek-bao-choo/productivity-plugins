@@ -7,8 +7,8 @@ description: >-
   quality. It applies when the user says "cut the silences", "run
   cut-silences", "remove the pauses from raw.mp4", "tighten my recording",
   "make raw.silenced.mp4", or "check lip sync after the cut", even if they don't
-  name the skill. It usually follows converting-speech-to-text-elevenlabs. The
-  skill runs read-only pre-flight checks, builds or reuses cut_silences.py,
+  name the skill. It is agent 1 of the editing pipeline and usually follows
+  converting-speech-to-text-elevenlabs. The skill runs read-only pre-flight checks, builds or reuses cut_silences.py,
   produces an EDL, re-timed transcript, and decisions report, stops for
   approval, then renders with ffmpeg, verifies with ffprobe, measures lip sync
   with check_sync.py, and runs render QA before stopping ahead of cut-mistakes.
@@ -17,6 +17,8 @@ author: productivity-plugins
 ---
 
 # Cutting Silences
+
+This is agent 1 (cut-silences) of the video editing pipeline.
 
 Follow this tested prompt exactly as written; do not reinterpret or simplify it.
 

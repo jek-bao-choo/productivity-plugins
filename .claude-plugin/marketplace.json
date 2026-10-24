@@ -34,8 +34,8 @@
     {
       "name": "video-editing",
       "source": "./video-editing",
-      "description": "Video editing workflow tools: ElevenLabs speech-to-text transcription and silence cutting with lip-sync QA for talking-head recordings",
-      "version": "0.2.0"
+      "description": "Video editing workflow tools: ElevenLabs speech-to-text transcription, silence cutting, and spoken-mistake cutting with lip-sync QA for talking-head recordings",
+      "version": "0.3.0"
     }
   ]
 }
