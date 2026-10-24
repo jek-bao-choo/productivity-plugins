@@ -71,7 +71,7 @@ A block is copied when **either** is true:
 1. Its `TAGS:` line contains **any** of the requested tags.
 2. Its `DEADLINE:` holds a real deadline: anything other than `NONE` (any case, with or without trailing words), an empty value, or a `{...}` template placeholder. A real deadline is always worth surfacing, whatever the tags.
 
-**Tags:** when the user supplies tags, they **replace** the defaults. When no tags are supplied, use the defaults `#presentation #spreadsheet #new-feature`. Normalise every requested tag to lowercase with a leading `#` (`APM` becomes `#apm`). Compare against the block's tags in lowercase. Match whole tags only: `#apm` does not match `#apm-agent`.
+**Tags:** when the user supplies tags, they **replace** the defaults. When no tags are supplied, use the defaults `#presentation #new-feature`. Normalise every requested tag to lowercase with a leading `#` (`APM` becomes `#apm`). Compare against the block's tags in lowercase. Match whole tags only: `#apm` does not match `#apm-agent`.
 
 **Dedup:** skip a block whose `SLACK_URL` value already appears in today's newsletter or was already picked earlier in this run. If a block has no usable `SLACK_URL`, compare the whole block text instead. Rerunning on the same day must never duplicate content.
 
