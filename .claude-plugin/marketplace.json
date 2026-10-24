@@ -30,6 +30,12 @@
       "source": "./poc-process",
       "description": "Proof of Concept artifact generation tools: Evaluation Plans, TMAPs, Success Criteria, and Scoping Decks",
       "version": "0.3.0"
+    },
+    {
+      "name": "video-editing",
+      "source": "./video-editing",
+      "description": "Video editing workflow tools: ElevenLabs speech-to-text transcription for talking-head recordings",
+      "version": "0.1.0"
     }
   ]
 }
