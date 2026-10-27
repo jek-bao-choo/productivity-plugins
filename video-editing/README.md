@@ -12,6 +12,10 @@ Every step is a tested prompt kept word for word in its skill. Each step plans f
 - **HyperFrames** and **GSAP** skills, for building-sections and finishing-video. Install GSAP with `/plugin marketplace add greensock/gsap-skills`. For HyperFrames, use the `hyperframes@hyperframes` plugin: the older copy in the official marketplace (0.8.61) doesn't know the `history` command these skills use, so remove it if you have both.
 - **Node.js**, for `npx hyperframes`.
 
+## Before your first recording
+
+Say **"set up OBS"** to run `configuring-obs-studio-screen-recording` once. It checks the tools on your Mac, walks you through every OBS panel against the reference recording spec (5120x1440 canvas with a screen pane and a camera pane, HEVC Hybrid MP4, one mic track, global hotkeys), and verifies a 30-second test recording. It never edits OBS's config files or installs anything without your approval.
+
 ## How to start
 
 Put the recording in its own folder as `raw.mp4`, open Claude Code there, and say **"edit this video"**. The orchestrator (`starting-video-editing`) works out where the project is, runs the next step with its skill, and records settings, decisions, approvals and output checksums in `PIPELINE.md`.
@@ -28,6 +32,7 @@ Other things to say:
 
 | # | Skill | What it does | Main outputs |
 |---|-------|--------------|--------------|
+| | `configuring-obs-studio-screen-recording` | One-time setup: checks the Mac's tools, walks you through OBS panel by panel, verifies a 30s test recording | a verified OBS profile, `/tmp/obs-setup/` reports |
 | | `starting-video-editing` | Orchestrator: detects state, runs the next skill, keeps the ledger | `PIPELINE.md` |
 | 0 | `converting-speech-to-text-elevenlabs` | Transcribes `raw.mp4` with ElevenLabs Scribe v2 (word timestamps, fillers kept) | `transcript.raw.json`, `transcript.json` |
 | 1 | `cutting-silences` | Trims pauses, renders, checks lip sync and render quality | `raw.silenced.mp4`, `raw.silence-*` |
