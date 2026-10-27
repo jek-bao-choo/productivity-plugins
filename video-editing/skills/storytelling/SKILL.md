@@ -13,8 +13,8 @@ description: >-
   read-only pre-flight checks and a contact sheet, builds or reuses
   story_tools.py, proposes 2-3 world concepts and canvas options using the
   Datadog design system by default, stops for the user's choice, then writes
-  plan/STORY.md, plan/DESIGN.md and a checked beat sheet, and stops before any
-  build.
+  plan/STORY.md, plan/DESIGN.md and a checked beat sheet, and stops before
+  planning-overlays.
 version: "0.1.0"
 author: productivity-plugins
 ---
@@ -336,7 +336,6 @@ Report:
   system).
 - Input md5s unchanged.
 
-Stop. No compositions until I approve the plan. The build step comes
-next: the open loop's shared geometry first, then one section end to
-end, rendered and reviewed muted, before the rest.
+Stop. No compositions until I approve the plan. Planning overlays
+(planning-overlays) comes next.
 ```

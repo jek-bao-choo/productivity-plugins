@@ -7,18 +7,21 @@ description: >-
   edited video. It applies when the user says "plan the overlays", "run
   planning-overlays", "plan lower thirds", "where should cards and takeovers
   go", "check overlay coverage", or "write overlay-beats.json and OVERLAYS.md",
-  even if they don't name the skill. It usually follows storytelling. Use it for
-  the planning step only, not for building HyperFrames compositions or
-  rendering. The skill runs read-only pre-flight checks, builds or reuses
-  beats_tools.py, scans storyboard coverage for pacing gaps, proposes one
-  overlay or none per topic span using the Datadog design system by default,
-  stops for the user's choices, then writes plan/overlay-beats.json,
+  even if they don't name the skill. It is agent 4 of the editing pipeline and
+  usually follows storytelling. Use it for the planning step only, not for
+  building HyperFrames compositions or rendering. The skill runs read-only
+  pre-flight checks, builds or reuses beats_tools.py, scans storyboard coverage
+  for pacing gaps, proposes one overlay or none per topic span, picking a card
+  type for each from a fixed card library and using the Datadog design system
+  by default, stops for the user's choices, then writes plan/overlay-beats.json,
   plan/overlay-beats.md and plan/OVERLAYS.md, and stops before any build.
-version: "0.1.0"
+version: "0.2.0"
 author: productivity-plugins
 ---
 
 # Planning Overlays
+
+This is agent 4 (planning-overlays) of the video editing pipeline.
 
 Follow this tested prompt exactly as written; do not reinterpret or simplify it.
 
@@ -99,6 +102,26 @@ Beat types
   presence.
 - none: the default when the storyboard already shows the idea.
 
+Card types (the build step's card library; pick one per overlay)
+  card kind:
+    lt-headline   headline + optional subline; no items
+    lt-list       headline + 1-4 items (items build in at their phrases)
+    lt-equation   2-3 terms as items, joined by + = or ->; only the
+                  result term may use Signal ink; joiners go in
+                  operators [strings], one between each pair of items
+                  (e.g. ["+", "="])
+  takeover kind:
+    to-statement  headline + optional source line (subline); no items
+    to-stat       headline = number + unit + short label; no items; the
+                  number uses Signal ink and may roll as an odometer;
+                  write the number and unit as one token (40ms, 3x,
+                  99.9%) so the headline stays within 3 words
+    to-overview   headline + 1-4 items, for an "in this video" moment
+If none fits, say so in Phase 1 and propose a new type with its slot
+limits; don't invent one silently. If I approve it, add it to
+beats_tools.py's card type table with its kind and item range, and show
+the diff before Phase 2 check.
+
 Placement
 - Cards sit in the lower half, never cover the face or overlap the
   speaker inset, never cover what the viewer must read on screen at that
@@ -128,9 +151,10 @@ Pacing (thresholds are parameters; propose values for this video)
 
 Writing (glance comprehension: under one second)
 - headline 1-3 words; optional subline up to 7 words with no closing
-  full stop (a fragment, not a sentence); or up to 4 list items of up to
-  3 words each. Short noun phrases, direct labels, one mental model per
-  card, numbers only when meaningful, verbs when they clarify the action.
+  full stop (a fragment, not a sentence); items up to 3 words each,
+  within the card type's item count. Short noun phrases, direct labels,
+  one mental model per card, numbers only when meaningful, verbs when
+  they clarify the action.
 - Never repeat the voiceover, use hype words, highlight more than one
   word, or explain how to use the video inside the graphic.
 - Overlay words count toward the storyboard's ~20 words per section.
@@ -146,8 +170,8 @@ Style (from plan/DESIGN.md; Datadog by default)
 - Takeover: a full-frame plate on Ground with sparse type (60 or 84 for
   the statement, 30 for a source line), entering and leaving by clip
   wipe over the world while the camera holds still underneath; never a
-  cross-fade, never a world reset. Paper texture with black type only if
-  I ask for it.
+  cross-fade, never a world reset.
+- No logos or brand marks.
 - Motion: entrances cubic-bezier(0.16,1,0.3,1), exits faster, no
   back.out on overlays (the storyboard owns it), deterministic only.
 
@@ -177,18 +201,25 @@ coverage BEATSHEET --transcript T [--overlays O] [--early 20]
 
 check OVERLAYS --beatsheet B --transcript T [--budget 20]
   Overlays file: { canvas {width, height}, inset_rect [x0,y0,x1,y1],
-  overlays [{id, kind card|takeover, section, anchor {index, text,
-  start}, start, end, headline, subline (optional), items (optional),
-  builds [times] (optional), placement [x0,y0,x1,y1] (cards),
-  answers remember|structure|emphasis|pacing, notes (optional)}] }
+  overlays [{id, kind card|takeover, card (type from the table above),
+  section, anchor {index, text, start}, start, end, headline, subline
+  (optional), items (optional), operators (lt-equation only), builds
+  [times] (optional), placement [x0,y0,x1,y1] (cards), answers
+  remember|structure|emphasis|pacing, notes (optional)}] }
+  Card types: lt-headline (card, 0 items), lt-list (card, 1-4),
+  lt-equation (card, 2-3), to-statement (takeover, 0), to-stat
+  (takeover, 0), to-overview (takeover, 1-4).
   Errors:
   - missing or duplicate id; bad kind or answers; non-numeric start/end
     or end <= start; unknown section; end after the video
   - anchor index out of range, anchor text != transcript text, or anchor
     start off by more than 0.0015s; lead outside 0.15-0.25s (+-0.0015)
   - headline not 1-3 words; subline over 7 words; subline ending in
-    . ! or ?; more than 4 items; an item over 3 words; a build time not
-    strictly inside the overlay
+    . ! or ?; an item over 3 words; a build time not strictly inside the
+    overlay
+  - card missing or not a known type; card type of the other kind (then
+    skip its item-count check); item count outside the card type's range
+  - lt-equation without operators, or operators count != items - 1
   - card without a placement rect; placement within 60px of any frame
     edge; placement overlapping inset_rect
   - two overlays on screen at the same time
@@ -218,11 +249,11 @@ self-test (run first; fix the script if anything differs)
     b3 s3 anchor 6 "Logs", camera W1, new L/element/"Logs", reshow
     b4 s3 anchor 9 "Done.", camera W2, no new elements, close
   Overlays: inset_rect [1440,600,1860,1020];
-    o1 card s2 anchor 4 "connect" 30.60, start 30.40, end 52.00,
-       headline "Service map", subline "every hop timed",
-       placement [160,700,1300,980], answers structure
-    o2 takeover s3 anchor 7 "explain" 70.50, start 70.30, end 78.30,
-       headline "Why it failed", answers emphasis
+    o1 card, card lt-headline, s2, anchor 4 "connect" 30.60, start
+       30.40, end 52.00, headline "Service map", subline "every hop
+       timed", placement [160,700,1300,980], answers structure
+    o2 takeover, card to-statement, s3, anchor 7 "explain" 70.50, start
+       70.30, end 78.30, headline "Why it failed", answers emphasis
   Expected coverage, storyboard only: events 0.8, 29.8, 69.8, 109.8;
     flags EARLY 0.8-29.8 (29.0s), EARLY 29.8-69.8 (40.0s),
     STRICT 69.8-109.8 (40.0s).
@@ -233,13 +264,15 @@ self-test (run first; fix the script if anything differs)
     speaker on screen 93.3%.
   Broken copy: o1 anchor text "connects"; o1 placement
     [160,700,1700,980]; o1 subline "Every hop is timed, end to end.";
-    o2 headline "Why the checkout failed"; o2 end 84.30; add o3 card s2
-    anchor 5 "services." 31.10, start 30.90, end 40.00, headline "Hops",
-    placement [160,700,1300,980], answers structure.
-  Expected: exactly 5 errors (anchor text mismatch, subline reads as a
+    o2 headline "Why the checkout failed"; o2 end 84.30; o2 card
+    lt-list; add o3 card, card lt-headline, s2, anchor 5 "services."
+    31.10, start 30.90, end 40.00, headline "Hops", placement
+    [160,700,1300,980], answers structure.
+  Expected: exactly 6 errors (anchor text mismatch, subline reads as a
     sentence, o1 overlaps the inset, headline over 3 words, o1 and o3 on
-    screen at the same time) and exactly 2 warnings (o1 is 1540px wide,
-    o2 takeover lasts 14.00s).
+    screen at the same time, o2's card lt-list is a card type on a
+    takeover) and exactly 2 warnings (o1 is 1540px wide, o2 takeover
+    lasts 14.00s).
   Show expected vs actual.
 
 === PHASE 1: COVERAGE AND PROPOSALS (no plan files) ===
@@ -249,16 +282,15 @@ Run the self-test and pre-flight. Report:
   flagged gap at the default thresholds and at your proposed ones.
 - Topic spans from the narration (not from timestamps): start and end
   word index and time, and what the topic is.
-- A proposal table, one row per topic span: overlay or none, kind,
-  answers, anchor word (index, time), start, end, builds, headline /
-  subline / items, placement, what it sits over in the storyboard, and
-  why. Include the spans you chose "none" for and why.
+- A proposal table, one row per topic span: overlay or none, kind, card
+  type, answers, anchor word (index, time), start, end, builds,
+  headline / subline / items, placement, what it sits over in the
+  storyboard, and why. Include the spans you chose "none" for and why.
 - Projected words per section and speaker-on-screen % with the
   proposals.
 - Conflicts with the storyboard you see (covered on-screen text, a card
   doubling a world element, budget pressure), each with a fix.
-- Ask which thresholds to use, whether takeovers should be the Datadog
-  plate or paper, and which proposals to keep.
+- Ask which thresholds to use and which proposals to keep.
 
 Stop and wait for my choices.
 
@@ -268,22 +300,25 @@ justify every warning, and re-run coverage with the overlays. Then write
 (mode "x"):
 - plan/overlay-beats.json (schema above).
 - plan/overlay-beats.md: the same as a readable table grouped by
-  section, with each overlay's reason.
+  section, with each overlay's card type and reason.
 - plan/OVERLAYS.md: the build rules for overlays, so the build step can
   follow them without this prompt:
   - the style, placement, motion and writing rules above, with this
-    video's values (inset rect, card area, thresholds, takeover style);
-  - one file per overlay: compositions/beats/NNN-short-name.html, mounted
-    in index.html on its own overlay track above the world and section
-    hosts, with data-start, data-duration and data-track-index and the
-    project's clip class;
-  - each overlay composition registers a paused GSAP timeline on
-    window.__timelines and pins its length with tl.set({}, {}, SLOT),
-    where SLOT equals the mounted duration (this is at the end, not at
-    0, so it doesn't break the build's no-set-at-0 rule);
+    video's values (inset rect, card area, thresholds);
+  - the card types used, with their slots and limits;
+  - each overlay is an instance of its card type from the build step's
+    card library (film/cards/), with slots filled from this plan:
+    compositions/beats/NNN-short-name.html, mounted in index.html on its
+    own overlay track above the world and section hosts, with
+    data-start, data-duration and data-track-index and the project's
+    clip class;
+  - each overlay composition registers one paused GSAP timeline on
+    window.__timelines and pads it to its slot (tl.to({}, {duration:
+    SLOT}, 0) or tl.set({}, {}, SLOT)), where SLOT equals the mounted
+    duration;
   - deterministic logic only; no animating video dimensions or media
-    properties; no same-track overlaps; HyperFrames lint and check after
-    every edit;
+    properties; no same-track overlaps; HyperFrames check after every
+    edit;
   - follow the build step's seek-safety rules (paused timelines,
     immediateRender:false defaults, initial states via gsap.set outside
     the timeline).
@@ -298,5 +333,7 @@ Report:
   face clearance, takeovers near payoff beats).
 - Input md5s unchanged.
 
-Stop. No compositions until I approve the overlay plan.
+Stop. No compositions until I approve the overlay plan. The build step
+comes next: the open loop's shared geometry first, then one section end
+to end, rendered and reviewed muted, before the rest.
 ```
