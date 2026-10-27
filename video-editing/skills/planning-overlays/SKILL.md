@@ -267,12 +267,15 @@ self-test (run first; fix the script if anything differs)
     o2 headline "Why the checkout failed"; o2 end 84.30; o2 card
     lt-list; add o3 card, card lt-headline, s2, anchor 5 "services."
     31.10, start 30.90, end 40.00, headline "Hops", placement
-    [160,700,1300,980], answers structure.
-  Expected: exactly 6 errors (anchor text mismatch, subline reads as a
+    [160,700,1300,980], answers structure; add o4 card, card
+    lt-equation, s1, anchor 1 "agents" 1.60, start 1.40, end 12.00,
+    headline "Signals", items ["Agents", "Metrics", "Insight"],
+    operators ["+"], placement [160,700,1300,980], answers structure.
+  Expected: exactly 7 errors (anchor text mismatch, subline reads as a
     sentence, o1 overlaps the inset, headline over 3 words, o1 and o3 on
     screen at the same time, o2's card lt-list is a card type on a
-    takeover) and exactly 2 warnings (o1 is 1540px wide, o2 takeover
-    lasts 14.00s).
+    takeover, o4 has 1 operator for 3 items) and exactly 2 warnings (o1
+    is 1540px wide, o2 takeover lasts 14.00s).
   Show expected vs actual.
 
 === PHASE 1: COVERAGE AND PROPOSALS (no plan files) ===

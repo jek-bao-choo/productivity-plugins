@@ -34,6 +34,7 @@ Run settings (fill in before each run)
   plan/beat-sheet.json)
 - First run for this video: <yes | no>
 - Decisions already made: <list each, or "none">
+- History author: <claude | codex | your name> (default claude)
 
 Inputs (read-only)
 - plan/STORY.md, plan/DESIGN.md, plan/beat-sheet.json,
@@ -85,7 +86,7 @@ Project (film/, created on the first run, reused after)
   OBJECTS with html|gsap per object, MOTION, SHOTS with absolute times
   per beat, BANNED, QA times).
 - Later runs: read film/SPEC.md, film/REVIEW.md and film/LESSONS.md
-  first, run `npx hyperframes history --since mine --who claude`, and build on what
+  first, run `npx hyperframes history --since mine --who <history author>`, and build on what
   changed.
 
 Localize every asset (nothing loads from the network at render)
@@ -265,9 +266,11 @@ Check and review (before replying)
    re-snapshot only what changed.
 5. Render: `npx hyperframes render --fps <fps> --quality looks
    --video-frame-format png --skill hyperframes -o
-   renders/build-0-<END>.mp4` with one worker, in the background. Cut
-   the section with ffmpeg (-ss START -to END, re-encode) to
-   renders/<section>-review.mp4; ffprobe it and full-decode it.
+   renders/build-0-<END>-v<N>.mp4` with one worker, in the background.
+   Cut the section with ffmpeg (-ss START -to END, re-encode) to
+   renders/<section>-review-v<N>.mp4; ffprobe it and full-decode it.
+   Use a new version number on every re-render; never replace one I
+   reviewed.
 6. Review muted: a 2 fps contact sheet of the whole section, plus frame
    strips at -0.1/+0.1/+0.2/+0.4s around every footage seam, camera
    move and overlay entrance (look for pages flashing, pops, jumps, a
@@ -276,7 +279,8 @@ Check and review (before replying)
    active labels, quiet labels, active lines, edges and card text.
    Compute each crop from world coords: canvas = (world - window
    origin) x scale. Targets from plan/DESIGN.md. Report every miss.
-8. Write film/REVIEW.md: creative calls, geometry and timing changes
+8. Update film/REVIEW.md (add this section's entry; keep earlier
+   sections' entries and approval lines): creative calls, geometry and timing changes
    from the plan, cards built or changed (and the card QA result), what
    was measured vs only looked at (sound not heard), kept warnings, the
    weakest shot with options, P2 polish, and a line

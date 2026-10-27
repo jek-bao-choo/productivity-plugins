@@ -43,8 +43,8 @@ Scripts
   - apply CLI: transcript (default raw.silence-transcript.json),
     --cuts raw.approved-cuts.json, --prefix raw, --video, --apply (needs
     --video), --output raw.clean.mp4, --dry-run, --self-test.
-- check_sync.py (only needed if cuts are rendered): write it to
-  /tmp/lipsync/check_sync.py from the lip-sync algorithm below.
+- check_sync_mistakes.py (only needed if cuts are rendered): write it to
+  /tmp/lipsync/check_sync_mistakes.py from the lip-sync algorithm below.
 - numpy isn't installed: use plain Python plus ffmpeg and
   /opt/homebrew/bin/ffprobe. Run Python with -I.
 
@@ -257,7 +257,7 @@ Expected:
             collects 1.20-1.60, metrics. 1.70-2.20
 Show expected vs actual.
 
-=== LIP-SYNC ALGORITHM (check_sync.py, only if cuts are rendered) ===
+=== LIP-SYNC ALGORITHM (check_sync_mistakes.py, only if cuts are rendered) ===
 CLI: --src raw.silenced.mp4 --out raw.clean.mp4 --edl
 raw.mistakes-edl.json --crop W:H:X:Y, then render test times.
 Face crop: grab one frame of the source at about 2/3 of its length,
@@ -373,7 +373,7 @@ Cut-point QA
   0.8s after the join in raw.clean.mp4).
 - These are hard joins between words. If any join is likely to click,
   say which; a 20-30 ms audio fade can be added later.
-- Lip sync: write check_sync.py, run its self-check, then measure and
+- Lip sync: write check_sync_mistakes.py, run its self-check, then measure and
   report the verdict.
 
 Stop after the report. The hand-off to the next step is raw.clean.mp4

@@ -70,10 +70,10 @@ Scripts (Python 3, standard library only, run with -I)
   here. Only write a new one if it's missing, from the spec below. Show
   the full script only if it is new or changed.
 - story_tools.py and beats_tools.py: use them if they're in this folder.
-- check_sync_final.py: reuse it from <PATH TO PREVIOUS FOLDER> if it
-  exists; otherwise write it to /tmp/finishing/check_sync_final.py from
-  the lip-sync spec below. (It is not the check_sync.py the cut steps
-  write to /tmp/lipsync/; that one uses a different method.)
+- check_sync_final.py: always write it fresh to
+  /tmp/finishing/check_sync_final.py from the lip-sync spec below.
+  Never reuse a cut step's check_sync.py: those map times through an
+  EDL and crop the source, so they measure the wrong thing here.
 - Scratch files go to /tmp/finishing/.
 
 Outputs (never overwrite: open files with mode "x"; renders get a new
@@ -174,8 +174,8 @@ locked cut, so render time t maps to source time t.
 === PHASE 1: ASSEMBLE AND CHECK (no render) ===
 Run all self-tests, then:
 1. Coverage: list every section in plan/beat-sheet.json and whether it's
-   built and approved (PIPELINE.md's Sections table if it exists,
-   otherwise the "<section>: approved" line in film/REVIEW.md). If any
+   built and approved (the "<section>: approved" line in
+   film/REVIEW.md; PIPELINE.md's Sections table mirrors it). If any
    isn't, stop and tell me.
 2. Assemble index.html: the world host, every section host, every
    overlay on the overlay track, <audio id="voice" data-volume="1"> from

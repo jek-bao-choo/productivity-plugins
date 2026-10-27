@@ -39,9 +39,9 @@ You can also run any skill on its own by naming it, for example "run cutting-mis
 
 ## Things to know
 
-- **Reused scripts.** Several skills reuse helper scripts (`cut_silences.py`, `cut_mistakes.py`, `story_tools.py`, `beats_tools.py`, `finish_tools.py`, `check_sync_final.py`) from a previous video's folder. The orchestrator asks once for that folder (`tools_from`) and fills in each skill's `<PATH TO PREVIOUS FOLDER>`. If a script is missing, the skill writes it from the spec in its prompt and runs its self-test first.
+- **Reused scripts.** Several skills reuse helper scripts (`cut_silences.py`, `cut_mistakes.py`, `story_tools.py`, `beats_tools.py`, `finish_tools.py`) from a previous video's folder. The orchestrator asks once for that folder (`tools_from`) and fills in each skill's `<PATH TO PREVIOUS FOLDER>`. If a script is missing, the skill writes it from the spec in its prompt and runs its self-test first.
 - **Nothing is overwritten.** Outputs open with mode `"x"`, renders get new version numbers, and inputs are checked by md5 at the end of each step.
-- **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions. HyperFrames AI describe, upload and share options stay off.
+- **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions, and they send audio only. HyperFrames AI describe, upload and share options stay off.
 - **No logos or brand marks.** The design system follows Datadog colours by default, but these are personal learning videos, not official content.
 
 **Example prompts:**

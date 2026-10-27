@@ -84,8 +84,10 @@ disagree, and say so.
    plan/beat-sheet.json exist and the ledger records the plan approved.
 4. Overlays: done when plan/overlay-beats.json and plan/OVERLAYS.md
    exist and are approved, or the ledger says overlays: skip.
-5. Build: per section, from the Sections table. Done when every section
-   is approved.
+5. Build: a section is approved when film/REVIEW.md contains the line
+   "<section>: approved". Done when every section in
+   plan/beat-sheet.json is approved. Mirror this into the Sections
+   table.
 6. Finish: done when deliver/VERIFY.md exists.
 The locked cut is raw.clean.mp4 + raw.mistakes-transcript.json if both
 exist, otherwise raw.silenced.mp4 + raw.silence-transcript.json.

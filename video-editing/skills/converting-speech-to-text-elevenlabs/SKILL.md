@@ -9,8 +9,8 @@ description: >-
   timestamps for my video", or "prepare the transcript before cut-silences or
   cut-mistakes", even if they don't mention ElevenLabs by name. It is agent 0
   of the editing pipeline, the first step before cutting-silences. The skill runs
-  read-only pre-flight checks, calls the API with curl using glossary.txt
-  keyterms, converts the response to the herk-edit-kit source.json schema,
+  read-only pre-flight checks, extracts the audio so only audio is uploaded,
+  calls the API with curl using glossary.txt keyterms, converts the response to the herk-edit-kit source.json schema,
   validates timings, and stops for confirmation before any editing step.
 version: "0.1.0"
 author: productivity-plugins
@@ -30,7 +30,12 @@ Pre-flight (read-only, report results)
 - If transcript.json or transcript.raw.json already exists in this folder,
   stop and tell me. Do not re-transcribe.
 - Check that ELEVENLABS_API_KEY is set (environment or .env). Never print it.
-- Get the media duration with /opt/homebrew/bin/ffprobe (expect ~<DURATION>s).
+- Get the media duration with /opt/homebrew/bin/ffprobe and report it,
+  and confirm the audio stream's start_time is 0.
+- Extract the audio only: ffmpeg -n -i raw.mp4 -vn -ac 1 -c:a flac
+  /tmp/transcribe/raw-audio.flac (WAV if the API rejects FLAC). Before
+  the call, tell me what will be uploaded (audio only, its size) and
+  that this is a paid API call.
 - Read glossary.txt: trim whitespace, skip blank lines, skip any term over
   50 characters (tell me which). If glossary.txt doesn't exist, continue
   without keyterms and say so.
@@ -38,13 +43,17 @@ Pre-flight (read-only, report results)
 API call (curl, no SDK)
   POST https://api.elevenlabs.io/v1/speech-to-text
   header xi-api-key: $ELEVENLABS_API_KEY
-  multipart: -F file=@raw.mp4
-  -F model_id=scribe_v2  -F language_code=en  -F timestamps_granularity=word
-  -F no_verbatim=false   (keep fillers, false starts, repeats, stutters;
-                          cut-mistakes needs them)
-  -F diarize=false       (single speaker)
-  -F tag_audio_events=true
-  -F keyterms=<term>     (one field per glossary term, built from a bash array)
+  multipart: -F file=@/tmp/transcribe/raw-audio.flac
+  --form-string model_id=scribe_v2  --form-string language_code=en
+  --form-string timestamps_granularity=word
+  --form-string no_verbatim=false   (keep fillers, false starts, repeats,
+                                     stutters; cut-mistakes needs them)
+  --form-string diarize=false       (single speaker)
+  --form-string tag_audio_events=true
+  --form-string keyterms=<term>     (one field per glossary term, built
+                                     from a bash array)
+  Text fields use --form-string so a value starting with @ or <, or
+  containing ;, is sent as text. -F is only for the file.
 Confirm in your report that each field was sent, plus the keyterms count.
 
 Outputs
