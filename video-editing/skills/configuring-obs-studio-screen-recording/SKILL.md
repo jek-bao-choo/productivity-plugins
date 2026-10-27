@@ -115,13 +115,25 @@ or unknown:
   capture expects 2560x1440; if it's the built-in screen at a different
   size, say so and list the options, e.g. an external 1440p display or
   the closest 16:9 scaled resolution).
-For everything missing, give the install command or link: Homebrew
-for ffmpeg, node, jq and chromium; for agent skills, the commands from
-each vendor (HyperFrames: npx skills add heygen-com/hyperframes; GSAP:
-/plugin marketplace add greensock/gsap-skills; ElevenLabs: npx skills
-add elevenlabs/skills; video-editing: /plugin marketplace add
-jek-bao-choo/productivity-plugins, then install the video-editing
-plugin from it, checking the exact plugin name in its marketplace.json).
+For everything missing, give the install command from this list:
+- ffmpeg and ffprobe: brew install ffmpeg (the skills call
+  /opt/homebrew/bin/ffprobe, so Homebrew is expected)
+- Node.js 22+: brew install node
+- Python 3: xcode-select --install, or brew install python
+- jq: brew install jq
+- Chrome or Chromium: google.com/chrome, or brew install --cask chromium
+- Claude Code: brew install --cask claude-code
+- HyperFrames: the hyperframes@hyperframes plugin, or npx skills add
+  heygen-com/hyperframes. If an older copy from the official
+  marketplace (0.8.61) is installed, flag it for removal: it doesn't
+  know the history command the editing skills use.
+- GSAP: /plugin marketplace add greensock/gsap-skills, then install
+  from it
+- ElevenLabs: npx skills add elevenlabs/skills
+- video-editing: /plugin marketplace add
+  jek-bao-choo/productivity-plugins, then
+  /plugin install video-editing@productivity-plugins
+Remind me to run /reload-plugins after installing.
 
 Report, then stop and wait. Install nothing until I approve each command.
 
