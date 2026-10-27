@@ -43,7 +43,7 @@ Run `/reload-plugins` after installing.
 
 ### 4. ElevenLabs API key
 
-Set `ELEVENLABS_API_KEY` in your environment or in a `.env` file in the project folder. Only transcription uses it, plus one optional fresh transcription in finishing-video. Both are paid calls; they upload audio only, never the video, and tell you the file size and cost before sending.
+Set `ELEVENLABS_API_KEY` in your environment or in a `.env` file in the project folder. Only transcription uses it, plus one optional fresh transcription in finishing-video. Both are paid calls; they upload audio only, never the video, and tell you the file size and that the call is paid before sending.
 
 ## How to run
 

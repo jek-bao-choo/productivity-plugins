@@ -183,8 +183,9 @@ locked cut, so render time t maps to source time t.
   with absolute timestamps (4 decimals).
   - Audio(FILE, A, D): -vn -af "atrim=start=A:end=A+D,aresample=8000"
     -ac 1 -f s16le -  -> int16 samples at 8 kHz.
-  - Frames(FILE, A, D, CROP): -an -vf "trim=start=A:end=A+D,CROP,
+  - Frames(FILE, A, D, CROP): -an -vf "trim=start=A:end=A+D,crop=CROP,
     scale=48:56,format=gray,showinfo" -fps_mode passthrough -f rawvideo -
+    (CROP as W:H:X:Y; drop the "crop=CROP," part when there's no crop.)
     Take each frame's pts_time from showinfo on stderr; never infer it
     from frame counts.
 - Audio offset at t: r = Audio(final, t-0.4, 0.8), w = Audio(locked

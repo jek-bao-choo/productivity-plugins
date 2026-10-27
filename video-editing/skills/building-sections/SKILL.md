@@ -136,7 +136,12 @@ Architecture
 - index.html: the root with the world host, section hosts above it, an
   overlay track above those, and <audio id="voice" data-volume="1">
   from 0. Set the root data-duration to the end of the last built
-  section for now.
+  section for now. When you build the last section and the plan has a
+  tail_hold: extend the world host, the last section host and their
+  timelines by tail_hold so they cover the end hold (hold the final
+  frame; footage and inset clips end at the audio end, so the close
+  must read without them), and set the root data-duration to the
+  plan's duration + tail_hold. Every timeline must still fill its slot.
 - Host ids: the host's data-composition-id, the inner composition's id
   and its window.__timelines key are identical; no -host or -mount
   suffixes. Each section's host id is its section id from
@@ -232,7 +237,9 @@ How a card is built
   the file. No values outside the token set.
 - Motion lives in the card's own paused timeline: entrance and exit per
   plan/OVERLAYS.md, builds at times passed in from the overlay plan,
-  padded to its slot. No back.out on cards.
+  padded to its slot. The plan's builds are absolute (film) times; in
+  the card's timeline use build - the overlay's start, since the card
+  is mounted at its start. No back.out on cards.
 - Fonts and GSAP are the project's local copies.
 
 Using a card
@@ -320,7 +327,9 @@ Check and review (before replying)
    Compute each crop from world coords: canvas = (world - window
    origin) x scale. Targets from plan/DESIGN.md. Report every miss.
 8. Update film/REVIEW.md (add this section's entry; keep earlier
-   sections' entries and approval lines): creative calls, geometry and timing changes
+   sections' entries and approval lines; if you rebuilt a section that
+   was approved, change its "<section>: approved" line back to
+   "<section>: awaiting approval", the only line you may rewrite): creative calls, geometry and timing changes
    from the plan, cards built or changed (and the card QA result), what
    was measured vs only looked at (sound not heard), kept warnings, the
    weakest shot with options (asked as a decision with a recommended

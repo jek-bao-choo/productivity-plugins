@@ -49,9 +49,11 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
   fresh_transcription (yes | no), auto_advance (yes | no; default yes),
   final_render_quality (default: the highest quality
   `npx hyperframes render --help` lists), privacy (default: run every
-  HyperFrames snapshot and render with `env -u GEMINI_API_KEY` and
-  `--describe false`; the CLI also reads GEMINI_API_KEY from .env, so
-  `--describe false` is what guarantees no frames go out; never send
+  HyperFrames snapshot and render with `env -u GEMINI_API_KEY`, and
+  every snapshot with `--describe false` (render has no --describe flag
+  and rejects unknown flags, so never pass it to render); the CLI also
+  reads GEMINI_API_KEY from .env, so `--describe false` on snapshots is
+  what guarantees no frames go out; never send
   media, frames or transcripts anywhere except the transcription
   call), hyperframes_cli (an exact pinned
   version, e.g. `npx --yes hyperframes@X.Y.Z`).
@@ -87,13 +89,23 @@ Check files, then reconcile with the ledger; files win when they
 disagree, and say so.
 0. Transcribe: done when transcript.json and transcript.raw.json exist.
 1. Cut silences: done when raw.silenced.mp4, raw.silence-transcript.json
-   and raw.silence-edl.json exist and the video's duration is within
-   0.1s of the transcript's audio_duration_secs. Awaiting approval when
-   the EDL exists without raw.silenced.mp4.
+   and raw.silence-edl.json exist, the video's duration is within 0.1s
+   of the transcript's audio_duration_secs, and the ledger records the
+   render approved (by me or auto_advance). Awaiting review when those
+   files match but the ledger has no approval: resume at the skill's
+   final review stop. Awaiting approval when the EDL exists without
+   raw.silenced.mp4. Stopped mid-apply when raw.silenced.mp4 exists but
+   its duration doesn't match (a failed or partial render): list the
+   partial outputs, and with my approval archive raw.silenced.mp4,
+   raw.silence-filter.txt and the three Phase 1 files so Phase 2 can
+   re-run.
 2. Cut mistakes: done when raw.approved-cuts.json exists and either its
    cuts list is empty (zero cuts: the silence pair carries forward) or
    raw.clean.mp4 + raw.mistakes-transcript.json exist with matching
-   durations. Awaiting approval when raw.cut-candidates.json exists
+   durations, and the ledger records the step approved (zero cuts, or
+   the render approved by me or auto_advance). Awaiting review when the
+   render matches but the ledger has no approval: resume at the skill's
+   final review stop. Awaiting approval when raw.cut-candidates.json exists
    without raw.approved-cuts.json. Stopped mid-apply when
    raw.approved-cuts.json has cuts but raw.clean.mp4 +
    raw.mistakes-transcript.json are missing or don't match: list the
@@ -101,8 +113,13 @@ disagree, and say so.
    raw.approved-cuts.json) so Phase 2 can re-run.
 3. Storytelling: done when plan/STORY.md, plan/DESIGN.md and
    plan/beat-sheet.json exist and the ledger records the plan approved.
+   Awaiting approval when they exist without that record: show me the
+   plan and ask for approval; don't re-run the skill (it stops because
+   plan/ exists).
 4. Overlays: done when plan/overlay-beats.json and plan/OVERLAYS.md
-   exist and are approved, or the ledger says overlays: skip.
+   exist and are approved, or the ledger says overlays: skip. Awaiting
+   approval when they exist without that record: show me the overlay
+   plan and ask; don't re-run the skill.
 5. Build: a section is approved when film/REVIEW.md contains the line
    "<section>: approved". Done when every section in
    plan/beat-sheet.json is approved. Mirror this into the Sections
@@ -139,11 +156,14 @@ Next step ("continue", "next", "edit this video")
   must review, (b) a HyperFrames Studio review, (c) a decision only I
   can make that no recorded decision or sensible default covers, or
   (d) a paid external call not already approved in Settings (such as
-  the first ElevenLabs transcription). Every
+  the first ElevenLabs transcription), or (e) one of these creative
+  checks, even when a recommended option exists: the transcript check
+  after transcription, and storytelling's choice of concept, canvas and
+  colours. Every
   other approval stop inside a skill counts as approved: write "auto-
   approved (auto_advance): <what>" in the Approvals log and continue.
   Phase stops that exist only to show me a plan or a table become
-  report-and-continue, unless they contain a stop of type (c) or (d).
+  report-and-continue, unless they contain a stop of type (c), (d) or (e).
 
 Single operation ("just cut the silences", "only plan overlays")
 - Route straight to that skill. First check that its inputs exist and
@@ -164,7 +184,7 @@ Pass this section to every skill as part of its Run settings.
 Review handoff (required whenever you stop for a review)
 - Put every file I'm asked to review (renders, review cuts, preview and
   listen clips, A/B tests, captions drafts) in <project>/reviews/<step>/
-  (e.g. reviews/cut-silences/, reviews/build/s3/, reviews/finish/),
+  (e.g. reviews/cut-silences/, reviews/build/, reviews/finish/),
   never in /tmp. Scratch files stay in /tmp.
 - End the message with a "Review" block:
   - File: the absolute path (clickable), duration, resolution/fps.

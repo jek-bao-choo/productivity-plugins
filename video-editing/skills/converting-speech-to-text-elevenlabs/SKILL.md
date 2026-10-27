@@ -42,8 +42,9 @@ Pre-flight (read-only, report results)
   the call, tell me what will be uploaded (audio only, its size) and
   that this is a paid API call.
 - Read glossary.txt: trim whitespace, skip blank lines, skip any term over
-  50 characters (tell me which). If glossary.txt doesn't exist, continue
-  without keyterms and say so.
+  50 characters or over 5 words, and keep at most the first 100 terms
+  (the API's limits; tell me which terms were skipped or dropped). If
+  glossary.txt doesn't exist, continue without keyterms and say so.
 
 API call (curl, no SDK)
   POST https://api.elevenlabs.io/v1/speech-to-text

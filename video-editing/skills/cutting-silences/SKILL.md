@@ -157,7 +157,7 @@ CROP from pre-flight, and render test times as CLI arguments.
    then trim with absolute timestamps:
    - Audio(FILE, A, D): -vn -af "atrim=start=A:end=A+D,aresample=8000"
      -ac 1 -f s16le -   -> list of int16 samples at 8 kHz.
-   - Frames(FILE, A, D): -an -vf "trim=start=A:end=A+D,CROP,
+   - Frames(FILE, A, D): -an -vf "trim=start=A:end=A+D,crop=CROP,
      scale=48:56,format=gray,showinfo" -fps_mode passthrough
      -f rawvideo -   -> frames of 48*56 bytes. Parse each frame's
      pts_time from showinfo on stderr; never infer it from frame counts.
