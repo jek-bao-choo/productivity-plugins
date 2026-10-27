@@ -232,9 +232,14 @@ checks on what changed, then:
      max within 0.5 dB) and an audio offset of 0 within 1 ms at 3 points
      using the lip-sync audio method. If an approved music bed exists,
      check the voice level instead and say so.
-   - If Run settings say yes: transcribe draft.wav the way the
-     transcription step does, then finish_tools.py diff <locked
-     transcript> <fresh>. Treat differences at or near a join as high
+   - If Run settings say yes: transcribe draft.wav with the same API
+     call and fields as the transcription step (upload
+     /tmp/finishing/draft.wav; tell me its size and that it's a paid
+     call first), writing the response to /tmp/finishing/fresh.raw.json
+     and converting it to /tmp/finishing/fresh.json with the same
+     schema. Don't run the transcription skill itself: it stops because
+     transcript.json exists and it writes into this folder. Then
+     finish_tools.py diff <locked transcript> /tmp/finishing/fresh.json. Treat differences at or near a join as high
      priority.
 4. Lip sync: run check_sync_final.py's self-check, then measure one point in
    every inset appearance of at least 0.9s, plus 2 points just after

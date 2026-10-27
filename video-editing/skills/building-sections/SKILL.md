@@ -125,7 +125,10 @@ Architecture
   section for now.
 - Host ids: the host's data-composition-id, the inner composition's id
   and its window.__timelines key are identical; no -host or -mount
-  suffixes.
+  suffixes. Each section's host id is its section id from
+  plan/beat-sheet.json, and each overlay's is its overlay id from
+  plan/overlay-beats.json (file names can stay NNN-short-name.html);
+  the finish step's mounts check matches on these ids.
 - Check the nesting of timed media against HyperFrames' sub-composition
   rules (no <video data-start> under an ancestor that also carries
   data-start) and report how the section hosts satisfy them.
@@ -265,8 +268,9 @@ Check and review (before replying)
    the viewer must read under the inset or a card. Fix, then
    re-snapshot only what changed.
 5. Render: `npx hyperframes render --fps <fps> --quality looks
-   --video-frame-format png --skill hyperframes -o
-   renders/build-0-<END>-v<N>.mp4` with one worker, in the background.
+   --video-frame-format png --workers 1 --skill hyperframes -o
+   renders/build-0-<END>-v<N>.mp4` in the background (--workers 1:
+   the default is parallel).
    Cut the section with ffmpeg (-ss START -to END, re-encode) to
    renders/<section>-review-v<N>.mp4; ffprobe it and full-decode it.
    Use a new version number on every re-render; never replace one I

@@ -35,7 +35,9 @@ Project
 - If raw.mp4 is missing: ask me for the source path, then copy it here
   as raw.mp4 (never move or modify the original), and record both paths
   and the md5 in PIPELINE.md.
-- Never delete, move or overwrite any file except PIPELINE.md.
+- You never delete, move or overwrite any file yourself except
+  PIPELINE.md. A skill may do what its own SKILL.md says (for example,
+  cutting-silences deletes its Phase 1 files before rendering).
 
 PIPELINE.md (the ledger; create it on the first run with mode "x")
 - Project: source path, raw.mp4 md5, created date.
@@ -142,7 +144,8 @@ Redo a step ("redo the silence cut", "re-plan the story")
   record it.
 - Between sections: carry each section's open decisions and new
   film/LESSONS.md rules into the next run's "decisions already made".
-- Before finishing: every section approved in the ledger.
+- Before finishing: every section approved (the "<section>: approved"
+  line in film/REVIEW.md, mirrored in the ledger).
 
 Rules
 - One skill at a time. Never skip, merge or shortcut a skill's phases or

@@ -30,8 +30,12 @@ Pre-flight (read-only, report results)
 - If transcript.json or transcript.raw.json already exists in this folder,
   stop and tell me. Do not re-transcribe.
 - Check that ELEVENLABS_API_KEY is set (environment or .env). Never print it.
+  If it's only in .env, load it without echoing (set -a; source .env;
+  set +a) in the same shell as the API call.
+- Check that ffmpeg and jq exist (validation depends on jq).
 - Get the media duration with /opt/homebrew/bin/ffprobe and report it,
-  and confirm the audio stream's start_time is 0.
+  and confirm the audio stream's start_time is 0. If it isn't, stop
+  and tell me: every word timestamp would be offset.
 - Extract the audio only: ffmpeg -n -i raw.mp4 -vn -ac 1 -c:a flac
   /tmp/transcribe/raw-audio.flac (WAV if the API rejects FLAC). Before
   the call, tell me what will be uploaded (audio only, its size) and
