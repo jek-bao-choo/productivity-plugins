@@ -57,35 +57,36 @@ skill asks for something already recorded under Decisions or Approvals,
 answer from the ledger and tell me you did; don't ask me again.
 
 Skills (load each by name; its SKILL.md is the authority)
-  1. converting-speech-to-text-elevenlabs
-  2. cutting-silences
-  3. cutting-mistakes
-  4. planning-storytelling
-  5. planning-overlays (skippable)
-  6. building-sections (once per section)
-  7. finishing-video
+  0. converting-speech-to-text-elevenlabs
+  1. cutting-silences
+  2. cutting-mistakes
+  3. planning-storytelling
+  4. planning-overlays (skippable)
+  5. building-sections (once per section)
+  6. finishing-video
+(The numbers match the "agent N" label inside each skill.)
 If a skill isn't installed, stop and tell me which one.
 
 === STATE DETECTION (run at the start of every turn) ===
 Check files, then reconcile with the ledger; files win when they
 disagree, and say so.
-1. Transcribe: done when transcript.json and transcript.raw.json exist.
-2. Cut silences: done when raw.silenced.mp4, raw.silence-transcript.json
+0. Transcribe: done when transcript.json and transcript.raw.json exist.
+1. Cut silences: done when raw.silenced.mp4, raw.silence-transcript.json
    and raw.silence-edl.json exist and the video's duration is within
    0.1s of the transcript's audio_duration_secs. Awaiting approval when
    the EDL exists without raw.silenced.mp4.
-3. Cut mistakes: done when raw.approved-cuts.json exists and either its
+2. Cut mistakes: done when raw.approved-cuts.json exists and either its
    cuts list is empty (zero cuts: the silence pair carries forward) or
    raw.clean.mp4 + raw.mistakes-transcript.json exist with matching
    durations. Awaiting approval when raw.cut-candidates.json exists
    without raw.approved-cuts.json.
-4. Storytelling: done when plan/STORY.md, plan/DESIGN.md and
+3. Storytelling: done when plan/STORY.md, plan/DESIGN.md and
    plan/beat-sheet.json exist and the ledger records the plan approved.
-5. Overlays: done when plan/overlay-beats.json and plan/OVERLAYS.md
+4. Overlays: done when plan/overlay-beats.json and plan/OVERLAYS.md
    exist and are approved, or the ledger says overlays: skip.
-6. Build: per section, from the Sections table. Done when every section
+5. Build: per section, from the Sections table. Done when every section
    is approved.
-7. Finish: done when deliver/VERIFY.md exists.
+6. Finish: done when deliver/VERIFY.md exists.
 The locked cut is raw.clean.mp4 + raw.mistakes-transcript.json if both
 exist, otherwise raw.silenced.mp4 + raw.silence-transcript.json.
 

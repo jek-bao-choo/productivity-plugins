@@ -85,14 +85,15 @@ Project (film/, created on the first run, reused after)
   OBJECTS with html|gsap per object, MOTION, SHOTS with absolute times
   per beat, BANNED, QA times).
 - Later runs: read film/SPEC.md, film/REVIEW.md and film/LESSONS.md
-  first, run `npx hyperframes history --since mine`, and build on what
+  first, run `npx hyperframes history --since mine --who claude`, and build on what
   changed.
 
 Localize every asset (nothing loads from the network at render)
-- Media into film/assets/, once: the screen footage and speaker inset
-  cropped per plan/STORY.md, no audio, a keyframe every 0.5s
-  (-g = fps/2); the voice audio copied. Check one inset frame shows the
-  whole head.
+- Media into film/assets/, once: the screen footage (screen.mp4) and
+  speaker inset (cam.mp4) cropped per plan/STORY.md, no audio, a
+  keyframe every 0.5s (-g = fps/2); the voice audio copied. Check one
+  inset frame shows the whole head. Keep these file names: the finish
+  step's lip-sync check reads film/assets/cam.mp4.
 - Fonts as local files with @font-face; no Google Fonts or other CDN.
 - GSAP from a local copy in the project, not a CDN.
 - No logos or brand marks. This is a personal learning video, not
@@ -193,8 +194,8 @@ Catalogue (slot limits match planning-overlays)
   operator slots between the term slots; never pick them yourself.
 - to-statement (takeover): headline 1-3 words at type 60 or 84 +
   optional source line up to 7 words at 30.
-- to-stat (takeover): one number (Signal ink) + unit + label of up to
-  3 words; a counter rolls as an odometer (same start, duration and
+- to-stat (takeover): number and unit as one token (Signal ink; 40ms,
+  3x, 99.9%) + a short label, 3 words in total; a counter rolls as an odometer (same start, duration and
   ease for every digit).
 - to-overview (takeover): headline 1-3 words + 1-4 items of up to 3
   words, for an "in this video" moment.
@@ -257,7 +258,8 @@ Check and review (before replying)
    at least its composition's data-duration. Any shortfall is an error.
 3. The no-network search above: 0 hits.
 4. Snapshot the SPEC.md QA times, plus each overlay at start + 0.5s and
-   at each build (`snapshot --at ... --no-end`). Check each: one element
+   at each build (`snapshot --at ... --no-end --describe false`; the
+   describe step sends frames to an AI model, so keep it off). Check each: one element
    at full brightness, no label cut or within 60px of an edge, nothing
    the viewer must read under the inset or a card. Fix, then
    re-snapshot only what changed.
@@ -277,7 +279,8 @@ Check and review (before replying)
 8. Write film/REVIEW.md: creative calls, geometry and timing changes
    from the plan, cards built or changed (and the card QA result), what
    was measured vs only looked at (sound not heard), kept warnings, the
-   weakest shot with options, P2 polish.
+   weakest shot with options, P2 polish, and a line
+   "<section>: awaiting approval" that I change to "approved".
 9. Append to film/LESSONS.md anything the next section should do
    differently (a rule, not a story).
 

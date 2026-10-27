@@ -70,9 +70,10 @@ Scripts (Python 3, standard library only, run with -I)
   here. Only write a new one if it's missing, from the spec below. Show
   the full script only if it is new or changed.
 - story_tools.py and beats_tools.py: use them if they're in this folder.
-- check_sync.py: reuse it from <PATH TO PREVIOUS FOLDER> if it exists;
-  otherwise write it to /tmp/finishing/check_sync.py from the lip-sync
-  spec below.
+- check_sync_final.py: reuse it from <PATH TO PREVIOUS FOLDER> if it
+  exists; otherwise write it to /tmp/finishing/check_sync_final.py from
+  the lip-sync spec below. (It is not the check_sync.py the cut steps
+  write to /tmp/lipsync/; that one uses a different method.)
 - Scratch files go to /tmp/finishing/.
 
 Outputs (never overwrite: open files with mode "x"; renders get a new
@@ -141,7 +142,7 @@ self-test (run first; fix the script if anything differs)
     data at 1.7.
   Show expected vs actual.
 
-=== LIP-SYNC SPEC (check_sync.py) ===
+=== LIP-SYNC SPEC (check_sync_final.py) ===
 The inset plays film/assets/cam.mp4 at the same absolute time as the
 locked cut, so render time t maps to source time t.
 - Exact extraction: ffmpeg -copyts -ss max(A-2, 0) -i FILE, then trim
@@ -173,7 +174,9 @@ locked cut, so render time t maps to source time t.
 === PHASE 1: ASSEMBLE AND CHECK (no render) ===
 Run all self-tests, then:
 1. Coverage: list every section in plan/beat-sheet.json and whether it's
-   built and approved (film/REVIEW.md). If any isn't, stop and tell me.
+   built and approved (PIPELINE.md's Sections table if it exists,
+   otherwise the "<section>: approved" line in film/REVIEW.md). If any
+   isn't, stop and tell me.
 2. Assemble index.html: the world host, every section host, every
    overlay on the overlay track, <audio id="voice" data-volume="1"> from
    0, and the root data-duration = the locked video's duration.
@@ -182,7 +185,7 @@ Run all self-tests, then:
      reasons.
    - Every registered timeline's duration >= its composition's
      data-duration.
-   - `npx hyperframes timeline` -> write /tmp/finishing/mounts.json ->
+   - `npx hyperframes timeline --json` -> write /tmp/finishing/mounts.json ->
      finish_tools.py mounts ... (0 errors; explain every extra id).
    - story_tools.py check and beats_tools.py check against the locked
      transcript (if present): the plan's anchors still match it.
@@ -233,7 +236,7 @@ checks on what changed, then:
      transcription step does, then finish_tools.py diff <locked
      transcript> <fresh>. Treat differences at or near a join as high
      priority.
-4. Lip sync: run check_sync.py's self-check, then measure one point in
+4. Lip sync: run check_sync_final.py's self-check, then measure one point in
    every inset appearance of at least 0.9s, plus 2 points just after
    each join that falls inside a visible inset.
 5. A listening list for me: every join on the final timeline with the

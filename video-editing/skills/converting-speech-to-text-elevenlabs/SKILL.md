@@ -7,7 +7,8 @@ description: >-
   timestamps. It applies when the user says "transcribe my recording",
   "transcribe raw.mp4", "run ElevenLabs STT", "make transcript.json", "get word
   timestamps for my video", or "prepare the transcript before cut-silences or
-  cut-mistakes", even if they don't mention ElevenLabs by name. The skill runs
+  cut-mistakes", even if they don't mention ElevenLabs by name. It is agent 0
+  of the editing pipeline, the first step before cutting-silences. The skill runs
   read-only pre-flight checks, calls the API with curl using glossary.txt
   keyterms, converts the response to the herk-edit-kit source.json schema,
   validates timings, and stops for confirmation before any editing step.
@@ -16,6 +17,8 @@ author: productivity-plugins
 ---
 
 # Converting Speech to Text with ElevenLabs
+
+This is agent 0 (transcription) of the video editing pipeline.
 
 Follow this tested prompt exactly as written; do not reinterpret or simplify it.
 
