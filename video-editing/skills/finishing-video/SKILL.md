@@ -59,6 +59,8 @@ Skills (read before touching compositions)
   where they conflict; say what conflicted.
 - GSAP (GreenSock): gsap-core and gsap-timeline, others only if used.
 - If either skill set is missing, stop and tell me how to install it.
+- If Run settings give hyperframes_cli (a pinned version), use it in
+  place of `npx hyperframes` in every command below.
 - Never send frames, renders, audio or transcripts to an external
   service, except the one fresh transcription in Run settings. If a
   HyperFrames command offers an AI describe, upload or share option,
@@ -101,9 +103,13 @@ mounts MOUNTS --beatsheet B [--overlays O] --duration D --fps F
   timeline. Every section in B and every overlay in O must be mounted
   under its own id, with start and duration each within one frame
   (1/F + 0.0015s) of the plan (section: start, end - start; overlay:
-  start, end - start). Errors: a planned id not mounted, a mount listed
-  twice, start or duration off by more than one frame, root_duration
-  more than one frame from D. Also print mounted ids not in the plan.
+  start, end - start). A section host may start up to --lead (default
+  0.25s) before its planned start (its first beat's lead); then its
+  end, not its duration, must match the planned end. The last section
+  may end at D (an approved tail hold). Errors: a planned id not
+  mounted, a mount listed twice, start or end off by more than allowed,
+  root_duration more than one frame from D. Also print mounted ids not
+  in the plan.
 
 audio WAV --joins J [--zero-ms 5] [--jump-db 18]
   WAV = 16-bit PCM (first channel if stereo). Dead spans = runs of
@@ -147,6 +153,8 @@ self-test (run first; fix the script if anything differs)
     root_duration 20.0 -> 0 errors, extra [world]. Broken copy: s2
     start 10.05, o1 removed, root_duration 19.9 -> exactly 3 errors
     (s2 off 50 ms, o1 not mounted, root duration).
+    Lead copy: s2 mounted at 9.8 with duration 10.2 (ends 20.0) -> 0
+    errors; s2 at 9.7 (300 ms early) -> 1 error.
   audio: a 3.0s, 16 kHz mono 16-bit WAV: sample i =
     round(A * sin(2*pi*2000*i/16000 + pi/8)), A = 33 for i < 32000 and
     3277 after; samples 16000-16159 set to 0. Joins 0.5, 1.0, 2.0.
@@ -193,6 +201,10 @@ locked cut, so render time t maps to source time t.
   smallest mean |rf[k] - sf[j+k]|. video_off = sp[j] - rp[0].
 - sync_ms = (video_off - audio_off) * 1000 (positive = picture leads).
   Expect corr >= 0.95.
+- Known causes of a constant offset: an AAC voice asset (renderer trims
+  the encoder priming twice: audio ~21.3 ms early; fix: PCM WAV voice)
+  and speaker clips one frame late (fix: data-media-start + 1/fps).
+  Verify a fix on a short scratch render before proposing it.
 - Self-check: at one time inside a visible inset, audio_off must be
   0 within 1 ms and video_off within one frame.
 - Verdict: pass if |sync_ms| < one frame at every point, with no drift
@@ -208,14 +220,17 @@ Run all self-tests, then:
    isn't, stop and tell me.
 2. Assemble index.html: the world host, every section host, every
    overlay on the overlay track, <audio id="voice" data-volume="1"> from
-   0, and the root data-duration = the locked video's duration.
+   0, and the root data-duration = the locked video's duration plus
+   the plan's approved tail_hold (if any). The voice element's
+   data-duration is the voice file's own length.
 3. Project checks:
    - `npx hyperframes check --json`: 0 errors; list kept warnings with
      reasons.
    - Every registered timeline's duration >= its composition's
      data-duration.
    - `npx hyperframes timeline --json` -> write /tmp/finishing/mounts.json ->
-     finish_tools.py mounts ... (0 errors; explain every extra id).
+     finish_tools.py mounts ... --duration <locked duration + tail_hold>
+     (0 errors; explain every extra id).
    - story_tools.py check and beats_tools.py check against the locked
      transcript (if present): the plan's anchors still match it.
    - SVG def ids: no id defined in more than one composition.
@@ -223,8 +238,13 @@ Run all self-tests, then:
      loads; fonts and GSAP are local files.
 4. List every seam to look at: section boundaries, camera moves,
    footage wipes, overlay entrances and exits, with times.
-5. Tell me to open the Studio (`npx hyperframes preview` from film/)
-   and scrub those seams before any draft render.
+5. Start the Studio yourself (`preview --background` from film/, then
+   `preview --status`), give me its URL in the Review block with the
+   seam table, and ask me to scrub those seams before any draft render.
+   Stop the preview at the end of Phase 3.
+   Known false positives to explain, not re-investigate: contrast
+   findings on world labels hidden under opaque footage, and
+   freezedetect spans that are slow thin-line or small-label builds.
 
 Report: self-tests, coverage, every check result, the seam list, input
 md5s unchanged. Stop and wait for "Studio OK" or my notes.
@@ -234,8 +254,10 @@ Fix my Studio notes first (through the generators), re-run the Phase 1
 checks on what changed, then:
 1. Render the draft with one worker (same command as the section
    builds) to renders/draft-v<N>.mp4. ffprobe it: duration within one
-   frame of the locked video, video and audio stream durations within
-   0.1s of each other. Full decode (ffmpeg -v error -i ... -f null -)
+   frame of the locked video's duration plus the plan's tail_hold (0 if
+   none); the audio stream at least the locked duration, and the video
+   and audio stream durations within 0.1s of each other or apart by
+   exactly the tail_hold (+-0.1s). Full decode (ffmpeg -v error -i ... -f null -)
    with exit code 0.
 2. Frames:
    - A 1 fps contact sheet of the whole video.
@@ -255,10 +277,12 @@ checks on what changed, then:
      16-bit) and the locked video's audio to /tmp/finishing/locked.wav.
    - finish_tools.py joins (with the mistakes EDL if it exists) ->
      /tmp/finishing/joins.json; finish_tools.py audio on draft.wav. For
-     every flagged join and dead span, cut a listen clip (1s either
-     side) to /tmp/finishing/listen-<t>.wav.
-   - The voice is copied, not mixed: volumedetect on both WAVs (mean and
-     max within 0.5 dB) and an audio offset of 0 within 1 ms at 3 points
+     every flagged join and dead span (and, for the listening list,
+     every join), cut a listen clip (1s either side) to
+     <project>/reviews/finish/listen-<t>.wav.
+   - The voice is copied, not mixed: volumedetect on both WAVs over the
+     locked span only (trim draft.wav to the locked duration, so a silent
+     tail_hold doesn't lower the mean; mean and max within 0.5 dB) and an audio offset of 0 within 1 ms at 3 points
      using the lip-sync audio method. If an approved music bed exists,
      check the voice level instead and say so.
    - If Run settings say yes: transcribe draft.wav with the same API
@@ -284,15 +308,18 @@ checks on what changed, then:
 
 Report: the draft path and specs, every check with its result (measured
 / looked at / not done), every failure with a proposed fix, the
-listening list, the draft captions result, and input md5s unchanged. Stop and wait for my approval
+listening list, the draft captions result, and input md5s unchanged, then
+the Review block: the draft's absolute path (watch with sound on), the
+join and seam timecodes, and the listen clips and any A/B test renders
+in <project>/reviews/finish/ with absolute paths. Stop and wait for my approval
 or notes.
 
 === PHASE 3: FINAL RENDER AND DELIVERY (after approval) ===
 1. Fix the approved failures through the generators and re-run the
    checks they touch.
 2. Render the final with one worker at the Run settings quality to
-   renders/final-v<N>.mp4. Re-verify: ffprobe (duration, stream
-   durations), full decode, a 1 fps contact sheet compared with the
+   renders/final-v<N>.mp4. Re-verify: ffprobe (duration and stream
+   durations, with the same tail_hold allowance as the draft), full decode, a 1 fps contact sheet compared with the
    draft's, the audio check on its WAV, and lip sync at 3 points.
 3. Create deliver/ with:
    - the final MP4;
@@ -315,6 +342,7 @@ or notes.
      decided.
 4. Confirm input md5s unchanged.
 
-Report: the deliver/ contents, VERIFY.md, and anything left for me to
-decide. Stop.
+Report: the absolute path of deliver/ and the final MP4, the deliver/
+contents, VERIFY.md, and anything left for me to decide (as decisions
+with a recommended option). Stop.
 ```

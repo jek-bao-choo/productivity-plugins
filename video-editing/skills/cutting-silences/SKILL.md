@@ -47,7 +47,7 @@ Safety
 - cut_silences.py must refuse existing outputs (open files with mode
   "x", run ffmpeg with -n).
 - The QA step is read-only for this folder: it must not modify or create
-  files here.
+  files here, except review clips in reviews/cut-silences/.
 
 Pre-flight (read-only, report results)
 - raw.mp4 and transcript.json exist in this folder.
@@ -262,6 +262,11 @@ Render checks
   it and confirm the video ends after the final word, not mid-word.
 - List the cuts around source pauses over 2s (source time and render
   time) for me to check by eye.
+
+Review files: cut a 2s clip (1s either side) around each cut at a
+source pause over 2s into <project>/reviews/cut-silences/ (the only
+files this step writes outside its outputs), and list them, with
+absolute paths, in the orchestrator's Review block.
 
 Stop after the report. Do not start cut-mistakes until I confirm the
 cut looks right.

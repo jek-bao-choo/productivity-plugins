@@ -46,8 +46,18 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
 - Project: source path, raw.mp4 md5, created date.
 - Settings: tools_from (the folder whose scripts later skills reuse, for
   their <PATH TO PREVIOUS FOLDER>), overlays (run | skip),
-  fresh_transcription (yes | no), auto_advance (yes | no; default no).
-  Ask me for any that are unset when a step first needs them.
+  fresh_transcription (yes | no), auto_advance (yes | no; default yes),
+  final_render_quality (default: the highest quality
+  `npx hyperframes render --help` lists), privacy (default: run every
+  HyperFrames snapshot and render with `env -u GEMINI_API_KEY` and
+  `--describe false`; the CLI also reads GEMINI_API_KEY from .env, so
+  `--describe false` is what guarantees no frames go out; never send
+  media, frames or transcripts anywhere except the transcription
+  call), hyperframes_cli (an exact pinned
+  version, e.g. `npx --yes hyperframes@X.Y.Z`).
+  Ask for every unset setting once, in one batch, on the first run
+  (using the decision format below), not when a later step first needs
+  it. Pass them to every skill as Run settings.
 - Steps table: step, skill, status (todo | in progress | awaiting
   approval | done | skipped | stale), key outputs, md5 of each key output
   at approval, approved date.
@@ -120,11 +130,20 @@ Next step ("continue", "next", "edit this video")
   (building-sections: the next section in build order, whether it's the
   first run, decisions already made; finishing-video: fresh
   transcription, approvals already given).
-- When the skill stops for approval, stop too. Record my reply in the
-  ledger before acting on it.
+- When the skill stops for approval, stop too, unless auto_advance
+  auto-approves that stop (below). Record my reply in the ledger before
+  acting on it.
 - After a step is done: with auto_advance no, tell me the next step and
-  stop. With auto_advance yes, start the next step, still honouring
-  every stop inside it.
+  stop. With auto_advance yes, start the next step.
+- auto_advance yes means: stop ONLY for (a) an .mp4 (or audio clip) I
+  must review, (b) a HyperFrames Studio review, (c) a decision only I
+  can make that no recorded decision or sensible default covers, or
+  (d) a paid external call not already approved in Settings (such as
+  the first ElevenLabs transcription). Every
+  other approval stop inside a skill counts as approved: write "auto-
+  approved (auto_advance): <what>" in the Approvals log and continue.
+  Phase stops that exist only to show me a plan or a table become
+  report-and-continue, unless they contain a stop of type (c) or (d).
 
 Single operation ("just cut the silences", "only plan overlays")
 - Route straight to that skill. First check that its inputs exist and
@@ -138,6 +157,39 @@ Redo a step ("redo the silence cut", "re-plan the story")
   archives the whole plan/ folder (planning-storytelling stops if plan/
   exists), which also takes the overlay plan, so mark planning-overlays
   todo too.
+
+=== REVIEWS AND DECISIONS (every skill, every stop) ===
+Pass this section to every skill as part of its Run settings.
+
+Review handoff (required whenever you stop for a review)
+- Put every file I'm asked to review (renders, review cuts, preview and
+  listen clips, A/B tests, captions drafts) in <project>/reviews/<step>/
+  (e.g. reviews/cut-silences/, reviews/build/s3/, reviews/finish/),
+  never in /tmp. Scratch files stay in /tmp.
+- End the message with a "Review" block:
+  - File: the absolute path (clickable), duration, resolution/fps.
+  - Watch with: sound on or off, and why.
+  - Timecodes: a table of clip time | film time | what happens | what to
+    check.
+  - Optional: any extra file, each with its absolute path and a one-line
+    reason to look at it.
+  - Reply with: the exact words that approve ("approve <step>") or ask
+    for changes.
+- Always give absolute paths for every output you mention (renders,
+  deliver/, reports), not paths relative to a subfolder.
+- A Studio review gets the same block with the running preview URL
+  (start it yourself with `preview --background`; stop it when done).
+
+Decisions
+- Ask with AskUserQuestion. Put the recommended option first, labelled
+  "(Recommended)", and give 1-2 sentences on why and what it costs.
+  Every open option in a report ("options: a/b/c") is a decision in this
+  format, never a bare list.
+- Batch all decisions pending at a stop into one AskUserQuestion call.
+- Never ask for anything already recorded under Decisions or Approvals;
+  answer from the ledger and say you did.
+- If I reply only "approve" while options are open, take the recommended
+  option for each, record each one, and say so.
 
 === HAND-OFFS BETWEEN STEPS ===
 - After transcription: confirm the transcript looks right with me
@@ -159,7 +211,8 @@ Redo a step ("redo the silence cut", "re-plan the story")
 
 Rules
 - One skill at a time. Never skip, merge or shortcut a skill's phases or
-  stops, and never do a skill's work yourself.
+  stops (except stops auto_advance auto-approves, which are logged), and
+  never do a skill's work yourself.
 - Read-only on everything except PIPELINE.md, the one-time raw.mp4 copy,
   archive moves I approve, and the section approval line in
   film/REVIEW.md when I approve a section.

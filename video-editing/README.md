@@ -9,12 +9,14 @@ Every step is a tested prompt kept word for word in its skill. Each step plans f
 - **ffmpeg** and **ffprobe**. The skills call `/opt/homebrew/bin/ffprobe`, so they assume a Homebrew install on macOS.
 - **Python 3**. The helper scripts use only the standard library.
 - **ElevenLabs API key** in `ELEVENLABS_API_KEY` (environment or `.env`). Only transcription uses it, plus one optional fresh transcription in finishing-video. Both are paid calls.
-- **HyperFrames** and **GSAP** skills, for building-sections and finishing-video. Install GSAP with `/plugin marketplace add greensock/gsap-skills`. For HyperFrames, use the `hyperframes@hyperframes` plugin: the older copy in the official marketplace (0.8.61) doesn't know the `history` and `usage` commands these skills use, so remove it if you have both.
+- **HyperFrames** and **GSAP** skills, for building-sections and finishing-video. Install GSAP with `/plugin marketplace add greensock/gsap-skills`. For HyperFrames, use the `hyperframes@hyperframes` plugin: the older copy in the official marketplace (0.8.61) doesn't know the `history` command these skills use, so remove it if you have both.
 - **Node.js**, for `npx hyperframes`.
 
 ## How to start
 
 Put the recording in its own folder as `raw.mp4`, open Claude Code there, and say **"edit this video"**. The orchestrator (`starting-video-editing`) works out where the project is, runs the next step with its skill, and records settings, decisions, approvals and output checksums in `PIPELINE.md`.
+
+On the first run it asks for all its settings at once (reused-scripts folder, overlays, fresh transcription, final quality, privacy, pinned HyperFrames CLI). `auto_advance` defaults to yes: the run keeps going and stops only for a video or audio clip you need to review, a HyperFrames Studio review, a decision only you can make, or a paid call you haven't approved yet. Every other stop is approved automatically and logged. Decisions come with a recommended option first; replying "approve" takes the recommendations.
 
 Other things to say:
 - "where am I": show the steps, sections and next step.
@@ -40,6 +42,7 @@ You can also run any skill on its own by naming it, for example "run cutting-mis
 ## Things to know
 
 - **Reused scripts.** Several skills reuse helper scripts (`cut_silences.py`, `cut_mistakes.py`, `story_tools.py`, `beats_tools.py`, `finish_tools.py`) from a previous video's folder. The orchestrator asks once for that folder (`tools_from`) and fills in each skill's `<PATH TO PREVIOUS FOLDER>`. If a script is missing, the skill writes it from the spec in its prompt and runs its self-test first.
+- **Review files.** Everything you're asked to watch or listen to (review cuts, preview and listen clips, A/B tests, draft captions) goes to `<project>/reviews/<step>/`, and each stop ends with a Review block: absolute path, sound on or off, a timecode table and the words that approve.
 - **Nothing is overwritten.** Outputs open with mode `"x"`, renders get new version numbers, and inputs are checked by md5 at the end of each step.
 - **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions, and they send audio only. HyperFrames AI describe, upload and share options stay off, and the skills don't pass `--skill`, which tags renders in HyperFrames' anonymous usage telemetry. The CLI may still send its own anonymous telemetry; run `npx hyperframes telemetry` to see or turn it off.
 - **No logos or brand marks.** The design system follows Datadog colours by default, but these are personal learning videos, not official content.

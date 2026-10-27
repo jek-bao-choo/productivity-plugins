@@ -58,7 +58,8 @@ Skills (read before authoring)
   gsap-utils or gsap-performance only if you use them.
 - If either skill set is missing, stop and tell me how to install it.
   Don't rebuild the contract from memory.
-- Run `npx hyperframes usage --json` and report it ("unknown" if so).
+- If Run settings give hyperframes_cli (a pinned version), use it in
+  place of `npx hyperframes` in every command below.
 - Never send frames, renders or transcripts to an external service. If
   a HyperFrames command offers an AI describe, upload or share option,
   leave it off.
@@ -100,7 +101,10 @@ Localize every asset (nothing loads from the network at render)
   raw.mp4) so their time equals render time, cropped per plan/STORY.md
   (the locked video keeps raw.mp4's frame size, so STORY.md's source-px
   windows apply unchanged), no audio, a
-  keyframe every 0.5s (-g = fps/2); the voice audio copied. Check one
+  keyframe every 0.5s (-g = fps/2); the voice audio as lossless PCM
+  (assets/voice.wav, decoded from the locked video with ffmpeg; never
+  AAC/m4a: the renderer trims AAC encoder priming a second time and
+  plays the voice ~21 ms early). Check one
   inset frame shows the whole head. Keep these file names: the finish
   step's lip-sync check reads film/assets/cam.mp4.
 - Fonts as local files with @font-face; no Google Fonts or other CDN.
@@ -123,7 +127,8 @@ Architecture
   data-media-start = the beat's absolute time on the locked timeline
   (which is the render timeline). Inset = a timed
   <video class="clip"> per beat, data-media-start = that beat's absolute
-  locked-timeline time so it stays lip-synced, styled per plan/DESIGN.md.
+  locked-timeline time + 1/fps (see Build rules) so it stays lip-synced,
+  styled per plan/DESIGN.md.
 - Overlays (if plan/overlay-beats.json exists): build every overlay
   whose start falls inside this section as an instance of the card type
   named in its card field, from the card library below, following
@@ -263,6 +268,20 @@ Build rules
   recording changes page inside the clip, shift only the screen's
   data-media-start (never the inset's).
 - Never label real footage with names that are only a spoken example.
+- Speaker clips (inset and full frame): data-media-start = the beat's
+  absolute time + 1/fps (the renderer shows the previous frame
+  otherwise). Confirm with the sync check in step 6; adjust if it reads
+  differently.
+- A label lights and dims with its element: when a beat lights a group,
+  light the group's separately drawn labels (names) too.
+- Connectors that leave a labelled node start outside its label box.
+- Anti-pattern shapes sit under the recommendation in SVG order (with an
+  opaque Ground underlay behind translucent plates they pass).
+- A new spanning shape clears existing parallel lines by more than 20
+  world px or fully encloses them.
+- Section hosts whose slots overlap (the 0.2s beat lead) go on separate
+  track indexes; every scene file that uses the typeface has its own
+  @font-face.
 
 Check and review (before replying)
 1. `npx hyperframes check --json`: 0 errors. List every kept warning
@@ -281,27 +300,39 @@ Check and review (before replying)
    renders/build-0-<END>-v<N>.mp4` in the background (--workers 1:
    the default is parallel).
    Cut the section with ffmpeg (-ss START -to END, re-encode) to
-   renders/<section>-review-v<N>.mp4; ffprobe it and full-decode it.
+   <project>/reviews/build/<section>-review-v<N>.mp4; ffprobe it and
+   full-decode it. If you re-render before I've seen a version, hand
+   me only the newest one and say the earlier one was superseded.
    Use a new version number on every re-render; never replace one I
    reviewed.
-6. Review muted: a 2 fps contact sheet of the whole section, plus frame
+6. Sync (every section): audio offset of the render's voice vs the
+   locked video at 2 points (expect 0 within 1 ms) and inset lip sync at
+   1 point per inset (expect |sync| < one frame): read the LIP-SYNC
+   SPEC in the finishing-video skill's SKILL.md and use that method.
+   Fix before the review.
+   Review muted for visuals: a 2 fps contact sheet of the whole section, plus frame
    strips at -0.1/+0.1/+0.2/+0.4s around every footage seam, camera
    move and overlay entrance (look for pages flashing, pops, jumps, a
    motion that stops and a second one starts).
 7. Luma on the render (Y 16-235): ffmpeg crop + signalstats YMAX on
    active labels, quiet labels, active lines, edges and card text.
+   Measure only after the camera has landed (mid-move crops miss).
    Compute each crop from world coords: canvas = (world - window
    origin) x scale. Targets from plan/DESIGN.md. Report every miss.
 8. Update film/REVIEW.md (add this section's entry; keep earlier
    sections' entries and approval lines): creative calls, geometry and timing changes
    from the plan, cards built or changed (and the card QA result), what
    was measured vs only looked at (sound not heard), kept warnings, the
-   weakest shot with options, P2 polish, and a line
+   weakest shot with options (asked as a decision with a recommended
+   option), P2 polish, and a line
    "<section>: awaiting approval" that I change to "approved".
 9. Append to film/LESSONS.md anything the next section should do
    differently (a rule, not a story).
 
-Report: the review file path and specs, every fix made, the check
-result, the timeline-duration result, the card QA result, the luma
-table, decisions needed from me, and input md5s unchanged. Then stop.
+Report: every fix made, the check result, the timeline-duration
+result, the sync result, the card QA result, the luma table and input
+md5s unchanged; then the decisions (orchestrator format) and the Review
+block (absolute path of the review cut, watch muted and once with
+sound, a timecode table of clip time | film time | what happens | what
+to check). Then stop.
 ```

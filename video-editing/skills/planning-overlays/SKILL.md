@@ -295,7 +295,10 @@ Run the self-test and pre-flight. Report:
   proposals.
 - Conflicts with the storyboard you see (covered on-screen text, a card
   doubling a world element, budget pressure), each with a fix.
-- Ask which thresholds to use and which proposals to keep.
+- Ask which thresholds to use and which proposals to keep, as
+  decisions in the orchestrator's format: a recommended choice for the
+  thresholds and for each proposal row (keep / drop), each with a
+  one-sentence reason. Skip any choice already recorded in the ledger.
 
 Stop and wait for my choices.
 

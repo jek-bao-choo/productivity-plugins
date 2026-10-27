@@ -142,6 +142,18 @@ Discipline
   footage = the recording (screen footage keeps the inset).
 - Presence: aim for ~40% speaker on screen; long absences are fine at
   payoff beats.
+- Type floor per window: rendered text must be at least 28px, so for
+  every camera window, (canvas width / window width) x the smallest
+  type token used by labels visible in it must be >= 28. A world-wide
+  orientation or payoff window usually fails this; plan a tighter
+  window instead of shrinking type. Record each window's min_type.
+- End hold: the final frame holds for 4s or more. If the last beat is
+  closer than 4s to the end of the audio, plan a tail_hold (seconds of
+  silent hold after the audio) instead of cutting the hold short; the
+  film's length is then duration + tail_hold.
+- The close shows the planted loop element (the filled sockets, the
+  completed pipeline) inside the close window at a legible size; if it
+  can't, say so in STORY.md and plan a re-show just before the close.
 
 Screen recordings (most Datadog videos)
 - The screen is part of the world: zooms and pans into screen regions
@@ -236,6 +248,9 @@ check BEATSHEET --transcript T [--budget 20] [--dead 1.5]
     (count each bad label once, never both errors)
   - back_out more than once in a section
   - open loop defined but no plant, or no close, or close before plant
+  - a camera window with min_type set where (canvas width / window
+    width) x min_type < 28 (type below the 28px floor)
+  - tail_hold present but not a number >= 0
   Warnings:
   - sections not contiguous, not starting at 0, or not ending at the
     duration (+-0.05s); beat enter outside its section (allowing the
@@ -285,6 +300,10 @@ self-test (run first; fix the script if anything differs)
   Expected: exactly 7 errors (text mismatch, lead 0.10s, back.out twice
   in s1, m drawn again, ghost lit before drawn, label over 2 words, no
   close beat).
+  Type copy: the good sheet with min_type 22 on both windows and
+  tail_hold 4. Expected: exactly 1 error (W_ORIENT renders
+  1920/1920 x 22 = 22px < 28; W_SLOT1 renders 1920/640 x 22 = 66px,
+  fine) and the same 1 warning as the good sheet.
   Show expected vs actual.
 
 === PHASE 1: UNDERSTAND AND PROPOSE (no plan files) ===
@@ -305,7 +324,8 @@ Run the self-test and pre-flight. Report:
 - Your recommendation and why.
 - Canvas options with costs.
 - Air-check results.
-- Ask which concept, which canvas, which design system (Datadog by
+- Ask these as decisions (orchestrator format: recommended option
+  first, with why). Ask which concept, which canvas, which design system (Datadog by
   default), whether I have brand values to replace the derived colours,
   and whether the brand typeface is licensed.
 
@@ -319,7 +339,11 @@ has 0 errors; fix or justify every warning. Then write (mode "x"):
   and its states, open-loop table (role, beat, anchor, what happens),
   altitudes, every camera window (id, exact rect, one purpose; world px
   vs source px stated), the speaker inset (source crop and canvas rect),
-  and build guardrails (example-only labels, footage timing to check).
+  and build guardrails (example-only labels, footage timing to check),
+  each window's scale and min_type, and the tail_hold if any.
+  Beat sheet schema additions: camera_windows[].min_type (optional,
+  the smallest type token labels use in that window) and tail_hold
+  (optional, seconds of silent final hold after the audio).
 - plan/DESIGN.md: the locked tokens and palette for this video, what
   each colour is used for here, any retuned value and why, the no-logo
   rule, material and motion.

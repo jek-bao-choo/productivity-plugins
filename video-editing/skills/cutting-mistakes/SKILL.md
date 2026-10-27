@@ -54,8 +54,11 @@ Safety
 - cut_mistakes.py must refuse existing outputs (open files with mode
   "x", run ffmpeg with -n), refuse an --output equal to the --video
   path, and refuse any output path that resolves to an input.
-- Preview clips and frame grabs go to /tmp/cut-mistakes/, not this
-  folder.
+- Frame grabs go to /tmp/cut-mistakes/. Clips I'm asked to listen to
+  (candidate previews, listen-check clips, join previews) go to
+  <project>/reviews/cut-mistakes/ instead of /tmp/cut-mistakes/
+  wherever this prompt says /tmp/cut-mistakes/<clip>.mp4, and are listed
+  with absolute paths in the Review block.
 
 Pre-flight (read-only, report results)
 - raw.silence-transcript.json, raw.silence-edl.json, raw.silenced.mp4
@@ -338,8 +341,11 @@ Report:
 - A very clean delivery may have few or no real mistakes. That's a
   valid result; don't cut natural speech to hit a quota.
 
-Stop and wait. I'll reply with approve / keep / changed ranges per id,
-or "approve zero cuts".
+If there are no candidates and the hidden-flub check found no listen-
+check spots, and auto_advance is on, treat it as "approve zero cuts"
+(record it) and go straight to Phase 2's zero-cuts path.
+Otherwise stop and wait. I'll reply with approve / keep / changed ranges
+per id, or "approve zero cuts".
 
 === PHASE 2: APPLY, RENDER AND QA (only after I approve) ===
 - Write my approvals exactly (id, start, end, reason) to
