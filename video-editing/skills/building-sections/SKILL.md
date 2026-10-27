@@ -188,7 +188,9 @@ Catalogue (slot limits match planning-overlays)
 - lt-list (card): headline 1-3 words + 1-4 items of up to 3 words;
   items build in at their spoken phrases.
 - lt-equation (card): 2-3 terms of up to 3 words, joined by + = or ->;
-  only the result term may use Signal ink.
+  only the result term may use Signal ink. The joiners come from the
+  overlay's operators list (one between each pair of terms) and fill
+  operator slots between the term slots; never pick them yourself.
 - to-statement (takeover): headline 1-3 words at type 60 or 84 +
   optional source line up to 7 words at 30.
 - to-stat (takeover): one number (Signal ink) + unit + label of up to
