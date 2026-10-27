@@ -36,7 +36,8 @@ Pre-flight (read-only, report results)
 - Get the media duration with /opt/homebrew/bin/ffprobe and report it,
   and confirm the audio stream's start_time is 0. If it isn't, stop
   and tell me: every word timestamp would be offset.
-- Extract the audio only: ffmpeg -n -i raw.mp4 -vn -ac 1 -c:a flac
+- Extract the audio only: mkdir -p /tmp/transcribe, then
+  ffmpeg -n -i raw.mp4 -vn -ac 1 -c:a flac
   /tmp/transcribe/raw-audio.flac (WAV if the API rejects FLAC). Before
   the call, tell me what will be uploaded (audio only, its size) and
   that this is a paid API call.

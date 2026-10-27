@@ -342,17 +342,24 @@ Stop and wait. I'll reply with approve / keep / changed ranges per id,
 or "approve zero cuts".
 
 === PHASE 2: APPLY, RENDER AND QA (only after I approve) ===
-- Write raw.approved-cuts.json from my reply exactly (id, start, end,
-  reason). Show it.
-- If I approved zero cuts: write { "cuts": [] }, run apply --dry-run to
-  confirm it's a no-op, confirm no raw.mistakes-* or raw.clean.mp4 was
-  created, confirm the input md5 checksums are unchanged, and say
-  raw.silenced.mp4 and raw.silence-transcript.json are the final outputs
-  of this step. Do not render. Stop.
-- Run apply --dry-run. Show each merged cut with the words it removes
-  and the words on each side. Stop if the boundary check fails or any
-  dropped word wasn't meant to go.
-- Run apply --video raw.silenced.mp4 --apply.
+- Write my approvals exactly (id, start, end, reason) to
+  /tmp/cut-mistakes/approved-cuts.json first. Show it.
+- If I approved zero cuts: write { "cuts": [] } there, run apply
+  --dry-run --cuts on it to confirm it's a no-op, then copy it to
+  raw.approved-cuts.json (mode "x"). Confirm no raw.mistakes-* or
+  raw.clean.mp4 was created, confirm the input md5 checksums are
+  unchanged, and say raw.silenced.mp4 and raw.silence-transcript.json
+  are the final outputs of this step. Do not render. Stop.
+- Run apply --dry-run --cuts /tmp/cut-mistakes/approved-cuts.json. Show
+  each merged cut with the words it removes and the words on each side.
+  Stop if the boundary check fails or any dropped word wasn't meant to
+  go; nothing has been written to this folder yet, so we can correct
+  the cuts and re-run.
+- Only after the dry run passes: copy it to raw.approved-cuts.json
+  (mode "x"), then run apply --video raw.silenced.mp4 --apply.
+- If the render fails, stop and list any partial outputs (e.g. a
+  half-written raw.clean.mp4); don't delete them. The orchestrator
+  archives them with my approval before a retry.
 
 Verify with /opt/homebrew/bin/ffprobe
 - raw.clean.mp4 duration is within 0.1s of edited_duration.

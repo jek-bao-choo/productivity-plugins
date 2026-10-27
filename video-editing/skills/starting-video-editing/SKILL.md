@@ -37,7 +37,10 @@ Project
   and the md5 in PIPELINE.md.
 - You never delete, move or overwrite any file yourself except
   PIPELINE.md. A skill may do what its own SKILL.md says (for example,
-  cutting-silences deletes its Phase 1 files before rendering).
+  cutting-silences deletes its Phase 1 files before rendering). One
+  exception: when I approve a section in chat, change that section's
+  "<section>: awaiting approval" line in film/REVIEW.md to
+  "<section>: approved" (that line only), then mirror it in the ledger.
 
 PIPELINE.md (the ledger; create it on the first run with mode "x")
 - Project: source path, raw.mp4 md5, created date.
@@ -81,7 +84,11 @@ disagree, and say so.
    cuts list is empty (zero cuts: the silence pair carries forward) or
    raw.clean.mp4 + raw.mistakes-transcript.json exist with matching
    durations. Awaiting approval when raw.cut-candidates.json exists
-   without raw.approved-cuts.json.
+   without raw.approved-cuts.json. Stopped mid-apply when
+   raw.approved-cuts.json has cuts but raw.clean.mp4 +
+   raw.mistakes-transcript.json are missing or don't match: list the
+   partial outputs, and with my approval archive them (and
+   raw.approved-cuts.json) so Phase 2 can re-run.
 3. Storytelling: done when plan/STORY.md, plan/DESIGN.md and
    plan/beat-sheet.json exist and the ledger records the plan approved.
 4. Overlays: done when plan/overlay-beats.json and plan/OVERLAYS.md
@@ -127,7 +134,10 @@ Redo a step ("redo the silence cut", "re-plan the story")
 - Don't delete anything. List the outputs the redo would replace and
   every later step and approval it makes stale. With my approval, move
   those outputs into archive/<step>-<date>/ (the only move allowed),
-  mark the steps stale or todo, then run the step.
+  mark the steps stale or todo, then run the step. Re-planning the story
+  archives the whole plan/ folder (planning-storytelling stops if plan/
+  exists), which also takes the overlay plan, so mark planning-overlays
+  todo too.
 
 === HAND-OFFS BETWEEN STEPS ===
 - After transcription: confirm the transcript looks right with me
@@ -151,7 +161,8 @@ Rules
 - One skill at a time. Never skip, merge or shortcut a skill's phases or
   stops, and never do a skill's work yourself.
 - Read-only on everything except PIPELINE.md, the one-time raw.mp4 copy,
-  and archive moves I approve.
+  archive moves I approve, and the section approval line in
+  film/REVIEW.md when I approve a section.
 - Never send media, frames or transcripts anywhere; only the skills'
   own approved service calls (transcription) leave the machine.
 - When you're unsure what state something is in, say so and ask; don't

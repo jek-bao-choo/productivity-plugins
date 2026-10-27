@@ -9,7 +9,7 @@ Every step is a tested prompt kept word for word in its skill. Each step plans f
 - **ffmpeg** and **ffprobe**. The skills call `/opt/homebrew/bin/ffprobe`, so they assume a Homebrew install on macOS.
 - **Python 3**. The helper scripts use only the standard library.
 - **ElevenLabs API key** in `ELEVENLABS_API_KEY` (environment or `.env`). Only transcription uses it, plus one optional fresh transcription in finishing-video. Both are paid calls.
-- **HyperFrames** and **GSAP** skills, for building-sections and finishing-video. Install them with `/plugin marketplace add greensock/gsap-skills` for GSAP, and the HyperFrames plugin from its marketplace.
+- **HyperFrames** and **GSAP** skills, for building-sections and finishing-video. Install GSAP with `/plugin marketplace add greensock/gsap-skills`. For HyperFrames, use the `hyperframes@hyperframes` plugin: the older copy in the official marketplace (0.8.61) doesn't know the `history` and `usage` commands these skills use, so remove it if you have both.
 - **Node.js**, for `npx hyperframes`.
 
 ## How to start
@@ -33,7 +33,7 @@ Other things to say:
 | 3 | `planning-storytelling` | Plans the visual story: world, camera windows, open loop, beat sheet | `plan/STORY.md`, `plan/DESIGN.md`, `plan/beat-sheet.json` |
 | 4 | `planning-overlays` | Plans lower-third cards and takeovers on top of the story (optional) | `plan/overlay-beats.json`, `plan/OVERLAYS.md` |
 | 5 | `building-sections` | Builds one section in HyperFrames with GSAP, renders and reviews it muted | `film/`, `film/REVIEW.md` |
-| 6 | `finishing-video` | Assembles all sections, runs full QA, renders the final | `renders/final-v<N>.mp4`, `deliver/VERIFY.md` |
+| 6 | `finishing-video` | Assembles all sections, runs full QA, renders the final, writes SRT and VTT caption files | `renders/final-v<N>.mp4`, `deliver/captions.srt`, `deliver/VERIFY.md` |
 
 You can also run any skill on its own by naming it, for example "run cutting-mistakes".
 
@@ -41,7 +41,7 @@ You can also run any skill on its own by naming it, for example "run cutting-mis
 
 - **Reused scripts.** Several skills reuse helper scripts (`cut_silences.py`, `cut_mistakes.py`, `story_tools.py`, `beats_tools.py`, `finish_tools.py`) from a previous video's folder. The orchestrator asks once for that folder (`tools_from`) and fills in each skill's `<PATH TO PREVIOUS FOLDER>`. If a script is missing, the skill writes it from the spec in its prompt and runs its self-test first.
 - **Nothing is overwritten.** Outputs open with mode `"x"`, renders get new version numbers, and inputs are checked by md5 at the end of each step.
-- **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions, and they send audio only. HyperFrames AI describe, upload and share options stay off.
+- **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions, and they send audio only. HyperFrames AI describe, upload and share options stay off, and the skills don't pass `--skill`, which tags renders in HyperFrames' anonymous usage telemetry. The CLI may still send its own anonymous telemetry; run `npx hyperframes telemetry` to see or turn it off.
 - **No logos or brand marks.** The design system follows Datadog colours by default, but these are personal learning videos, not official content.
 
 **Example prompts:**

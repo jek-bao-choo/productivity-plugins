@@ -81,17 +81,25 @@ HTML or GSAP: decide per object, record it in film/SPEC.md (OBJECTS)
 
 Project (film/, created on the first run, reused after)
 - First run: `npx hyperframes init film --example blank --resolution
-  <landscape | the canvas from plan/STORY.md> --non-interactive --skill
-  hyperframes`, then write film/SPEC.md (GOAL, OUTPUT, TIME, LOOK,
+  <preset> --non-interactive`, where <preset> is the resolution preset
+  nearest the canvas in plan/STORY.md (e.g. landscape); --resolution
+  takes preset names only, so if the canvas isn't a preset, set the
+  root's width and height to it after init and say so. No --skill flag
+  (it only tags the project in HyperFrames' anonymous telemetry). Then
+  write film/SPEC.md (GOAL, OUTPUT, TIME, LOOK,
   OBJECTS with html|gsap per object, MOTION, SHOTS with absolute times
   per beat, BANNED, QA times).
 - Later runs: read film/SPEC.md, film/REVIEW.md and film/LESSONS.md
-  first, run `npx hyperframes history --since mine --who <history author>`, and build on what
-  changed.
+  first, run `npx hyperframes history --since mine --who <history author>`
+  (if the installed CLI has no history command, skip it and say so),
+  and build on what changed.
 
 Localize every asset (nothing loads from the network at render)
 - Media into film/assets/, once: the screen footage (screen.mp4) and
-  speaker inset (cam.mp4) cropped per plan/STORY.md, no audio, a
+  speaker inset (cam.mp4), both cut from the locked video (never from
+  raw.mp4) so their time equals render time, cropped per plan/STORY.md
+  (the locked video keeps raw.mp4's frame size, so STORY.md's source-px
+  windows apply unchanged), no audio, a
   keyframe every 0.5s (-g = fps/2); the voice audio copied. Check one
   inset frame shows the whole head. Keep these file names: the finish
   step's lip-sync check reads film/assets/cam.mp4.
@@ -112,9 +120,10 @@ Architecture
   speaker inset, mounted at the section start with LOCAL times.
   Footage = an untimed wipe wrapper > untimed window div (CSS transform
   for the footage rect) > timed <video class="clip" muted> with
-  data-media-start = absolute source time. Inset = a timed
+  data-media-start = the beat's absolute time on the locked timeline
+  (which is the render timeline). Inset = a timed
   <video class="clip"> per beat, data-media-start = that beat's absolute
-  time so it stays lip-synced, styled per plan/DESIGN.md.
+  locked-timeline time so it stays lip-synced, styled per plan/DESIGN.md.
 - Overlays (if plan/overlay-beats.json exists): build every overlay
   whose start falls inside this section as an instance of the card type
   named in its card field, from the card library below, following
@@ -268,7 +277,7 @@ Check and review (before replying)
    the viewer must read under the inset or a card. Fix, then
    re-snapshot only what changed.
 5. Render: `npx hyperframes render --fps <fps> --quality looks
-   --video-frame-format png --workers 1 --skill hyperframes -o
+   --video-frame-format png --workers 1 -o
    renders/build-0-<END>-v<N>.mp4` in the background (--workers 1:
    the default is parallel).
    Cut the section with ffmpeg (-ss START -to END, re-encode) to

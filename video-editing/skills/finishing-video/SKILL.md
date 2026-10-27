@@ -12,9 +12,10 @@ description: >-
   works in three phases with a stop after each: assemble and check (coverage,
   hyperframes check, mounts, plan anchors, no-network) and hand off to Studio;
   draft render with frame, audio-join, optional fresh transcription diff and
-  lip-sync QA; then the final render and a deliver/ folder with edit
-  decisions, transcript, composition manifest and VERIFY.md.
-version: "0.1.0"
+  lip-sync QA, plus draft captions; then the final render and a deliver/
+  folder with edit decisions, transcript, SRT and VTT caption files,
+  composition manifest and VERIFY.md.
+version: "0.2.0"
 author: productivity-plugins
 ---
 
@@ -121,6 +122,22 @@ diff EXPECTED FRESH
   autojunk) non-equal opcodes, each with the expected start time, the
   expected words and the heard words.
 
+captions TRANSCRIPT --srt S --vtt V [--max-chars 42] [--max-lines 2]
+         [--max-dur 6] [--gap 0.6] [--duration D]
+  Words = word entries (type "word" or no type) in order; audio events
+  are skipped. Text is each word's text unchanged. Build cues in order:
+  add the next word to the current cue only if the cue text still wraps
+  (greedy, words never split) into at most --max-lines lines of at most
+  --max-chars characters, the cue stays within --max-dur seconds, and
+  the gap before the word is under --gap. A word whose text ends with
+  . ! or ? closes its cue. Cue start = first word's start, end = last
+  word's end (3 decimals), lines as wrapped.
+  SRT: numbered cues, HH:MM:SS,mmm --> HH:MM:SS,mmm, blank line between.
+  VTT: "WEBVTT", a blank line, then the same cues with HH:MM:SS.mmm.
+  Open both with mode "x". Print the cue count and flag any cue shorter
+  than 0.8s, over 20 characters per second, or ending after --duration
+  (if given). Flags are warnings: exit 0 unless the input is bad.
+
 self-test (run first; fix the script if anything differs)
   joins: silence keeps [0.28,1.51], [2.31,3.14], [4.00,6.00] -> joins
     1.23, 2.06. With mistakes deletes [1.00,1.50] and keeps [0,1.00],
@@ -140,6 +157,15 @@ self-test (run first; fix the script if anything differs)
     1.7) vs heard "The agents collects metric data." -> WER 0.75;
     exactly 2 differences: agent -> agents at 0.8, metrics -> metric
     data at 1.7.
+  captions: words (no type) The 0.50-0.70, agent 0.80-1.10, collects
+    1.20-1.60, metrics. 1.70-2.20, Then 3.00-3.20, traces 3.30-3.70,
+    flow 3.80-4.10, in. 4.20-4.50. Defaults -> 2 cues:
+    1 00:00:00,500 --> 00:00:02,200 "The agent collects metrics."
+    2 00:00:03,000 --> 00:00:04,500 "Then traces flow in."
+    With --max-chars 12 -> 3 cues: 0.500-1.600 "The agent" / "collects";
+    1.700-2.200 "metrics." (flagged: 0.50s, under 0.8s); 3.000-4.500
+    "Then traces" / "flow in.". The VTT starts with "WEBVTT" and uses
+    00:00:00.500.
   Show expected vs actual.
 
 === LIP-SYNC SPEC (check_sync_final.py) ===
@@ -158,9 +184,12 @@ locked cut, so render time t maps to source time t.
   win = w[L:L+len(r)]: corr(L) = sum(r*win - mean(win)*r) /
   (|r| * |win - mean(win)|). Best L = largest corr.
   audio_off = (t-0.55 + L/8000) - (t-0.4).
-- Video offset at t: rf = Frames(final, t-0.2, 0.4, crop = the inset's
-  canvas rect from plan/STORY.md, inside its rounded corners);
-  sf = Frames(film/assets/cam.mp4, t-0.35, 0.7, no crop). Best j =
+- Video offset at t: rf = Frames(final, t-0.2, 0.4, crop = a rect
+  inside the inset's canvas rect from plan/STORY.md, clear of its
+  rounded corners); sf = Frames(film/assets/cam.mp4, t-0.35, 0.7, crop
+  = the same region mapped into cam.mp4 pixels, i.e. offset from the
+  inset's origin and scaled by cam.mp4 width / inset width), so both
+  show the same part of the face. Best j =
   smallest mean |rf[k] - sf[j+k]|. video_off = sp[j] - rp[0].
 - sync_ms = (video_off - audio_off) * 1000 (positive = picture leads).
   Expect corr >= 0.95.
@@ -246,10 +275,16 @@ checks on what changed, then:
    each join that falls inside a visible inset.
 5. A listening list for me: every join on the final timeline with the
    words on each side and its listen clip. I listen; you can't.
+6. Draft captions: finish_tools.py captions <locked transcript> --srt
+   /tmp/finishing/captions-draft.srt --vtt
+   /tmp/finishing/captions-draft.vtt --duration <locked duration>.
+   Report the cue count, every flagged cue, and any filler words
+   (um, uh, erm, er, ah, hmm, mm, mhm) the captions would show, so I
+   can decide whether to keep them. Never burn captions into the video.
 
 Report: the draft path and specs, every check with its result (measured
 / looked at / not done), every failure with a proposed fix, the
-listening list, and input md5s unchanged. Stop and wait for my approval
+listening list, the draft captions result, and input md5s unchanged. Stop and wait for my approval
 or notes.
 
 === PHASE 3: FINAL RENDER AND DELIVERY (after approval) ===
@@ -266,6 +301,10 @@ or notes.
      plan/overlay-beats.json if it exists;
    - transcript.json: a copy of the locked transcript, which is on the
      final timeline;
+   - captions.srt and captions.vtt: finish_tools.py captions on the
+     locked transcript with --duration set to the final's duration
+     (sidecar files for players and upload sites; the picture has no
+     burned-in captions);
    - composition.txt: the film/ path and every file the root loads, with
      its md5;
    - VERIFY.md: every check run in Phases 1-3 and its result, marked

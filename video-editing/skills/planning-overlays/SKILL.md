@@ -228,6 +228,8 @@ check OVERLAYS --beatsheet B --transcript T [--budget 20]
   - card placement starting above the frame's vertical midline
   - card wider than min(1280, 0.72 x canvas width)
   - less than 0.1s between one overlay ending and the next starting
+    (only for overlays that don't overlap; an overlap is already an
+    error)
   - section words over --budget, counting storyboard label and caption
     words plus overlay headline, subline and item words
   Report: words per section (storyboard + overlays); speaker-on-screen %
