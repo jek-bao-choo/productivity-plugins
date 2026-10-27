@@ -187,9 +187,8 @@ active lines; active labels use the Type colour. No cyan, no gradient
 text. Replace derived values if internal brand values are available.
 Luma targets (Y 16-235): active 200-235, context 120-150, spent 85-105,
 labels never below 90. Verify on the render, not the hex.
-Logo: official files only, never recoloured or inverted; white on dark
-or purple, purple on light; Bits always white. "Datadog", one word,
-capital D. Logo at open and close, not a persistent corner bug.
+No logos or brand marks: this is a personal learning video, not
+official content. In text, "Datadog" is one word, capital D.
 Material: three-layer shadow stack (contact, key, ambient), neutral
 tones; top-lit edge light on plates; the video inset follows the same
 corners, shadow and edge light.
@@ -322,8 +321,8 @@ has 0 errors; fix or justify every warning. Then write (mode "x"):
   vs source px stated), the speaker inset (source crop and canvas rect),
   and build guardrails (example-only labels, footage timing to check).
 - plan/DESIGN.md: the locked tokens and palette for this video, what
-  each colour is used for here, any retuned value and why, logo,
-  material and motion.
+  each colour is used for here, any retuned value and why, the no-logo
+  rule, material and motion.
 - plan/beat-sheet.json (schema above) and plan/beat-sheet.md (the same
   as a readable table grouped by section).
 Run: story_tools.py check plan/beat-sheet.json --transcript <transcript>
