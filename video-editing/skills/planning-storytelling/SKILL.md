@@ -1,10 +1,10 @@
 ---
-name: storytelling
+name: planning-storytelling
 description: >-
   This skill should be used when the user wants to plan the visual story for an
   edited video (typically raw.clean.mp4 or raw.silenced.mp4 with its re-timed
   transcript) before any compositions are built. It applies when the user says
-  "plan the visual story", "run storytelling", "make a beat sheet", "storyboard
+  "plan the visual story", "run planning-storytelling", "make a beat sheet", "storyboard
   this video", "propose world concepts", "plan the open loop and camera
   windows", or "write STORY.md and DESIGN.md", even if they don't name the
   skill. It is agent 3 of the editing pipeline and usually follows
@@ -19,9 +19,9 @@ version: "0.1.0"
 author: productivity-plugins
 ---
 
-# Storytelling
+# Planning Storytelling
 
-This is agent 3 (storytelling) of the video editing pipeline.
+This is agent 3 (planning-storytelling) of the video editing pipeline.
 
 Follow this tested prompt exactly as written; do not reinterpret or simplify it.
 

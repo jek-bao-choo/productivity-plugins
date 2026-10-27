@@ -10,7 +10,7 @@ description: >-
   It is the orchestrator: it detects the project's state from files and
   PIPELINE.md, runs the next step with its own skill
   (converting-speech-to-text-elevenlabs, cutting-silences, cutting-mistakes,
-  storytelling, planning-overlays, building-sections, finishing-video),
+  planning-storytelling, planning-overlays, building-sections, finishing-video),
   honours every stop inside those skills, keeps the PIPELINE.md ledger of
   settings, decisions, approvals and output md5s up to date, flags stale steps,
   and never edits media itself.
@@ -60,7 +60,7 @@ Skills (load each by name; its SKILL.md is the authority)
   1. converting-speech-to-text-elevenlabs
   2. cutting-silences
   3. cutting-mistakes
-  4. storytelling
+  4. planning-storytelling
   5. planning-overlays (skippable)
   6. building-sections (once per section)
   7. finishing-video

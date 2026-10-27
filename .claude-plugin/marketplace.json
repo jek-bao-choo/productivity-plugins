@@ -35,7 +35,7 @@
       "name": "video-editing",
       "source": "./video-editing",
       "description": "Video editing workflow tools: a pipeline orchestrator, ElevenLabs speech-to-text transcription, silence cutting, spoken-mistake cutting with lip-sync QA, visual story planning, overlay planning, section-by-section HyperFrames builds, and final assembly, QA and delivery for talking-head recordings",
-      "version": "0.9.0"
+      "version": "0.10.0"
     }
   ]
 }

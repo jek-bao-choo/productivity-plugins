@@ -8,7 +8,7 @@ description: >-
   planning-overlays", "plan lower thirds", "where should cards and takeovers
   go", "check overlay coverage", or "write overlay-beats.json and OVERLAYS.md",
   even if they don't name the skill. It is agent 4 of the editing pipeline and
-  usually follows storytelling. Use it for the planning step only, not for
+  usually follows planning-storytelling. Use it for the planning step only, not for
   building HyperFrames compositions or rendering. The skill runs read-only
   pre-flight checks, builds or reuses beats_tools.py, scans storyboard coverage
   for pacing gaps, proposes one overlay or none per topic span, picking a card
