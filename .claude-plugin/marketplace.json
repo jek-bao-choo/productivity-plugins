@@ -34,8 +34,8 @@
     {
       "name": "video-editing",
       "source": "./video-editing",
-      "description": "Video editing workflow tools: ElevenLabs speech-to-text transcription, silence cutting, spoken-mistake cutting with lip-sync QA, visual story planning, overlay planning, and section-by-section HyperFrames builds for talking-head recordings",
-      "version": "0.7.0"
+      "description": "Video editing workflow tools: ElevenLabs speech-to-text transcription, silence cutting, spoken-mistake cutting with lip-sync QA, visual story planning, overlay planning, section-by-section HyperFrames builds, and final assembly, QA and delivery for talking-head recordings",
+      "version": "0.8.0"
     }
   ]
 }
