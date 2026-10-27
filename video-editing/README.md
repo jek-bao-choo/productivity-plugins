@@ -18,6 +18,8 @@ Say **"set up OBS"** to run `configuring-obs-studio-screen-recording` once. It c
 
 ## How to start
 
+See the [pipeline diagram and full prerequisites](skills/starting-video-editing/README.md).
+
 Put the recording in its own folder as `raw.mp4`, open Claude Code there, and say **"edit this video"**. The orchestrator (`starting-video-editing`) works out where the project is, runs the next step with its skill, and records settings, decisions, approvals and output checksums in `PIPELINE.md`.
 
 On the first run it asks for all its settings at once (reused-scripts folder, overlays, fresh transcription, final quality, privacy, pinned HyperFrames CLI). `auto_advance` defaults to yes: the run keeps going and stops only for a video or audio clip you need to review, a HyperFrames Studio review, a decision only you can make, or a paid call you haven't approved yet. Every other stop is approved automatically and logged. Decisions come with a recommended option first; replying "approve" takes the recommendations.
