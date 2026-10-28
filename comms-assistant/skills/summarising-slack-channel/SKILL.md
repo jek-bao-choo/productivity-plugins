@@ -15,7 +15,7 @@ description: >-
   the #apm blocks", or mentions a TIL FAQ newsletter. Make sure to use this
   skill whenever the user asks about Slack channel activity, wants to review
   discussions, or needs to extract insights from Slack message history.
-version: "0.7.0"
+version: "0.7.2"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A, newsletter, til, faq
 ---
@@ -28,7 +28,7 @@ You are a Technical Newsletter Editor. Your goal is to transform Slack message h
 
 ## Task
 
-Summarise Slack messages from a specific timeframe. Identify technical questions, provide summarised answers, extract links, and classify tags from the Slack messages and thread replies. Then copy the Q&A blocks that carry the requested newsletter tags into a daily TIL FAQ newsletter.
+Summarise Slack messages from a specific timeframe. Identify technical questions, provide summarised answers, extract links, and classify tags from the Slack messages and thread replies. Then copy the Q&A blocks that carry the requested newsletter tags, plus popular conversations with a `MESSAGE_COUNT` greater than 10, into a daily TIL FAQ newsletter.
 
 ## Prerequisites
 
@@ -164,7 +164,7 @@ MESSAGE_COUNT: [Integer total of messages in the conversation: the parent messag
 
 Use the workspace domain returned by Slack metadata or supplied by the user for `{workspace-domain}`, or a canonical permalink returned by Slack. Do not hardcode an organization's hostname. All channel names, identifiers, timestamps, and usernames in these examples are placeholders or synthetic values.
 
-Use a horizontal rule `---` to separate summaries of different Slack messages.
+Separate every Q&A block, including multiple blocks from the same Slack message, and the summaries of different Slack messages with a blank line, a horizontal rule `---`, then another blank line. Never put `---` directly under a text line: Markdown would turn that line into a heading.
 
 ### Tagging Rules
 
@@ -176,7 +176,9 @@ Include `TAGS:` in every Q&A block, immediately after `EXTERNAL_URLs:` and befor
 
 - `#presentation`: Slide decks, such as Google Slides (`docs.google.com/presentation/`), PowerPoint (`.ppt` / `.pptx`), or a clearly identified presentation.
 - `#spreadsheet`: Spreadsheets, such as Google Sheets (`docs.google.com/spreadsheets/`), Excel (`.xls` / `.xlsx`), or CSV files.
-- `#documentation`: Technical documentation, guides, references, runbooks, or process documentation, including relevant Datadog Docs pages. A generic Google Doc or ordinary webpage is not automatically documentation; use its title or content as evidence.
+- `#doc`: Word processing documents, such as Google Docs (`docs.google.com/document/`) or Microsoft Word files (`.doc` / `.docx`, including Word files opened from SharePoint or OneDrive). Tag by file type, whatever the document is about.
+- `#datadog-technical-doc`: Datadog technical documentation pages, such as `docs.datadoghq.com` (any language or regional variant). Do not use it for Datadog marketing pages, blog posts, or a Google Doc or Word file that only discusses Datadog; tag those by their own type.
+- `#non-datadog-doc`: Ordinary webpages and non-Datadog technical documentation, guides, references, or runbooks, such as vendor or open source docs, GitHub READMEs, wikis, or Confluence pages. Do not use it for Google Docs or Word files (use `#doc`), slides, spreadsheets, PDFs, or `docs.datadoghq.com` pages.
 - `#pdf`: PDF resources identified by a `.pdf` URL/path, PDF content type, or clear file metadata.
 
 A link can support multiple types, such as a presentation exported to PDF (`#presentation #pdf`). Do not guess from an opaque shortened URL or inaccessible Drive file; omit uncertain types. When `EXTERNAL_URLs: NONE`, omit content-type tags while retaining any applicable product and update tags. External lookups classify links only: keep `EXTERNAL_URLs` limited to URLs actually present in Slack.
@@ -318,7 +320,11 @@ The coordinating agent runs this phase alone, after every channel worker has fin
 
 1. **Load existing keys:** If `newsletter-{date}.md` already exists in the current working directory, read it and collect every `SLACK_URL:` value as the starting dedup set. Otherwise start with an empty set.
 2. **Extract blocks:** Read each summary file saved in this run, in the original section/channel order. A block starts at a line beginning with `DATE:` and ends just before the next line that is `---`, the next markdown heading (a line starting with `#` followed by a space), the next `DATE:` line, or the end of the file. Ignore everything outside blocks.
-3. **Select:** Pick a block when its `TAGS:` line contains **any** newsletter tag. Compare in lowercase and match whole tags only: `#apm` does not match `#apm-agent`. A block with no `TAGS:` line does not match.
+3. **Select:** Pick a block when **either** is true:
+   1. Its `TAGS:` line contains **any** newsletter tag. Compare in lowercase and match whole tags only: `#apm` does not match `#apm-agent`.
+   2. Its `MESSAGE_COUNT:` is an integer greater than 10 (11 or more). Popular conversations always go in, whether the default or user supplied tags are in use.
+
+   A block that matches neither rule is skipped. A missing `TAGS:` line or a missing or non-integer `MESSAGE_COUNT:` simply fails that rule.
 4. **Dedup:** Skip a block whose `SLACK_URL` value is already in the dedup set; add each picked block's key straight away. If a block has no usable `SLACK_URL`, compare the whole block text instead. Rerunning on the same day must never duplicate content.
 5. **Write:** If no blocks were picked, do not touch the newsletter. Otherwise build one section per source file with at least one picked block, copying each block verbatim and trimming only trailing blank lines:
 
@@ -352,7 +358,7 @@ Archive every summary file saved in this run, including files with no picked blo
 Tell the user:
 - The archived path of each summary file, plus any channel that failed or had no messages
 - The newsletter tags used
-- The newsletter file, how many blocks were added and how many duplicates were skipped (or that no blocks matched)
+- The newsletter file, how many blocks were added (picked by tags, and picked only because `MESSAGE_COUNT` is greater than 10) and how many duplicates were skipped (or that no blocks matched)
 - The archive folder and how many files were moved
 
 ## Constraint Checklist

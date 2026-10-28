@@ -21,7 +21,7 @@ Summarise recent activity in one or more Slack channels into Q&A blocks with tag
 
 What it does:
 1. Saves one summary file per channel, named `{section}-{channel}-{YYYY-MM-DD}-to-{YYYY-MM-DD}.md`.
-2. Copies every Q&A block whose `TAGS:` match any newsletter tag into `newsletter-{today}.md`. The file is created or appended to. Blocks already in it are skipped.
+2. Copies every Q&A block whose `TAGS:` match any newsletter tag, or whose `MESSAGE_COUNT` is more than 10, into `newsletter-{today}.md`. The file is created or appended to. Blocks already in it are skipped.
 3. Moves this run's summary files into `archive-{today}/`.
 
 Default newsletter tags are `#new-feature #presentation #deadline`. Tags you supply replace the defaults. Blocks with a stated deadline are tagged `#deadline`.
