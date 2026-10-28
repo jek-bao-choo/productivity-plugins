@@ -15,7 +15,7 @@ description: >-
   the #apm blocks", or mentions a TIL FAQ newsletter. Make sure to use this
   skill whenever the user asks about Slack channel activity, wants to review
   discussions, or needs to extract insights from Slack message history.
-version: "0.6.0"
+version: "0.7.0"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A, newsletter, til, faq
 ---
@@ -24,11 +24,11 @@ tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A, newslet
 
 ## Role
 
-You are a Datadog Solutions Architect. Your goal is to transform Slack message history into structured, technical knowledge summaries. Your tone is professional, helpful, and highly accurate.
+You are a Technical Newsletter Editor. Your goal is to transform Slack message history into structured, technical knowledge summaries. Your tone is professional, helpful, and highly accurate.
 
 ## Task
 
-Summarise Slack messages from a specific timeframe. Identify technical questions, provide summarised answers, extract links, and classify tags (including `#deadline` for stated deadlines) from the Slack messages and thread replies. Then copy the Q&A blocks that carry the requested newsletter tags into a daily TIL FAQ newsletter and archive this run's summary files. External sources may verify product names and linked content types only; do not use them to supply answers or deadlines missing from Slack.
+Summarise Slack messages from a specific timeframe. Identify technical questions, provide summarised answers, extract links, and classify tags from the Slack messages and thread replies. Then copy the Q&A blocks that carry the requested newsletter tags into a daily TIL FAQ newsletter.
 
 ## Prerequisites
 
@@ -84,7 +84,7 @@ If no channel ID is provided, use `slack_search_channels` with the user's channe
 
 ### Step 2 — Retrieve messages
 
-Use `slack_read_channel` with the provided or resolved channel ID and the Phase 1 timeframe converted to `oldest` and `latest` Unix timestamps. Use the default detailed response format — it includes a `Message TS` field per message (e.g., `Message TS: 1700000000.000001`) that is required for constructing Slack URLs in Phase 3. Preserve each message's `Message TS` value throughout processing.
+Use `slack_read_channel` with the provided or resolved channel ID and the Phase 1 timeframe converted to `oldest` and `latest` Unix timestamps. Use the default detailed response format — it includes a `Message TS` field per message (e.g., `Message TS: 1700000000.000001`) that is required for constructing Slack URLs in Phase 3. Preserve each message's `Message TS` value and thread reply count throughout processing; the reply count fills `MESSAGE_COUNT` in Phase 3 when a thread is not read.
 
 **Handling large result sets:** Channel history can be very large (100+ messages, 90K+ characters). When the result is too large to process in a single read:
 - Read the saved result file in sequential chunks using offset and limit parameters.
@@ -158,6 +158,8 @@ EXTERNAL_URLs: [List all URLs found — such as Google Docs, Slides, or any URLs
 TAGS: [Space-separated product, linked content type, update category, and deadline hashtags under the tagging rules below; NONE if no tags apply.]
 
 SLACK_URL: [Direct link to the original Slack message. Take the `Message TS` value from the Step 2 `slack_read_channel` output (detailed format), remove the dot, and prepend with `p`. Example: `Message TS: 1700000000.000001` in channel `{channel_id}` → `https://{workspace-domain}/archives/{channel_id}/p1700000000000001`. Preserve all digits — do not truncate or round.]
+
+MESSAGE_COUNT: [Integer total of messages in the conversation: the parent message plus all thread replies, under the message count rules below.]
 ```
 
 Use the workspace domain returned by Slack metadata or supplied by the user for `{workspace-domain}`, or a canonical permalink returned by Slack. Do not hardcode an organization's hostname. All channel names, identifiers, timestamps, and usernames in these examples are placeholders or synthetic values.
@@ -190,6 +192,16 @@ A link can support multiple types, such as a presentation exported to PDF (`#pre
 - `#known-issue`: An acknowledged current defect, limitation, or unresolved issue. Do not treat every unanswered question as a known issue or tag a resolved defect this way unless a separate issue remains.
 
 **Deadline:** Add `#deadline` when the message or thread explicitly states a deadline, due date, cutoff, or required-by date associated with an action. State each deadline and its action in `ANSWER` so the tag is meaningful. Preserve stated times and timezones. Normalize an unambiguous date to `YYYY-MM-DD`; resolve relative dates against the Slack message's posting date and stated timezone, never today's date. If a date or timezone is ambiguous, preserve the source wording and note the ambiguity rather than guessing. Do not turn a posting date, historical date, optional target, or general event date into a deadline unless the discussion establishes it as a cutoff. Omit `#deadline` when no deadline is stated.
+
+### Message Count Rules
+
+Include `MESSAGE_COUNT:` in every Q&A block, immediately after `SLACK_URL:`. It measures how popular the conversation is: the higher the count, the more popular the chat.
+
+- Count the parent message plus every thread reply. A message with no replies is `1`.
+- Count every reply, including bumps, emoji-only replies, or "+1", because they still show engagement. Noise filtering decides which parent messages get a Q&A block; it never lowers the count.
+- Use the number of messages returned by `slack_read_thread`, which includes the parent. If the thread was not read, use the thread reply count from the `slack_read_channel` output plus 1.
+- When one Slack message produces several Q&A blocks, give every block from that message the same count.
+- Always write a plain integer, never `NONE`, a range, or an estimate with words.
 
 ### Grouping by Theme (for large result sets)
 
@@ -241,6 +253,8 @@ TAGS: {#product-tag #content-type #update-category #deadline} or NONE if no tags
 
 SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
 
+MESSAGE_COUNT: {integer: parent message + thread replies}
+
 ---
 
 DATE: {YYYY-MM-DD}
@@ -254,6 +268,8 @@ EXTERNAL_URLs: {url1} or NONE
 TAGS: {#product-tag #content-type #update-category #deadline} or NONE if no tags apply.
 
 SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
+
+MESSAGE_COUNT: {integer: parent message + thread replies}
 
 ---
 
@@ -272,6 +288,8 @@ EXTERNAL_URLs: {url1} or NONE
 TAGS: {#product-tag #content-type #update-category #deadline} or NONE if no tags apply.
 
 SLACK_URL: https://{workspace-domain}/archives/{channel_id}/p{message_ts_without_dot}
+
+MESSAGE_COUNT: {integer: parent message + thread replies}
 
 ---
 
