@@ -42,8 +42,10 @@ Pull every recent Slack message, email and calendar event involving each person 
 Input table:
 
 ```markdown
-| SLACK_USER_ID | SLACK_DISPLAY_NAME | EMAIL_ADDRESS |
+| PRIORITY | SLACK_USER_ID | SLACK_DISPLAY_NAME | EMAIL_ADDRESS |
 ```
+
+Every row is analysed by default. Ask for a priority to narrow the run, for example "highest priority only" for `PRIORITY` 1 (1 is the highest).
 
 What it does:
 1. Runs every Slack search type per person (from:, with:, is:thread, in:@ DM, is:dm, creator: files, reactions, saved), plus Gmail and Calendar by email address.
@@ -55,6 +57,7 @@ Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when 
 **Example prompts:**
 - "Flatten my communication with the people in people.md"
 - "Run the daily people analysis for this table"
+- "Run the people analysis for priority 1 only"
 - "What has @example-person been saying to me over the past week?"
 
 ### drafting-gmail

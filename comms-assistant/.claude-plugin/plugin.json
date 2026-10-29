@@ -1,5 +1,5 @@
 {
   "name": "comms-assistant",
   "description": "Draft and summarise Slack communications, build a daily TIL FAQ newsletter, and flatten communication with people across Slack, Gmail and Calendar using MCP tools",
-  "version": "0.6.0"
+  "version": "0.6.1"
 }
