@@ -254,25 +254,16 @@ Depth,Title,Description,Success Criteria
 ...
 ```
 
-## Reference: Confluence Product Wiki Pages
+## Reference: Product Wiki Pages
 
-When the user needs deeper product context, search Confluence ({wiki-space} space) for:
+When the user needs deeper product context, search the team's internal product wiki (for example with the Atlassian MCP) by product name, such as LLM Observability or Cloud SIEM. Use only pages the user can access, and do not copy internal pricing or page identifiers into outputs.
 
-- **LLM Observability:** page ID `{page-id}` — pricing, value props, HIPAA, data privacy
-- **Cloud SIEM:** page ID `{page-id}` — TDIR capabilities, OOTB rules, MITRE ATT&CK
-- **General product wikis:** space `{wiki-space}` — search by product name
+## Reference: LLM Observability Packaging
 
-Use Atlassian MCP CQL search:
-```
-space = "{wiki-space}" AND title ~ "<product name>" AND type = page
-```
+For current pricing, see the public [Datadog pricing page](https://www.datadoghq.com/pricing/?product=llm-observability).
 
-## Reference: LLM Observability Pricing (from Confluence)
-
-- See the public Datadog pricing page for current LLM Observability pricing.
-- Additional requests above 100K: $8 per 10,000 LLM requests
 - No other Datadog product required
-- HIPAA eligible (since April 2025)
+- HIPAA eligible
 - Sensitive Data Scanner included with LLMObs
 - OOTB evaluations require customer's own OpenAI/Anthropic/Bedrock keys (BYOK)
 - Custom LLM-as-a-Judge supports: OpenAI, Anthropic, Bedrock, Vertex AI (Gemini), Azure OpenAI, AI Gateway

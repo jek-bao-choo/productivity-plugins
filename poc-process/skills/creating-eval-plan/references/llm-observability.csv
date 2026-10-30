@@ -47,6 +47,6 @@ Depth,Title,Description,Success Criteria
 7,Post POV,,
 7.1,POV Playback / Showback,,Technical validation outcomes presented
 7.2,Commercial Alignment,,
-- See the public Datadog pricing page for current LLM Observability pricing.
+7.2.1,Confirm LLM Request Volume for Pricing,"Confirm the expected monthly LLM request volume and estimate cost using the public Datadog pricing page.",Volume confirmed and pricing estimated
 7.2.2,Review Sensitive Data Scanner Inclusion,"SDS included with LLMObs for PII redaction in LLM traces.",SDS requirements reviewed
 7.3,Define Production Rollout Plan,,Rollout timeline and owner agreed

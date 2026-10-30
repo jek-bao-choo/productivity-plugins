@@ -2,3 +2,7 @@
 
 # skill-creator eval workspaces (disposable test/benchmark artifacts)
 **/*-workspace/
+
+# Python bytecode (contains local absolute paths)
+__pycache__/
+*.pyc

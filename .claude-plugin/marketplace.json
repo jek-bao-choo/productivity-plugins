@@ -17,7 +17,7 @@
       "name": "sales-process",
       "source": "./sales-process",
       "description": "Sales process tools: RFP/RFI Responses, Lead Qualification, and more",
-      "version": "0.2.0"
+      "version": "0.2.1"
     },
     {
       "name": "product-demo",
@@ -29,7 +29,7 @@
       "name": "poc-process",
       "source": "./poc-process",
       "description": "Proof of Concept artifact generation tools: Evaluation Plans, TMAPs, Success Criteria, and Scoping Decks",
-      "version": "0.3.0"
+      "version": "0.3.1"
     },
     {
       "name": "video-editing",
