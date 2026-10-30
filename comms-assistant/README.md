@@ -1,6 +1,6 @@
 # comms-assistant
 
-Draft and summarise Slack communications, build a daily TIL FAQ newsletter, and flatten communication with people across Slack, Gmail, Calendar and Drive using MCP tools.
+Draft and summarise Slack communications, build a daily TIL FAQ newsletter, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Required MCP tools:
 - `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `drafting-gmail` and `flattening-communication`)
 - `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`)
 
-`flattening-communication` also uses Gmail, Google Calendar and Google Drive MCPs when available. Without them it runs on Slack only and reports the gap.
+`flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
 
 ## Skills
 
@@ -46,15 +46,16 @@ Input table:
 ```
 
 What it does:
-1. Runs every Slack search type per person (from:, with:, mentions, is:thread, in:@ DM, is:dm, creator: files, reactions, saved), searches your Gmail by their address, reads their calendar (or the meetings you share with them), and lists the Google Drive files they created or edited that you can see.
+1. Runs every Slack search type per person (from:, with:, mentions, is:thread, in:@ DM, is:dm, creator: files, reactions, saved), searches your Gmail by their address, reads their calendar (or the meetings you share with them), lists the Google Drive files they own or last edited that you can see (newest first, in a **Drive files** section, for the same timeframe as the report, optionally filtered by name keyword and type doc/sheet/slides/pdf), and pulls their Zoom meetings (with AI summaries and next steps), chats, canvases, notes and calls.
 2. Removes duplicates within the run.
-3. Writes `analysis-{display-name}-{YYYY-MM-DD}.md` for each person, named with the date it runs. A rerun on the same day replaces that day's file. Each report has a **Summary** (what they are involved in, mood, character, meetings, watch out, follow up), **Involved in** blocks grouped by account or project, and a one-line-per-item **Timeline**. Every involvement ends with **Sources** links such as `#channel-name · Thu 29 Oct 11:43`. Character, behaviour and sentiment come only from the person's own words. Behaviour labels such as complaining or blaming always carry a quote.
+3. Writes `analysis-{display-name}-{YYYY-MM-DD}.md` for each person, named with the date it runs. A rerun on the same day replaces that day's file. Each report has a **Summary** (what they are involved in, mood, character, meetings, watch out, follow up), **Involved in** blocks grouped by account or project, and a one-line-per-item **Timeline**. Every involvement ends with **Sources** links such as `#channel-name · Thu 29 Oct 11:43`. Involvement blocks also list stated decisions, action items and open questions, each with its source. Character, behaviour and sentiment come only from the person's own words. Behaviour labels such as complaining or blaming always carry a quote.
 
 Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when run on a Monday. It is built for a daily Monday to Friday schedule. Meetings are included up to 23:59 today, so you also see what is still coming up. Any period you supply overrides it. Slack, Gmail and Drive only cover what your own account can see. Drive records only the last editor of a file.
 
 **Example prompts:**
 - "Flatten my communication with the people in people.md"
 - "Run the daily people analysis for this table"
+- "Run the people analysis for the past week, Drive files: type sheet, name contains pipeline"
 - "What is @example-person involved in this week?"
 
 ### drafting-gmail
