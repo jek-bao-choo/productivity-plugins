@@ -1,20 +1,23 @@
 ---
 name: building-sections
 description: >-
-  This skill should be used when the user wants to build one section of an
+  This skill should be used when the user wants to build one or more sections of an
   approved video plan (plan/STORY.md, plan/DESIGN.md, plan/beat-sheet.json and
   optionally plan/overlay-beats.json) end to end as HyperFrames compositions
   with GSAP, render it, and review it muted. It applies when the user says
   "build section s2", "run building-sections", "build the next section", "build
   the first section of the plan", "render and review this section", or "build
-  the cards and overlays for this section", even if they don't name the skill.
+  the cards and overlays for this section", "build the remaining sections in
+  parallel" or "build s1, s2 and s5 at once", even if they don't name the skill.
   It is agent 5 of the editing pipeline and usually follows planning-overlays.
   The skill reads the HyperFrames and GSAP skills first, creates or reuses the
   film/ project, localizes every asset, builds the persistent world, the
   section's footage and speaker inset, and its overlays from a reusable card
   library, then runs check, timeline-duration, no-network, snapshot, render,
   muted frame review and luma checks, writes film/REVIEW.md and film/LESSONS.md,
-  and stops after that one section.
+  and stops after that one section. In parallel mode (after an approved pilot
+  section) it briefs one helper agent per section, merges their work, renders
+  once and reviews every section from that render.
 version: "0.1.0"
 author: productivity-plugins
 ---
@@ -26,12 +29,15 @@ This is agent 5 (building-sections) of the video editing pipeline.
 Follow this tested prompt exactly as written; do not reinterpret or simplify it.
 
 ```
-Build one section of the approved plan end to end, then render it and
-review it muted. Stop after that section; do not build others.
+Build sections of the approved plan end to end, then render and review
+them. In single mode, build one section and stop after it; do not build
+others. In parallel mode, build several sections at once with helper
+agents (PARALLEL MODE at the end), then render once and stop.
 
 Run settings (fill in before each run)
-- Section: <SECTION_ID> (its title and times come from
-  plan/beat-sheet.json)
+- Mode: <single <SECTION_ID> | parallel <SECTION_ID list>> (titles and
+  times come from plan/beat-sheet.json). Parallel needs an approved
+  pilot section first; the first section of a video is always single.
 - First run for this video: <yes | no>
 - Decisions already made: <list each, or "none">
 - History author: <claude | codex | your name> (default claude)
@@ -174,7 +180,8 @@ Seek and render safety
 - A footage clip that starts or ends while visible gets poster and
   last-frame stills (extracted from the derived clip) bracketing it, or
   runs 0.3s past its exit wipe.
-- Render with one worker.
+- Render with the measured worker count (render_workers in Run settings
+  or PIPELINE.md; 1 until measured, see the worker test in step 5).
 
 Motion (plan/DESIGN.md and the storytelling rules win)
 - One idea per beat. Every transition uses motion; never a hard cut or
@@ -324,9 +331,26 @@ Check and review (before replying)
    the viewer must read under the inset or a card. Fix, then
    re-snapshot only what changed.
 5. Render: `npx hyperframes render --fps <fps> --quality looks
-   --video-frame-format png --workers 1 --protocol-timeout 900000 -o
-   renders/build-0-<END>-v<N>.mp4` in the background (--workers 1:
-   the default is parallel), through the render guard below.
+   --video-frame-format png --workers <render_workers>
+   --protocol-timeout 900000 -o renders/build-0-<END>-v<N>.mp4` in the
+   background, through the render guard below. Always pass --workers
+   explicitly: the CLI default is "auto" (parallel).
+   Worker test (first run, and whenever the pinned CLI or the machine
+   changes; record the result as render_workers in film/LESSONS.md and
+   the ledger):
+   - Use a scratch root in /tmp/building/wtest/ that mounts the built
+     section (or a 10 s span of it, hosts shifted to 0) with the same
+     assets, and render it with --workers 1, 2 and 3, one at a time,
+     each through the render guard. Note each render's time.
+   - Compare every candidate with the 1-worker render: frame count and
+     duration identical; decoded frames identical or within encoder
+     noise (mean |difference| < 0.5 on 0-255 at 1 fps across the span);
+     lip sync 0.0 ms at 3 points with the step 6 method; audio identical.
+   - Pick the fastest count that passes. A count that times out, hits
+     zero-filled cache frames or differs in any frame fails; keep the
+     next lower one. Under heavy load (a video call), drop back to 1.
+   - Watch memory: each worker is a separate Chrome (about 256 MB plus
+     decoded 4K frames); stay under about half the free RAM.
    Render guard (write it once to /tmp/building/guarded_render.sh and
    use it for every full render, here and in finishing-video):
    - Run under `caffeinate -dims` (macOS) so the machine can't sleep. A
@@ -347,7 +371,8 @@ Check and review (before replying)
    - Report the render's frame progress and expected end time in the
      ledger, so the orchestrator can answer "how long?".
    Render cost scales with the whole root: a 9-minute film at 60 fps
-   takes 40-55 minutes on one worker even when only one section changed.
+   took 40-55 minutes on one worker even when only one section changed;
+   the worker test is the first lever.
    The CLI has no time-range option. When the built span is long, try
    a review root before the first section review: a scratch copy of
    index.html in film/ (for example review-<section>.html) whose root
@@ -394,4 +419,79 @@ md5s unchanged; then the decisions (orchestrator format) and the Review
 block (absolute path of the review cut, watch muted and once with
 sound, a timecode table of clip time | film time | what happens | what
 to check). Then stop.
+
+=== PARALLEL MODE (several sections at once) ===
+Use only when Run settings say parallel and a pilot section is already
+approved (film/, assets, world.html, the measured media offset and
+film/LESSONS.md exist). Everything above still applies to every section;
+this adds who writes what. Only one render ever runs (two renders at
+once slow the machine and fail), so agents parallelise authoring and one
+render serves every section's review.
+
+Roles
+- Lead: you. The only writer of index.html, world.html, film/SPEC.md,
+  film/REVIEW.md, film/LESSONS.md and film/seams.json, and the only one
+  who renders.
+- Section agents: one per section, launched with the Agent tool
+  (general-purpose), all in one message so they run at once.
+
+1. Prepare (lead, before any agent starts)
+   - Read SPEC, REVIEW and LESSONS; run history; record input md5s.
+   - Write film/seams.json: for every boundary that touches a section
+     in this run, the exact state at that frame: the window rect, the
+     opacity of every drawn element and inset, which ticks or loop items
+     are lit and at what level, and whether the footage is open. Derive
+     it from plan/beat-sheet.json and the approved sections' end and
+     start states, then correct it against the page-change scan: an
+     element drawn on footage (a tick on a board) is visible at a seam
+     only if its page is on screen at that frame, and its level is the
+     one the earlier section actually leaves (a tick may still be
+     active, dimmed by the next section's first tween). Every seam
+     between two sections that share a page is continuous (no wipe).
+   - Run the page-change scan for the whole span once and save it as
+     /tmp/building/page-changes.txt for every agent.
+   - Mount every new section host in index.html now (ids = section ids,
+     start and duration on frames, distinct track indexes for hosts that
+     touch, root data-duration covering them), so agents never edit it.
+2. Fan out: one agent per section, briefed with
+   - the section id and times; the Run settings' decisions already made;
+     its two seams.json entries; the LESSONS rules; the pinned CLI, the
+     measured media offset and the privacy flags (env -u GEMINI_API_KEY,
+     snapshot --describe false); the page-change list;
+   - "Read the building-sections SKILL.md and follow its Localize,
+     Architecture, Seek and render safety, Motion and Build rules exactly";
+   - may write: compositions/<sid>.html (mode "x") and
+     /tmp/building/<sid>/ only;
+   - must not touch: index.html, world.html, SPEC.md, REVIEW.md,
+     LESSONS.md, seams.json, other sections' files, plan/, raw.*,
+     film/assets/ (ask the lead for any new asset);
+   - never render. Allowed: check, snapshot (--describe false), frame
+     grabs and measurements;
+   - report back: files written; page changes it relied on; every
+     deviation from the plan; the world.html events it needs (time,
+     element, change; e.g. chip lit, dot 3 fills) and SPEC rows (SHOTS
+     and QA times); its check result; snapshots one frame either side of
+     both seams, compared with seams.json.
+3. Merge (lead)
+   - Apply every agent's world.html events and SPEC rows. Remove any
+     placeholder wipe-in at a seam that is now continuous (that change
+     only in an approved section; record it in REVIEW.md).
+   - If an agent's seam disagrees with seams.json, seams.json wins: send
+     the agent back (SendMessage) to fix its side, then re-check.
+   - Run the project checks once: check (0 errors), timeline durations,
+     no-network, and snapshots either side of every boundary (must
+     match).
+4. Render once, through the render guard, covering every section.
+5. Review per section. Cut one review clip per section; run sync, the
+   muted frame review and luma per section (these can be parallel
+   read-only agents on the one render). Write one REVIEW.md entry per
+   section, each ending in its own "<sid>: awaiting approval" line, and
+   append LESSONS once.
+6. Report: one table row per section (review clip path, specs, sync,
+   luma, weakest moment, decisions needed), then the shared check and
+   render results and input md5s unchanged. Then stop; I approve sections
+   one by one.
+7. Fix round: notes on several sections go to agents again in parallel
+   (each edits only its own section file; the lead merges shared
+   changes), then one re-render for all of them.
 ```

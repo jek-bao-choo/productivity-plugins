@@ -78,7 +78,7 @@ You can also run any skill on its own by naming it, for example "run cutting-mis
 | 2 | `cutting-mistakes` | Proposes stutters, retakes and false starts; cuts only what you approve (zero cuts is fine) | `raw.clean.mp4`, `raw.mistakes-*` | review |
 | 3 | `planning-storytelling` | Plans the visual story: one world, camera windows, an open loop, the beat sheet | `plan/STORY.md`, `plan/DESIGN.md`, `plan/beat-sheet.json` | concept, canvas and colours |
 | 4 | `planning-overlays` (optional) | Plans lower-third cards and takeovers on top of the story | `plan/overlay-beats.json`, `plan/OVERLAYS.md` | thresholds and which cards to keep |
-| 5 | `building-sections` (once per section) | Builds one section in HyperFrames with GSAP, renders it, checks sync, reviews it | `film/`, `reviews/build/`, the `<section>: approved` line in `film/REVIEW.md` | review of each section |
+| 5 | `building-sections` (a pilot section, then the rest in parallel) | Builds sections in HyperFrames with GSAP: one pilot alone, then every remaining section at once with helper agents and one render; checks sync, reviews each | `film/`, `reviews/build/`, the `<section>: approved` line in `film/REVIEW.md` | review of each section |
 | 6 | `finishing-video` | Assembles every section, Studio check, draft QA, final render, SRT and VTT captions | `renders/final-v<N>.mp4`, `deliver/` with `VERIFY.md` and `captions.srt` / `.vtt` | Studio, draft and final review |
 
 ## What PIPELINE.md records
