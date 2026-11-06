@@ -33,6 +33,13 @@ Pre-flight (read-only, report results)
   If it's only in .env, load it without echoing (set -a; source .env;
   set +a) in the same shell as the API call.
 - Check that ffmpeg and jq exist (validation depends on jq).
+- Shell variables: the default shell may be zsh, where `status` is
+  read-only. Capture the HTTP code in a variable like `http_code`.
+- Credits: estimate the call's cost (Scribe bills by audio length) and,
+  if the key's usage endpoint (GET https://api.elevenlabs.io/v1/user/subscription)
+  answers, report the remaining credits before the call. If they're too
+  few, stop and tell me before uploading. On a quota_exceeded reply,
+  report the credits it names and stop; don't retry.
 - Get the media duration with /opt/homebrew/bin/ffprobe and report it,
   and confirm the audio stream's start_time is 0. If it isn't, stop
   and tell me: every word timestamp would be offset.

@@ -56,7 +56,10 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
   what guarantees no frames go out; never send
   media, frames or transcripts anywhere except the transcription
   call), hyperframes_cli (an exact pinned
-  version, e.g. `npx --yes hyperframes@X.Y.Z`).
+  version, e.g. `npx --yes hyperframes@X.Y.Z`), brand (none | official
+  <press-kit URL>; default none: no logos).
+  hyperframes_cli also sets the media offset: re-measure it (see
+  building-sections) whenever the pin changes.
   Ask for every unset setting once, in one batch, on the first run
   (using the decision format below), not when a later step first needs
   it. Pass them to every skill as Run settings.
@@ -66,8 +69,17 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
 - Sections table (after storytelling): id, title, times, status (todo |
   in progress | awaiting approval | approved), build order.
 - Decisions: anything I decide that a later step needs (chosen concept,
-  canvas, thresholds, card or colour choices, "decisions already made"
-  for building-sections), each with its date.
+  canvas, thresholds, card or colour choices, the brand setting, term
+  corrections for captions, "decisions already made" for
+  building-sections), each with its date.
+- Renders: every render started (file, start time, frames done / total
+  when last checked, expected end time, outcome). When I ask "how long?",
+  read the live progress and answer with frames done, percent and an
+  end time.
+- Parallel work: while a render runs, a later section may be authored
+  (by you or a helper agent) as long as it doesn't render, touches only
+  its own files and the seam it shares, and runs check and snapshots
+  only. Never two renders at once.
 - Approvals log: every approval I give, with the step and date.
 Update the ledger after every step result and every approval. When a
 skill asks for something already recorded under Decisions or Approvals,

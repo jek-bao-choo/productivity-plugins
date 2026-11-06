@@ -33,9 +33,13 @@ Scripts
   already here. Only write a new one if it's missing, implementing the
   cut-silences algorithm below in Python with only the standard library.
   Required CLI: transcript (default transcript.json), --gap, --head-pad,
-  --tail-pad, --audio-events cut|protect, --video, --apply (needs
+  --tail-pad, --audio-events cut|protect, --fps (required with --video,
+  must equal the source's constant frame rate), --video, --apply (needs
   --video), --prefix raw, --dry-run (computes and prints, writes
   nothing), --self-test.
+- If the reused script has no --fps option, it predates the frame-snap
+  fix: add the fix (step 4a, the filter-file format and the second
+  self-test case below) and show the diff before using it.
 - check_sync.py: write it to /tmp/lipsync/check_sync.py (not this
   folder) from the lip-sync algorithm below. Frame grabs go to
   /tmp/lipsync/ too.
@@ -98,6 +102,12 @@ Algorithm
    "pause {gap:.2f}s -> {keep:.2f}s".
 4. If --audio-events protect: subtract every audio_event's [start, end]
    from the delete ranges (splitting ranges where needed).
+4a. Frame snap (only with --fps): move every delete boundary to the
+   nearest frame boundary, round(t * fps) / fps, except an end equal to
+   the duration. Then every keep range holds whole frames, so its video
+   and audio lengths are identical. Without this, concat pads each
+   segment to its longer stream and the render drifts later than the
+   EDL (measured: +121 ms over 47 segments).
 5. Merge: drop ranges where end <= start, sort by start, and merge any
    range whose start <= the previous range's end. Collect all reasons.
 6. Keep ranges = complement of the merged deletes over [0, duration].
@@ -119,23 +129,32 @@ Expected:
   deletes [0, 0.28], [1.51, 2.31], [3.14, 3.50]; removed 1.44;
   edited_duration 2.06; keeps [0.28, 1.51], [2.31, 3.14];
   re-timed: Hello 0.22-0.62, world. 0.72-1.12, Again 1.32-1.72
+Same words with --fps 60:
+  deletes [0, 0.283], [1.517, 2.317], [3.133, 3.50]; removed 1.45;
+  edited_duration 2.05; keeps [0.283, 1.517], [2.317, 3.133] (74 and 49
+  whole frames); re-timed: Hello 0.217-0.617, world. 0.717-1.117,
+  Again 1.317-1.717
 Show expected vs actual.
 
 Outputs (in this folder)
 - raw.silence-edl.json: { agent: "cut-silences", params, source_duration,
   edited_duration, removed, delete_ranges: [{start, end, reasons}],
-  keep_ranges: [{start, end}] }
+  keep_ranges: [{start, end, start_frame, end_frame}] } (times to 6
+  decimals; frames only with --fps)
 - raw.silence-transcript.json: { language_code, source_audio_duration_secs,
   audio_duration_secs (edited), produced_by: "cut-silences",
   words: [{text, source_start, source_end, start, end}] }
 - raw.silence-decisions.md: source and edited duration as mm:ss.ss and
   seconds, total removed across N ranges, params, and the top 15 pause
   deletes by length (mm:ss.ss-mm:ss.ss removed X.XXs).
-- raw.silence-filter.txt (only with --video): for each keep range i,
-    [0:v]trim=start=S:end=E,setpts=PTS-STARTPTS[vi];
-    [0:a]atrim=start=S:end=E,asetpts=PTS-STARTPTS[ai];
-  then a final line: [v0][a0][v1][a1]...concat=n=N:v=1:a=1[v][a]
-  (S and E to 3 decimals).
+- raw.silence-filter.txt (only with --video, which needs --fps): for
+  each keep range i, with F0/F1 its start and end frames and
+  SPF = sample_rate / fps (it must be a whole number; 48000/60 = 800):
+    [0:v]trim=start_frame=F0:end_frame=F1,setpts=PTS-STARTPTS[vi];
+    [0:a]atrim=start_sample=F0*SPF:end_sample=F1*SPF,asetpts=PTS-STARTPTS[ai];
+  then a final line: [v0][a0][v1][a1]...concat=n=N:v=1:a=1[v][a].
+  Frame and sample numbers, never rounded times: rounded times can't land
+  on frame boundaries.
 - raw.silenced.mp4 (only with --apply):
     ffmpeg -n -i raw.mp4 -/filter_complex raw.silence-filter.txt
       -map "[v]" -map "[a]" -c:v libx264 -preset medium -crf 18
@@ -228,10 +247,12 @@ Render
 - Delete only the three Phase 1 files (raw.silence-edl.json,
   raw.silence-transcript.json, raw.silence-decisions.md), because the
   script refuses to overwrite.
-- Re-run with --video raw.mp4 --apply, plus any parameter changes.
+- Re-run with --video raw.mp4 --fps <source fps> --apply, plus any parameter changes.
 
 Verify with /opt/homebrew/bin/ffprobe
-- raw.silenced.mp4 duration is within 0.1s of edited_duration.
+- raw.silenced.mp4 duration is within one frame of edited_duration
+  (frame-snapped cuts make it exact; a larger gap means the filter used
+  rounded times, so stop and fix the script).
 - Video and audio stream durations match each other within 0.1s.
 - Report codec, resolution, fps, start_time, duration and nb_frames for
   every stream in the render, the file size, and that raw.mp4 and

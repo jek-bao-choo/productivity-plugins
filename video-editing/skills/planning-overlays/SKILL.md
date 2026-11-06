@@ -171,7 +171,7 @@ Style (from plan/DESIGN.md; Datadog by default)
   the statement, 30 for a source line), entering and leaving by clip
   wipe over the world while the camera holds still underneath; never a
   cross-fade, never a world reset.
-- No logos or brand marks.
+- Logos only as plan/DESIGN.md's brand setting allows (none by default).
 - Motion: entrances cubic-bezier(0.16,1,0.3,1), exits faster, no
   back.out on overlays (the storyboard owns it), deterministic only.
 

@@ -97,7 +97,7 @@ If an upstream file changes after approval, every later step is marked stale and
 - **Reused scripts.** Several skills reuse helper scripts (`cut_silences.py`, `cut_mistakes.py`, `story_tools.py`, `beats_tools.py`, `finish_tools.py`) from a previous video's folder. The orchestrator asks once for that folder (`tools_from`) and fills in each skill's `<PATH TO PREVIOUS FOLDER>`. If a script is missing, the skill writes it from the spec in its prompt and runs its self-test first.
 - **Nothing is overwritten.** Outputs open with mode `"x"`, renders get new version numbers, and inputs are checked by md5 at the end of each step.
 - **Privacy.** Frames, renders and transcripts stay on your machine. The only outside calls are the ElevenLabs transcriptions, and they send audio only. HyperFrames AI describe, upload and share options stay off, and the skills don't pass `--skill`, which tags renders in HyperFrames' anonymous usage telemetry. The CLI may still send its own anonymous telemetry; run `npx hyperframes telemetry` to see or turn it off.
-- **No logos or brand marks.** The design system follows Datadog colours by default, but these are personal learning videos, not official content.
+- **No logos or brand marks by default.** The design system follows Datadog colours, but these are usually personal learning videos, not official content. For official content, set `brand: official <press-kit URL>` and the official logo is used under the press kit's rules.
 
 **Example prompts:**
 - "Set up OBS"

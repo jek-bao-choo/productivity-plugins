@@ -41,8 +41,14 @@ Scripts
     --fillers, --dry-run (computes and prints, writes nothing),
     --self-test.
   - apply CLI: transcript (default raw.silence-transcript.json),
-    --cuts raw.approved-cuts.json, --prefix raw, --video, --apply (needs
+    --cuts raw.approved-cuts.json, --prefix raw, --fps (required with
+    --video, must equal its constant frame rate), --video, --apply (needs
     --video), --output raw.clean.mp4, --dry-run, --self-test.
+  - If the reused script's apply has no --fps option, it predates the
+    frame-snap fix: add it (apply step 3a, the filter-file format and the
+    extra self-test lines below) and show the diff before using it.
+- join_tools.py (scratch, /tmp/cut-mistakes/): the edge finder and join
+  preview below. Standard library plus ffmpeg.
 - check_sync_mistakes.py (only needed if cuts are rendered): write it to
   /tmp/lipsync/check_sync_mistakes.py from the lip-sync algorithm below.
 - numpy isn't installed: use plain Python plus ffmpeg and
@@ -208,6 +214,12 @@ transcription data too. From transcript.raw.json (type "word" entries):
 3. Boundary check: report any cut whose start or end falls strictly
    inside a word (word.start < t < word.end). Do not apply those; stop
    and show them.
+3a. Frame snap (only with --fps): move both edges of every cut back to
+   the frame boundary at or before them, floor(t * fps) / fps, except an
+   end equal to the duration. Both edges sit in pauses (a cut starts at
+   a removed word and ends at the next kept word), so moving back stays
+   in the pause and no kept word loses its onset. Re-run the boundary
+   check on the snapped edges; stop if one lands inside a word.
 4. Merge: sort by start, merge any cut whose start <= the previous
    range's end, and collect all reasons ("<id>: <reason>").
 5. Keep ranges = complement of the merged deletes over [0, duration].
@@ -239,11 +251,14 @@ Apply outputs (in this folder)
 - raw.mistakes-decisions.md: input and output duration (mm:ss.ss and
   seconds), total removed across N cuts, then one line per merged cut:
   "- mm:ss.ss-mm:ss.ss (X.XXs): <reasons>".
-- raw.mistakes-filter.txt (only with --video): for each keep range i,
-    [0:v]trim=start=S:end=E,setpts=PTS-STARTPTS[vi];
-    [0:a]atrim=start=S:end=E,asetpts=PTS-STARTPTS[ai];
-  then a final line: [v0][a0][v1][a1]...concat=n=N:v=1:a=1[v][a]
-  (S and E to 3 decimals).
+- raw.mistakes-filter.txt (only with --video, which needs --fps): for
+  each keep range i, with F0/F1 its start and end frames and
+  SPF = sample_rate / fps (a whole number):
+    [0:v]trim=start_frame=F0:end_frame=F1,setpts=PTS-STARTPTS[vi];
+    [0:a]atrim=start_sample=F0*SPF:end_sample=F1*SPF,asetpts=PTS-STARTPTS[ai];
+  then a final line: [v0][a0][v1][a1]...concat=n=N:v=1:a=1[v][a].
+  Frame and sample numbers, never rounded times (rounded times make
+  concat pad each segment and the render drift from the transcript).
 - raw.clean.mp4 (only with --apply):
     ffmpeg -n -i raw.silenced.mp4 -/filter_complex raw.mistakes-filter.txt
       -map "[v]" -map "[a]" -c:v libx264 -preset medium -crf 18
@@ -258,6 +273,8 @@ Expected:
   dropped: The, datadog, agent (first take), metrics
   re-timed: The 0.00-0.20, datadog 0.30-0.70, agent 0.80-1.10,
             collects 1.20-1.60, metrics. 1.70-2.20
+  With --fps 60 the same cuts are already on frames and are unchanged;
+  floor_frame(2.13) = 127/60, floor_frame(0.51) = 30/60.
 Show expected vs actual.
 
 === LIP-SYNC ALGORITHM (check_sync_mistakes.py, only if cuts are rendered) ===
@@ -318,6 +335,15 @@ and context; don't trust recommend blindly. Common false positives:
 - lists and parallel phrasing
 - in a tech demo, a product name, command or number said twice on
   purpose (e.g. re-running a command)
+- ordinary fillers and small hesitations: cutting them is what makes an
+  edit sound choppy
+
+Default to keeping. Mistakes are normal speech; a cut is only worth it
+when the removed take is clearly a do-over AND the join will be
+invisible and inaudible. When in doubt, recommend keep, and say
+"recommend zero cuts" if nothing clears that bar. Several cuts within a
+few seconds of each other read as choppy even when each one is clean:
+recommend keeping that whole stretch.
 For retakes and false starts, check that the kept take is complete and
 cleaner. Flag any candidate with spans_segments > 1: its default cut
 also removes the segments in between, which may be good content. Prefer
@@ -325,6 +351,27 @@ narrowing the cut to just the botched take. Every range you propose
 must start at a word's start and end at the start of the next kept
 word. You may add your own candidates for flubs the detector missed;
 label them "manual" and never pre-approve them.
+
+Join check (every range you recommend cutting, before you report)
+Transcript word times are only approximate (Scribe is off by tens of ms),
+so an edge placed on a word boundary can land on sound and click.
+- Edges by audio, not by transcript: in the pause between the two words
+  on each side, find the frame boundaries whose 10 ms RMS (8 kHz mono) is
+  below -60 dBFS, and move each edge to the quiet boundary nearest the
+  approved one. If there's none (the words run together), say so and
+  recommend keep.
+- Pause left at the join (quiet before + quiet after): under 0.10 s
+  sounds rushed; recommend keep unless the original pause was that short.
+- Visual jump: mean absolute difference (0-255) of the face crop and of
+  the screen area between the last kept frame and the first frame after
+  the cut. Compare with the same measure on a sample of the approved
+  silence-cut joins, and report both. A face jump well above the
+  silence joins' median is a choppy cut.
+- Before/after previews: cut a frame-exact preview of each join as it
+  would play (2 s before the cut + 2 s after, spliced with trim/atrim on
+  frame and sample numbers) to /tmp/cut-mistakes/after-<id>.mp4, next to
+  the current clip. These are what I approve from, so I never have to
+  wait for a render to find out a cut looks or sounds choppy.
 
 Report:
 - Pre-flight results and both self-test results.
@@ -338,6 +385,9 @@ Report:
 - The segment table (id, start, end, text), so I can sanity-check
   retake pairing.
 - The hidden-flub check results and listen-check clips.
+- The join check per recommended cut: moved edges, the pause left, the
+  face and screen jump vs the silence joins, and the after-<id>.mp4
+  preview to watch.
 - A very clean delivery may have few or no real mistakes. That's a
   valid result; don't cut natural speech to hit a quota.
 
@@ -362,13 +412,14 @@ per id, or "approve zero cuts".
   go; nothing has been written to this folder yet, so we can correct
   the cuts and re-run.
 - Only after the dry run passes: copy it to raw.approved-cuts.json
-  (mode "x"), then run apply --video raw.silenced.mp4 --apply.
+  (mode "x"), then run apply --video raw.silenced.mp4 --fps <source fps> --apply.
 - If the render fails, stop and list any partial outputs (e.g. a
   half-written raw.clean.mp4); don't delete them. The orchestrator
   archives them with my approval before a retry.
 
 Verify with /opt/homebrew/bin/ffprobe
-- raw.clean.mp4 duration is within 0.1s of edited_duration.
+- raw.clean.mp4 duration is within one frame of edited_duration (a
+  larger gap means the filter used rounded times: stop and fix).
 - Video and audio stream durations match each other within 0.1s.
 - Codec, resolution and fps match raw.silenced.mp4. Report file size.
 - Full decode: ffmpeg -v error -i raw.clean.mp4 -f null - ; report any
