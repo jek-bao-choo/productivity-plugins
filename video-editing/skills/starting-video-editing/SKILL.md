@@ -57,7 +57,13 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
   media, frames or transcripts anywhere except the transcription
   call), hyperframes_cli (an exact pinned
   version, e.g. `npx --yes hyperframes@X.Y.Z`), brand (none | official
-  <press-kit URL>; default none: no logos).
+  <press-kit URL>; default none: no logos), build_mode (parallel |
+  sequential; default parallel: a pilot section alone, then every
+  remaining section at once with helper agents and one render),
+  render_workers (default 1 until building-sections' worker test
+  measures the fastest safe count on this machine; record it here and
+  pass it to building-sections and finishing-video; re-measure when the
+  CLI pin or the machine changes).
   hyperframes_cli also sets the media offset: re-measure it (see
   building-sections) whenever the pin changes.
   Ask for every unset setting once, in one batch, on the first run
@@ -76,10 +82,11 @@ PIPELINE.md (the ledger; create it on the first run with mode "x")
   when last checked, expected end time, outcome). When I ask "how long?",
   read the live progress and answer with frames done, percent and an
   end time.
-- Parallel work: while a render runs, a later section may be authored
-  (by you or a helper agent) as long as it doesn't render, touches only
-  its own files and the seam it shares, and runs check and snapshots
-  only. Never two renders at once.
+- Parallel work: building-sections' parallel mode runs its own helper
+  agents (one per section) inside one skill run; only its lead renders,
+  and never two renders at once. In sequential mode, a later section
+  may still be authored while a render runs, if it doesn't render and
+  touches only its own file and the seam it shares.
 - Approvals log: every approval I give, with the step and date.
 Update the ledger after every step result and every approval. When a
 skill asks for something already recorded under Decisions or Approvals,
@@ -156,9 +163,17 @@ Next step ("continue", "next", "edit this video")
   doesn't start over).
 - Pass the skill what it needs from the ledger: tools_from as
   <PATH TO PREVIOUS FOLDER>, recorded decisions, and Run settings
-  (building-sections: the next section in build order, whether it's the
-  first run, decisions already made; finishing-video: fresh
-  transcription, approvals already given).
+  (building-sections: the mode and section(s), whether it's the first
+  run, decisions already made; finishing-video: fresh transcription,
+  approvals already given).
+- Build step with build_mode parallel: run building-sections in single
+  mode for the first section in build order (the pilot). After I approve
+  it, run building-sections once in parallel mode for every remaining
+  unapproved section. Its report has one review clip and one
+  "<sid>: awaiting approval" line per section; I approve them one by
+  one, and notes on several sections go into one parallel fix round.
+  With build_mode sequential: one section per run in build order, as
+  before.
 - When the skill stops for approval, stop too, unless auto_advance
   auto-approves that stop (below). Record my reply in the ledger before
   acting on it.
@@ -236,13 +251,16 @@ Decisions
   building, and record the answer.
 - Overlays: ask once whether to run or skip planning-overlays, and
   record it.
-- Between sections: carry each section's open decisions and new
-  film/LESSONS.md rules into the next run's "decisions already made".
+- Between sections (and from the pilot into the parallel run): carry
+  each section's open decisions and new film/LESSONS.md rules into the
+  next run's "decisions already made". Several sections can be
+  "awaiting approval" at once; update each line separately.
 - Before finishing: every section approved (the "<section>: approved"
   line in film/REVIEW.md, mirrored in the ledger).
 
 Rules
-- One skill at a time. Never skip, merge or shortcut a skill's phases or
+- One skill at a time (building-sections' parallel mode is one skill run
+  with its own helper agents). Never skip, merge or shortcut a skill's phases or
   stops (except stops auto_advance auto-approves, which are logged), and
   never do a skill's work yourself.
 - Read-only on everything except PIPELINE.md, the one-time raw.mp4 copy,

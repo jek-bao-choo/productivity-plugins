@@ -272,7 +272,29 @@ md5s unchanged. Stop and wait for "Studio OK" or my notes.
 === PHASE 2: DRAFT RENDER AND FULL QA (after Studio OK) ===
 Fix my Studio notes first (through the generators), re-run the Phase 1
 checks on what changed, then:
-1. Render the draft with one worker (same command as the section
+Parallel QA: steps 2-4 and 6 all read the one draft (or the locked
+files) and don't depend on each other. Once the draft passes step 1,
+start them at the same time as background shell jobs, each writing its
+own output file in /tmp/finishing/ and never touching this folder:
+- frames A: the 1 fps contact sheet; the seam strips;
+- frames B: blackdetect and freezedetect on the proxy, plus the same
+  freezedetect on the source footage (screen + cam composite at the
+  same scale) for the comparison below;
+- frames C: face frames and the legibility downscales; the luma crops;
+- audio: draft.wav and locked.wav; volumedetect on both; joins and
+  finish_tools.py audio; listen clips for every flagged join;
+- sync: check_sync_final.py self-check, then every test point, split
+  into 2-4 jobs by time range;
+- captions: draft captions and the filler and term report.
+Cap the concurrent ffmpeg jobs at the machine's performance cores minus
+one, and never run them while a render is still running. When all jobs
+have finished, use one helper agent (Agent tool, general-purpose,
+read-only) for the judgement part. Give it the freeze list, the source
+freeze list, page-changes and plan/beat-sheet.json; it classifies each
+draft freeze as source stillness, a planned hold, or a failure, with
+evidence (inset motion vs source). Then read all the outputs together
+and write the report; the checks and their pass marks are unchanged.
+1. Render the draft with render_workers (same command as the section
    builds, through the building-sections render guard: caffeinate,
    --protocol-timeout 900000, extraction-cache scan and retry) to
    renders/draft-v<N>.mp4. ffprobe it: duration within one
@@ -339,7 +361,7 @@ or notes.
 === PHASE 3: FINAL RENDER AND DELIVERY (after approval) ===
 1. Fix the approved failures through the generators and re-run the
    checks they touch.
-2. Render the final with one worker at the Run settings quality to
+2. Render the final with render_workers at the Run settings quality to
    renders/final-v<N>.mp4. Re-verify: ffprobe (duration and stream
    durations, with the same tail_hold allowance as the draft), full decode, a 1 fps contact sheet compared with the
    draft's, the audio check on its WAV, and lip sync at 3 points.

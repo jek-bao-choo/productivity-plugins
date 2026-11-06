@@ -336,7 +336,29 @@ self-test (run first; fix the script if anything differs)
   Show expected vs actual.
 
 === PHASE 1: UNDERSTAND AND PROPOSE (no plan files) ===
-Run the self-test and pre-flight. Report:
+Run the self-test, then the pre-flight in parallel: the contact sheet,
+the frame-by-frame page-change scan, the full-resolution crops, the
+transcript index and the air check don't depend on each other, so start
+them together as background shell jobs writing to /tmp/storytelling/,
+and look at the results when all have finished.
+
+Concepts by separate agents: once the analysis is done, write
+/tmp/storytelling/analysis.md (the on-screen table, the page changes,
+the readable transcript with timestamps, the section boundaries, the
+canvas facts and the design system). Then launch 2-3 helper agents
+(Agent tool, general-purpose) in one message, each told to develop ONE
+world concept from analysis.md and this skill's STORYTELLING RULES,
+with a different starting angle per agent (for example: the real
+on-screen artefact as the world; a drawn diagram world; a minimal
+overlay world). Each returns the concept fields listed below, read-only,
+writing nothing outside /tmp/storytelling/<concept>/. Agents that land
+on the same idea: keep the stronger one and say so. You compare them,
+check each against the rules (word budget, one grammar break, open
+loop, real travelling subject, footage timing), and recommend one.
+Phase 2 (the beat sheet) stays with you alone: it is one connected
+artefact.
+
+Report:
 - Self-test result, pre-flight results and the contact-sheet
   description, including a time-ordered table of what's on screen.
 - The transcript as readable paragraphs, with an edited timestamp at
