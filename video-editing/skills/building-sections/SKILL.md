@@ -109,8 +109,11 @@ Localize every asset (nothing loads from the network at render)
   step's lip-sync check reads film/assets/cam.mp4.
 - Fonts as local files with @font-face; no Google Fonts or other CDN.
 - GSAP from a local copy in the project, not a CDN.
-- No logos or brand marks. This is a personal learning video, not
-  official content.
+- Logos follow plan/DESIGN.md's brand setting. brand: none (default):
+  no logos or brand marks. brand: official: localize the press kit's
+  logo files (PNG, not SVG) into film/assets/brand/, follow the rules
+  copied into DESIGN.md, and give each <img> that shows the logo its own
+  file (an identical copy), or lint flags duplicate_media_discovery_risk.
 - Before rendering, search every file under film/ that the root loads
   for http:// and https:// URLs; any outside a comment is an error.
 
@@ -127,8 +130,8 @@ Architecture
   data-media-start = the beat's absolute time on the locked timeline
   (which is the render timeline). Inset = a timed
   <video class="clip"> per beat, data-media-start = that beat's absolute
-  locked-timeline time + 1/fps (see Build rules) so it stays lip-synced,
-  styled per plan/DESIGN.md.
+  locked-timeline time + the measured media offset (see Build rules) so
+  it stays lip-synced, styled per plan/DESIGN.md.
 - Overlays (if plan/overlay-beats.json exists): build every overlay
   whose start falls inside this section as an instance of the card type
   named in its card field, from the card library below, following
@@ -263,6 +266,15 @@ Build rules
   (0.25s). Labels print in with blur 6px -> 0 plus opacity, 0.2s,
   expo.out. Footage enters and exits by clip-path wipe (0.35s in, 0.25s
   out); move the world camera only while footage covers it.
+- Seams between sections: only the film's first frame wipes in from
+  Ground. A section whose neighbour shows the same page across the seam
+  starts open (gsap.set, no wipe) and must end in exactly the state the
+  next section opens with: same window, same element opacities. When
+  sections are built out of order, the first built one wipes in as a
+  placeholder; when its neighbour is built later, remove that wipe-in
+  in the approved section (that change only, recorded in REVIEW.md).
+  Check every seam by snapshotting one frame either side: they must
+  match.
 - When a label is cut by a window edge or sits within 60 rendered px of
   it, move the LABEL in world geometry, never the window. Record every
   geometry change.
@@ -275,10 +287,19 @@ Build rules
   recording changes page inside the clip, shift only the screen's
   data-media-start (never the inset's).
 - Never label real footage with names that are only a spoken example.
-- Speaker clips (inset and full frame): data-media-start = the beat's
-  absolute time + 1/fps (the renderer shows the previous frame
-  otherwise). Confirm with the sync check in step 6; adjust if it reads
-  differently.
+- Speaker and screen clips: data-media-start = the beat's absolute time
+  + the media offset, and the offset is measured, never assumed. It
+  depends on the HyperFrames CLI version:
+  - CLI 0.8.193: +1/fps.
+  - CLI 0.9.14: +0.0002 s. +1/fps there showed the picture one frame
+    (16.7 ms) early, and exactly on the frame boundary made the first
+    frame fail to decode.
+  On the first run (and whenever the pinned CLI changes), render a 3 s
+  scratch project in /tmp/building/rtest/ that mounts one section at a
+  few candidate offsets, and measure each against the locked video with
+  the sync method in step 6 (match a sequence of inset frames, not one
+  frame). Use the offset that measures 0.0 ms, and record it in
+  film/LESSONS.md.
 - A label lights and dims with its element: when a beat lights a group,
   light the group's separately drawn labels (names) too.
 - Connectors that leave a labelled node start outside its label box.
@@ -303,9 +324,38 @@ Check and review (before replying)
    the viewer must read under the inset or a card. Fix, then
    re-snapshot only what changed.
 5. Render: `npx hyperframes render --fps <fps> --quality looks
-   --video-frame-format png --workers 1 -o
+   --video-frame-format png --workers 1 --protocol-timeout 900000 -o
    renders/build-0-<END>-v<N>.mp4` in the background (--workers 1:
-   the default is parallel).
+   the default is parallel), through the render guard below.
+   Render guard (write it once to /tmp/building/guarded_render.sh and
+   use it for every full render, here and in finishing-video):
+   - Run under `caffeinate -dims` (macOS) so the machine can't sleep. A
+     sleeping or throttled host stalls one frame's capture until it
+     times out.
+   - `--protocol-timeout 900000`: screenshot capture slows under load
+     (a video call, a busy WindowServer) and the default times out.
+   - After the extraction phase (the log shows the first "capture"
+     progress line), scan the renderer's extraction cache
+     ($TMPDIR/hyperframes-extract-cache-<uid>/hfcache-*): every frame
+     file must start with \x89PNG (or \xFF\xD8\xFF for JPEG). On any
+     zero-filled frame, kill the render, delete only that cache entry
+     (regenerable temp files), and retry, up to 3 attempts. Corrupt
+     entries otherwise fail every later render at the same frame with
+     "Video frame ... cannot be decoded".
+   - Never run two renders at once. Authoring, check and snapshots can
+     run while a render runs (it compiles at start).
+   - Report the render's frame progress and expected end time in the
+     ledger, so the orchestrator can answer "how long?".
+   Render cost scales with the whole root: a 9-minute film at 60 fps
+   takes 40-55 minutes on one worker even when only one section changed.
+   The CLI has no time-range option. When the built span is long, try
+   a review root before the first section review: a scratch copy of
+   index.html in film/ (for example review-<section>.html) whose root
+   covers only the section's span plus 2 s each side, with every host
+   shifted by -start, rendered with `-c review-<section>.html`. Confirm
+   it on a 3 s test first (frames and lip sync match the full build at
+   the same absolute time). If it doesn't match, fall back to the full
+   build render and say so.
    Cut the section with ffmpeg (-ss START -to END, re-encode) to
    <project>/reviews/build/<section>-review-v<N>.mp4; ffprobe it and
    full-decode it. If you re-render before I've seen a version, hand

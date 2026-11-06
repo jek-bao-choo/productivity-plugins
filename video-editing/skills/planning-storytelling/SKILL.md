@@ -70,6 +70,14 @@ Pre-flight (read-only, report results)
 - Also grab full-resolution crops of the screen at 3-4 key moments (the
   live product, any docs or code) to locate real on-screen subjects and
   footage windows in source pixels.
+- Page changes, frame by frame: the 5 s contact sheet misses short
+  pages, dark flashes and pans. Scan every frame of the screen area
+  (scaled to 32x18 gray) and list each frame whose mean absolute change
+  from the previous frame exceeds about 1.5 (0-255), with its time, as
+  /tmp/storytelling/page-changes.txt. Group bursts into one change.
+  Report it as a table (time, from page, to page). Use these exact times
+  for footage windows, covers and any beat that depends on what's on
+  screen, and copy the table into STORY.md for the build.
 - story_tools.py index <transcript> --out /tmp/storytelling/transcript-indexed.txt
 - story_tools.py air <transcript>
 
@@ -129,7 +137,12 @@ Discipline
 - ~20 on-screen words per section. No sentences. Labels 1-2 words.
 - An anti-pattern visual never overlays the recommendation.
 - One travelling subject whose state visibly changes; it moves along
-  drawn connectors at constant speed and never teleports.
+  drawn connectors at constant speed and never teleports. Plan each of
+  its resting points on a box edge or an arrow tip, never on a box's
+  label. Each state change happens where the subject already is: if a
+  beat needs it to fail somewhere, it must have travelled there first.
+- The opening title holds 1.5-2 s after landing, then leaves. Never plan
+  it to stay over content the speaker is walking through.
 - Motion: entrances cubic-bezier(0.16,1,0.3,1); exits faster; duration
   by mass; back.out exactly once per section; no cross-fade ever (full-
   bleed layers enter and exit by clip).
@@ -167,7 +180,12 @@ Screen recordings (most Datadog videos)
   drawn elements only.
 - For every footage window, confirm from frames that the content is on
   screen at that beat's time; note any timing that needs checking during
-  the build.
+  the build. Check the window against the subject it frames: if it cuts
+  part of it (a row of tiles, a table), reframe to the largest clean
+  subset rather than widening to near the full screen.
+- A cover (a still over a blank or loading page) must be opaque before
+  the first changed frame in page-changes.txt. If the beat's word comes
+  later, anchor the beat on an earlier word.
 - Decide the delivery canvas explicitly. If the source isn't 16:9,
   propose options with costs (native, a 16:9 reframe following the
   action, or a 16:9 layout that re-places the webcam). If the recording
@@ -199,8 +217,19 @@ active lines; active labels use the Type colour. No cyan, no gradient
 text. Replace derived values if internal brand values are available.
 Luma targets (Y 16-235): active 200-235, context 120-150, spent 85-105,
 labels never below 90. Verify on the render, not the hex.
-No logos or brand marks: this is a personal learning video, not
-official content. In text, "Datadog" is one word, capital D.
+Logos follow the brand setting (Run settings or PIPELINE.md Decisions):
+- brand: none (default): no logos or brand marks. Use this for a
+  personal learning video, not official content.
+- brand: official <press-kit URL>: the official logo may appear (title
+  plate, sign-off). Read the press kit's rules and copy them into
+  DESIGN.md. For Datadog (https://www.datadoghq.com/about/resources/):
+  vertical version unless horizontal is necessary; white logo on dark or
+  purple, purple logo on white; Bits always white; never invert,
+  recolour, outline, add a gradient, change the ratio or aspect, or put
+  it in a box or shape. Place the white logo on a Ground plate with no
+  border. Use the PNG files: the SVGs carry xmlns URL strings that trip
+  the no-network check.
+In text, "Datadog" is one word, capital D.
 Material: three-layer shadow stack (contact, key, ambient), neutral
 tones; top-lit edge light on plates; the video inset follows the same
 corners, shadow and edge light.
@@ -324,10 +353,16 @@ Run the self-test and pre-flight. Report:
 - Your recommendation and why.
 - Canvas options with costs.
 - Air-check results.
+- Colour meanings the plan will use on screen: for every element that
+  gets a colour other than Signal (for example a Human-warm tick for a
+  human-approved step), name it and its reason in one line, so I can
+  say yes or no now rather than asking "why is that one orange?" later.
 - Ask these as decisions (orchestrator format: recommended option
   first, with why). Ask which concept, which canvas, which design system (Datadog by
-  default), whether I have brand values to replace the derived colours,
-  and whether the brand typeface is licensed.
+  default), the brand setting (none, or official with a press-kit URL),
+  whether I have brand values to replace the derived colours, whether
+  the brand typeface is licensed, and whether the colour meanings above
+  are right.
 
 Stop and wait for my choice of concept, canvas and colours.
 
@@ -345,8 +380,9 @@ has 0 errors; fix or justify every warning. Then write (mode "x"):
   the smallest type token labels use in that window) and tail_hold
   (optional, seconds of silent final hold after the audio).
 - plan/DESIGN.md: the locked tokens and palette for this video, what
-  each colour is used for here, any retuned value and why, the no-logo
-  rule, material and motion.
+  each colour is used for here, any retuned value and why, the logo rule
+  for the brand setting (none, or the press kit's rules), material and
+  motion.
 - plan/beat-sheet.json (schema above) and plan/beat-sheet.md (the same
   as a readable table grouped by section).
 Run: story_tools.py check plan/beat-sheet.json --transcript <transcript>

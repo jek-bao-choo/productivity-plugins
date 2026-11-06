@@ -65,7 +65,7 @@ Skills (read before touching compositions)
   service, except the one fresh transcription in Run settings. If a
   HyperFrames command offers an AI describe, upload or share option,
   leave it off.
-- No logos or brand marks.
+- Logos only as plan/DESIGN.md's brand setting allows (none by default).
 
 Scripts (Python 3, standard library only, run with -I)
 - finish_tools.py (this folder): reuse it from
@@ -129,9 +129,21 @@ diff EXPECTED FRESH
   expected words and the heard words.
 
 captions TRANSCRIPT --srt S --vtt V [--max-chars 42] [--max-lines 2]
-         [--max-dur 6] [--gap 0.6] [--duration D]
+         [--max-dur 6] [--gap 0.6] [--duration D] [--fixes FIXES]
+         [--drop-fillers]
   Words = word entries (type "word" or no type) in order; audio events
-  are skipped. Text is each word's text unchanged. Build cues in order:
+  are skipped. Text is each word's text unchanged unless --fixes or
+  --drop-fillers is given:
+  - --fixes FIXES: a JSON list of {match, replace, at (optional start
+    time, +-0.01 s)}, where match is one or more consecutive word
+    tokens (lowercased, punctuation stripped) and replace is the new
+    text; the merged word keeps the first word's start, the last word's
+    end and the last word's trailing punctuation. Use "at" for fixes
+    that must apply to one occurrence only (a word that is also a real
+    word elsewhere, e.g. "beats" as a verb). Print every applied change.
+  - --drop-fillers: skip words whose token is um, uh, erm, er, ah, hmm,
+    mm or mhm.
+  Build cues in order:
   add the next word to the current cue only if the cue text still wraps
   (greedy, words never split) into at most --max-lines lines of at most
   --max-chars characters, the cue stays within --max-dur seconds, and
@@ -174,6 +186,11 @@ self-test (run first; fix the script if anything differs)
     1.700-2.200 "metrics." (flagged: 0.50s, under 0.8s); 3.000-4.500
     "Then traces" / "flow in.". The VTT starts with "WEBVTT" and uses
     00:00:00.500.
+    With --drop-fillers and --fixes [{"match": "agent", "replace":
+    "Agent"}, {"match": "traces flow", "replace": "data flows"}] on the
+    same words plus "uh" 3.25-3.28 (no type) -> 2 cues: "The Agent
+    collects metrics." and "Then data flows in." (the merged word spans
+    3.30-4.10; "uh" is gone); 2 changes printed.
   Show expected vs actual.
 
 === LIP-SYNC SPEC (check_sync_final.py) ===
@@ -204,7 +221,9 @@ locked cut, so render time t maps to source time t.
   Expect corr >= 0.95.
 - Known causes of a constant offset: an AAC voice asset (renderer trims
   the encoder priming twice: audio ~21.3 ms early; fix: PCM WAV voice)
-  and speaker clips one frame late (fix: data-media-start + 1/fps).
+  and speaker clips one frame off (fix: the media offset measured per CLI
+  version in building-sections' Build rules; +1/fps on 0.8.193, +0.0002 s
+  on 0.9.14).
   Verify a fix on a short scratch render before proposing it.
 - Self-check: at one time inside a visible inset, audio_off must be
   0 within 1 ms and video_off within one frame.
@@ -254,7 +273,9 @@ md5s unchanged. Stop and wait for "Studio OK" or my notes.
 Fix my Studio notes first (through the generators), re-run the Phase 1
 checks on what changed, then:
 1. Render the draft with one worker (same command as the section
-   builds) to renders/draft-v<N>.mp4. ffprobe it: duration within one
+   builds, through the building-sections render guard: caffeinate,
+   --protocol-timeout 900000, extraction-cache scan and retry) to
+   renders/draft-v<N>.mp4. ffprobe it: duration within one
    frame of the locked video's duration plus the plan's tail_hold (0 if
    none); the audio stream at least the locked duration, and the video
    and audio stream durations within 0.1s of each other or apart by
@@ -328,11 +349,16 @@ or notes.
      raw.mistakes-edl.json if they exist, plan/beat-sheet.json, and
      plan/overlay-beats.json if it exists;
    - transcript.json: a copy of the locked transcript, which is on the
-     final timeline;
+     final timeline, with the spelling fixes from PIPELINE.md Decisions
+     applied to the copy (never to the locked file); list every change
+     in VERIFY.md;
    - captions.srt and captions.vtt: finish_tools.py captions on the
-     locked transcript with --duration set to the final's duration
-     (sidecar files for players and upload sites; the picture has no
-     burned-in captions);
+     locked transcript with --duration set to the final's duration,
+     --fixes from the Decisions' term corrections, and --drop-fillers if
+     I chose it in Phase 2 (sidecar files for players and upload sites;
+     the picture has no burned-in captions). Read the applied-changes
+     list before delivering: a fix that hits a real word (a verb, a
+     common noun) needs an "at" time instead;
    - composition.txt: the film/ path and every file the root loads, with
      its md5;
    - VERIFY.md: every check run in Phases 1-3 and its result, marked
@@ -342,6 +368,14 @@ or notes.
      the note that automated checks propose, but editorial judgement
      decided.
 4. Confirm input md5s unchanged.
+5. Disk: report the size of the renderer's extraction cache
+   ($TMPDIR/hyperframes-extract-cache-<uid>, 30 GB after one 9-minute
+   film) and of film/renders/, and offer `npx hyperframes clean` plus
+   removing the cache and superseded build renders. Delete nothing
+   without my OK; never delete a render I reviewed or the deliverable.
+6. If the final render can't finish in time, offer the approved draft
+   as the deliverable (copied byte for byte, md5 checked) and say so in
+   VERIFY.md; the final can still be added later next to it.
 
 Report: the absolute path of deliver/ and the final MP4, the deliver/
 contents, VERIFY.md, and anything left for me to decide (as decisions
