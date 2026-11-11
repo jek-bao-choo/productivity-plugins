@@ -1,5 +1,5 @@
 {
   "name": "comms-assistant",
-  "description": "Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools",
-  "version": "0.7.2"
+  "description": "Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools",
+  "version": "0.8.0"
 }

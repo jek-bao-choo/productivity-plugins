@@ -1,6 +1,6 @@
 # comms-assistant
 
-Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
@@ -15,6 +15,8 @@ Required MCP tools:
 - `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`; message search is also used by `refining-question-for-slack`)
 
 `flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
+
+`drafting-daily-opps-update-for-slack` also uses Gmail, Google Calendar and Zoom MCPs when available. Without them it drafts from Slack only and lists the gap in its notes message.
 
 ## Skills
 
@@ -95,3 +97,18 @@ To add a template, create a new file in `references/` with the same structure an
 - `/drafting-gmail PoC update email to ACME after today's call`
 - `/drafting-gmail follow-up email to my colleague about the trial timeline`
 - `/drafting-gmail thank you email to the prospect for the workshop`
+
+### drafting-daily-opps-update-for-slack
+
+Draft a short daily update for one or more opportunities, ready to post in each opportunity's Slack channel. It reads Slack, Zoom, Google Calendar and Gmail for the opportunity name over the window (today by default, or the dates you give), and writes three sections: **Updates**, **Roadblocks** and **Next Steps**, with the owner of each item when the sources name one. Calendar also looks ahead to the next working day so booked meetings show up as next steps.
+
+What it sends to your own Slack self-DM, per opportunity:
+1. The update itself, in Slack formatting, nothing else, so you can copy it straight into the channel.
+2. A notes message for you only: the opportunity channel to post to, the source links behind each item, and any gaps (for example Zoom not connected).
+
+Owners are written as plain `@Name` text, never as real Slack mentions, so nobody is notified before you post. The skill never sends anywhere except your self-DM, and is read only on Slack, Gmail, Calendar and Zoom.
+
+**Example prompts:**
+- `/drafting-daily-opps-update-for-slack Acme Corp`
+- `/drafting-daily-opps-update-for-slack Acme Corp, Globex for yesterday`
+- `/drafting-daily-opps-update-for-slack Initech (Initech Bank, initech.com) 9 to 11 Nov`
