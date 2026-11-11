@@ -1,6 +1,6 @@
 # comms-assistant
 
-Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
@@ -23,6 +23,30 @@ Required MCP tools:
 ## Skills
 
 Every skill runs only when you type its slash command (for example `/drafting-poc-update-for-gmail`). Claude never starts them on its own.
+
+### summarising-a-long-slack-message
+
+Summarise one or more long Slack threads into a fixed block you can paste into a doc or newsletter, written as a Datadog Solutions Architect. Paste the thread text with the command, or give a Slack permalink if Slack tools are connected.
+
+Each thread becomes:
+
+```
+DATE: {today, YYYY-MM-DD}
+
+QUESTION: {the question, in one sentence}
+
+ANSWER: {one paragraph, quoting key commands and settings word for word with the @username}
+
+EXTERNAL_URLs: {every URL in the thread, separated by " | ", or None}
+
+SLACK_URL: {the thread permalink, or Not available}
+```
+
+Several threads are separated by `---`. Threads with no conclusion end with "The discussion is ongoing/unresolved." Datadog product names (Monitors, APM, Log Management and so on) are used accurately. The result stays in chat and is not sent anywhere.
+
+**Example prompts:**
+- `/summarising-a-long-slack-message` (then paste the thread)
+- `/summarising-a-long-slack-message https://example.slack.com/archives/C0123/p1731290040000100`
 
 ### summarising-slack-channel
 
