@@ -1,18 +1,18 @@
 # comms-assistant
 
-Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, draft technical questions to ask in Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
 Slack MCP tools must be available in your Claude Code environment. These are typically provided by a Slack MCP server plugin (e.g., `plugin-dev@claude-plugins-official`).
 
 Required MCP tools:
-- `slack_search_channels` — find channels by name (also used by `refining-question-for-slack` to recommend a channel)
+- `slack_search_channels` — find channels by name (also used by `drafting-technical-question-to-ask-in-slack` to recommend a channel)
 - `slack_read_channel` — read recent messages in a channel
 - `slack_read_thread` — read a specific thread
 - `slack_send_message` — deliver composed content to your own self-DM for review
-- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `flattening-communication`, `refining-question-for-slack` and `drafting-daily-opp-update-for-slack`)
-- `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`; message search is also used by `refining-question-for-slack`)
+- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `flattening-communication`, `drafting-technical-question-to-ask-in-slack` and `drafting-daily-opp-update-for-slack`)
+- `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`; message search is also used by `drafting-technical-question-to-ask-in-slack`)
 
 `flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
 
@@ -86,9 +86,9 @@ Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when 
 - `/flattening-communication` (then paste the table)
 - `/flattening-communication people.md for the past week, Drive files: type sheet, name contains pipeline`
 
-### refining-question-for-slack
+### drafting-technical-question-to-ask-in-slack
 
-Refine rough question text so you can post it in a company Slack channel and get clear, relevant answers, with one recommended channel per question. It runs only when you type `/refining-question-for-slack`; Claude never picks it up on its own. Paste the text with the command or in your next message.
+Refine rough question text so you can post it in a company Slack channel and get clear, relevant answers, with one recommended channel per question. It runs only when you type `/drafting-technical-question-to-ask-in-slack`; Claude never picks it up on its own. Paste the text with the command or in your next message.
 
 What it does:
 1. Splits the text into distinct questions. Each becomes one sentence starting with `Hi,` and `Can`, `Does`, `What`, `When`, `Where`, `Why`, `Who` or `How`, with a standalone `Context:` block. Grammar is fixed, technical details and uncertainty are kept, nothing is invented and the questions are not answered.
@@ -106,8 +106,8 @@ Recommended Slack channel: [#channel-name and link] — [brief reason]
 4. Sends each block to your own Slack self-DM so it is easy to copy. Your user ID is looked up from your Slack profile at runtime. The skill never posts to a channel or anyone else.
 
 **Example prompts:**
-- `/refining-question-for-slack` (then paste the text in your next message)
-- `/refining-question-for-slack does the java tracer support log injection without a restart...`
+- `/drafting-technical-question-to-ask-in-slack` (then paste the text in your next message)
+- `/drafting-technical-question-to-ask-in-slack does the java tracer support log injection without a restart...`
 
 ### drafting-poc-update-for-gmail
 

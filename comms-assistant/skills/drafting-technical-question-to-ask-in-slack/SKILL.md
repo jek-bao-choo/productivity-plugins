@@ -1,17 +1,18 @@
 ---
-name: refining-question-for-slack
+name: drafting-technical-question-to-ask-in-slack
 description: >-
-  Refine rough question text into standalone one-sentence Slack questions that start
-  with "Hi," plus a Context block, recommend one verified Slack channel per question,
-  and send the result only to the user's own Slack self-DM. Run only when the user
-  explicitly types /refining-question-for-slack.
+  Draft technical questions to ask in Slack: turn rough question text into
+  standalone one-sentence questions that start with "Hi," plus a Context block,
+  recommend one verified Slack channel per question, and send the result only to
+  the user's own Slack self-DM. Run only when the user explicitly types
+  /drafting-technical-question-to-ask-in-slack.
 disable-model-invocation: true
-version: "0.2.0"
+version: "0.3.0"
 author: productivity-plugins
 tags: slack, question, refine, rewrite, channel, recommend, ask
 ---
 
-# Refining Questions for Slack
+# Drafting a Technical Question to Ask in Slack
 
 Turn rough question text into clear, standalone Slack questions that get fast, relevant answers, and recommend the best channel for each one. People in busy channels skim. A question that is one clear sentence, with its background underneath, gets answered; a paragraph with three tangled questions gets ignored or half answered. That is the reason for every formatting rule below.
 

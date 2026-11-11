@@ -10,8 +10,8 @@
     {
       "name": "comms-assistant",
       "source": "./comms-assistant",
-      "description": "Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools",
-      "version": "0.11.0"
+      "description": "Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, draft technical questions to ask in Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools",
+      "version": "0.12.0"
     },
     {
       "name": "sales-process",
