@@ -60,7 +60,7 @@ Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when 
 
 ### refining-question-for-slack
 
-Refine rough question text so you can post it in a company Slack channel and get clear, relevant answers, with one recommended channel per question. Send the request first and paste the text in your next message, or include it straight away.
+Refine rough question text so you can post it in a company Slack channel and get clear, relevant answers, with one recommended channel per question. It runs only when you type `/refining-question-for-slack`; Claude never picks it up on its own. Paste the text with the command or in your next message.
 
 What it does:
 1. Splits the text into distinct questions. Each becomes one sentence starting with `Hi,` and `Can`, `Does`, `What`, `When`, `Where`, `Why`, `Who` or `How`, with a standalone `Context:` block. Grammar is fixed, technical details and uncertainty are kept, nothing is invented and the questions are not answered.
@@ -78,9 +78,8 @@ Recommended Slack channel: [#channel-name and link] — [brief reason]
 4. Sends each block to your own Slack self-DM so it is easy to copy. Your user ID is looked up from your Slack profile at runtime. The skill never posts to a channel or anyone else.
 
 **Example prompts:**
-- "Refine my question for Slack" (then paste the text)
-- "Which channel should I ask this in? Does the Java tracer support log injection without a restart..."
-- "Clean up these questions before I post them on Slack"
+- `/refining-question-for-slack` (then paste the text in your next message)
+- `/refining-question-for-slack does the java tracer support log injection without a restart...`
 
 ### drafting-gmail
 

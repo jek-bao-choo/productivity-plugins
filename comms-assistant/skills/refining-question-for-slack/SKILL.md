@@ -1,19 +1,12 @@
 ---
 name: refining-question-for-slack
 description: >-
-  This skill should be used when the user wants to refine, rewrite, or clean up one
-  or more questions before posting them in a company Slack channel, and wants to know
-  which channel to post them in. It applies when the user says "refine my question
-  for Slack", "help me ask this in Slack", "which channel should I post this in",
-  "clean up this question before I post it", "rewrite this so I get a good answer on
-  Slack", "turn my notes into Slack questions", or pastes a messy question and
-  mentions Slack, a channel, or asking colleagues, even if they don't say "refine".
-  It splits the text into standalone one-sentence questions that start with "Hi,"
-  plus a Context block, recommends one verified Slack channel per question using
-  Slack search tools, and sends the result only to the user's own Slack self-DM.
-  Make sure to use this skill whenever the user wants help phrasing a question for
-  Slack or finding the right channel to ask it in.
-version: "0.1.0"
+  Refine rough question text into standalone one-sentence Slack questions that start
+  with "Hi," plus a Context block, recommend one verified Slack channel per question,
+  and send the result only to the user's own Slack self-DM. Run only when the user
+  explicitly types /refining-question-for-slack.
+disable-model-invocation: true
+version: "0.2.0"
 author: productivity-plugins
 tags: slack, question, refine, rewrite, channel, recommend, ask
 ---
