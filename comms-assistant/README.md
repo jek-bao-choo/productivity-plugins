@@ -16,7 +16,7 @@ Required MCP tools:
 
 `flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
 
-`drafting-daily-opps-update-for-slack` also uses Gmail, Google Calendar and Zoom MCPs when available. Without them it drafts from Slack only and lists the gap in its notes message.
+`drafting-daily-opp-update-for-slack` also uses Gmail, Google Calendar and Zoom MCPs when available. Without them it drafts from Slack only and lists the gap in its notes message.
 
 ## Skills
 
@@ -98,9 +98,11 @@ To add a template, create a new file in `references/` with the same structure an
 - `/drafting-gmail follow-up email to my colleague about the trial timeline`
 - `/drafting-gmail thank you email to the prospect for the workshop`
 
-### drafting-daily-opps-update-for-slack
+### drafting-daily-opp-update-for-slack
 
 Draft a short daily update for one or more opportunities, ready to post in each opportunity's Slack channel. It reads Slack, Zoom, Google Calendar and Gmail for the opportunity name over the window (today by default, or the dates you give), and writes three sections: **Updates**, **Roadblocks** and **Next Steps**, with the owner of each item when the sources name one. Calendar also looks ahead to the next working day so booked meetings show up as next steps.
+
+If the opportunity name is missing, vague or matches more than one account, or the period is vague or could be read two ways (for example `since the workshop` or `11/12`), it asks you first and waits before reading anything. No period means today.
 
 What it sends to your own Slack self-DM, per opportunity:
 1. The update itself, in Slack formatting, nothing else, so you can copy it straight into the channel.
@@ -109,6 +111,6 @@ What it sends to your own Slack self-DM, per opportunity:
 Owners are written as plain `@Name` text, never as real Slack mentions, so nobody is notified before you post. The skill never sends anywhere except your self-DM, and is read only on Slack, Gmail, Calendar and Zoom.
 
 **Example prompts:**
-- `/drafting-daily-opps-update-for-slack Acme Corp`
-- `/drafting-daily-opps-update-for-slack Acme Corp, Globex for yesterday`
-- `/drafting-daily-opps-update-for-slack Initech (Initech Bank, initech.com) 9 to 11 Nov`
+- `/drafting-daily-opp-update-for-slack Acme Corp`
+- `/drafting-daily-opp-update-for-slack Acme Corp, Globex for yesterday`
+- `/drafting-daily-opp-update-for-slack Initech (Initech Bank, initech.com) 9 to 11 Nov`

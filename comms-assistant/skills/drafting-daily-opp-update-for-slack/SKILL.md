@@ -1,13 +1,13 @@
 ---
-name: drafting-daily-opps-update-for-slack
+name: drafting-daily-opp-update-for-slack
 description: >-
   Draft a succinct daily opportunity update (Updates, Roadblocks, Next Steps, with
   owners) for one or more named opportunities from Slack, Zoom, Google Calendar and
   Gmail, for today or a given date range, and send it only to the user's own Slack
   self-DM for copy-paste into the opportunity's channel. Run only when the user
-  explicitly types /drafting-daily-opps-update-for-slack.
+  explicitly types /drafting-daily-opp-update-for-slack.
 disable-model-invocation: true
-version: "0.1.0"
+version: "0.2.0"
 author: productivity-plugins
 tags: slack, zoom, gmail, calendar, opportunity, deal, daily, standup, update, roadblocks, next-steps
 ---
@@ -51,7 +51,34 @@ From the user's message, take:
 - **Opportunities:** one or more names, separated by commas, "and" or new lines. Each opportunity gets its own update, because each is posted to its own channel. The user may add aliases in brackets, such as `Acme (ACME Corp, acme.com)`. Use them as extra search terms.
 - **Window:** optional. Default is **today**, from 00:00 until now in the user's timezone. Accept phrasings like `yesterday`, `since Monday`, `last 3 days`, `this week`, `9 Nov`, `9 to 11 Nov` or explicit dates. A day given on its own runs 00:00 to 23:59 on that day; a range runs from 00:00 on the first day to 23:59 on the last day, or to now if it ends today.
 
-If no opportunity name was given, reply in one short line asking which opportunity, then wait. Do not search anything until you have a name.
+### Step 1b: Ask clarifying questions when the name or period is unclear
+
+A wrong opportunity or a wrong window produces an update that looks confident but is about the wrong thing, and the user might post it before noticing. A short question up front is much cheaper than that, so stop and ask before gathering anything whenever either input is unclear.
+
+**The opportunity name is unclear when:**
+- No name was given.
+- It is too vague to search on its own, such as `the bank`, `the POC`, `my big deal` or a single generic word like `Health`.
+- It looks like a typo or partial name you cannot confirm.
+- A quick check finds it ambiguous. Run `slack_search_channels` with the name (this and the profile lookup in Step 1c are the only calls allowed before the user answers). If it matches channels for clearly different accounts (for example `#opp-acme-bank` and `#opp-acme-retail`), or matches nothing at all, ask which one they mean, listing what you found.
+
+**The period is unclear when:**
+- It is vague, such as `recently`, `the past few days`, `since the meeting` or `after the workshop`.
+- A date could be read two ways, such as `11/12` (11 Dec or 12 Nov).
+- It is invalid or odd: the end is before the start, it is entirely in the future, or it names a day without saying which week (`Tuesday` said on a Monday).
+
+A missing period is not unclear: it means today, so do not ask about it. Common phrasings listed under **Window** above are clear too.
+
+**How to ask.** Put every question in one short message, so the user answers once. Make each question easy to answer by offering the likely choices, for example:
+
+```
+Before I draft this, two quick checks:
+1. "Acme" matches #opp-acme-bank and #opp-acme-retail. Which one, or both?
+2. "Since the workshop": which date was the workshop? Or should I use the last 3 days?
+```
+
+Then wait for the answer. Do not search sources, draft, or send anything to Slack until both the opportunity and the period are clear. If only one of several opportunities is unclear, still ask before starting, so the whole batch runs on settled inputs.
+
+### Step 1c: Work out the window
 
 Get the user's timezone from their Slack profile (`slack_read_user_profile` with no `user_id`, which you also need in Step 6). If the profile has none, use the system timezone. Work out the window with `date` so the dates are right, and convert to Unix seconds where a tool wants them, for example:
 
@@ -134,7 +161,7 @@ Then show the update in chat and add one line with the message links. If the sen
 
 ## Example
 
-Input: `/drafting-daily-opps-update-for-slack Acme Corp`
+Input: `/drafting-daily-opp-update-for-slack Acme Corp`
 
 Message 1:
 ```
@@ -167,8 +194,8 @@ The names, channels and details above are placeholders. Real updates must come o
 
 ## Failure Handling
 
-- **No opportunity name:** ask for it in one line and wait.
-- **Name matches several unrelated accounts** (for example two customers sharing a word): use the one with an opportunity channel or the most activity, and say in the notes message which one you chose and what else matched.
-- **Date range unclear:** pick the most natural reading, state it in the update header, and carry on.
+- **Opportunity name missing, vague or ambiguous:** ask before proceeding (Step 1b) and wait for the answer.
+- **Period vague, ambiguous or invalid:** ask before proceeding (Step 1b) and wait for the answer. No period at all means today.
+- **Name turns out ambiguous only during gathering** (for example search hits for two unrelated customers that the channel check did not show): keep the items that clearly belong to the opportunity the user confirmed, and say in the notes message what else matched and was left out.
 - **Gmail, Calendar or Zoom unavailable or not authenticated:** try its authenticate flow once, then carry on without it and list it under Gaps.
 - **Slack unavailable:** draft from the other sources, show the update in chat, and say it could not be sent to the self-DM.
