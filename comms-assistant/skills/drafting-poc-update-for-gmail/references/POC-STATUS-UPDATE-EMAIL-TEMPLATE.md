@@ -10,6 +10,7 @@ For drafting a follow-up email to prospects or customers after a PoC-related int
 - Communication mode: In-Person, Zoom, or Ms Teams (infer from notes if possible, otherwise ask)
 - Date of communication (infer from notes if possible, otherwise ask)
 - Recipient name(s) for the greeting
+- Sender name for the sign-off (looked up from the signed in Gmail account at runtime, never hardcoded)
 
 ## Email Format
 
@@ -38,7 +39,7 @@ What's Next
 Please let me know if I missed anything or if you have any questions.
 
 Best regards,
-Jek Bao Choo
+{Sender name}
 ```
 
 ## Formatting Rules
@@ -49,7 +50,7 @@ Jek Bao Choo
 - Do not use " — " or " - " to connect clauses. Write short, direct sentences instead
 - Extract and infer from the sales notes. Do not fabricate information
 - If a section has no relevant content from the notes, use a single bullet: "None identified"
-- What's Next items should include the owner in parentheses, e.g. "(Datadog)" or "(MOX team)"
+- What's Next items should include the owner in parentheses, e.g. "(Datadog)" or "(Acme team)"
 - Always include a blank line before "What's Achieved" and before "What's Next"
 - The opening line should reference the type of interaction (session, call, meeting) naturally
 - Use `•` for bullet points

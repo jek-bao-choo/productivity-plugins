@@ -1,6 +1,6 @@
 # comms-assistant
 
-Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
@@ -11,16 +11,18 @@ Required MCP tools:
 - `slack_read_channel` — read recent messages in a channel
 - `slack_read_thread` — read a specific thread
 - `slack_send_message` — deliver composed content to your own self-DM for review
-- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `drafting-gmail`, `flattening-communication` and `refining-question-for-slack`)
+- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `flattening-communication`, `refining-question-for-slack` and `drafting-daily-opp-update-for-slack`)
 - `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`; message search is also used by `refining-question-for-slack`)
 
 `flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
+
+`drafting-poc-update-for-gmail` needs a Gmail MCP server instead of Slack.
 
 `drafting-daily-opp-update-for-slack` also uses Gmail, Google Calendar and Zoom MCPs when available. Without them it drafts from Slack only and lists the gap in its notes message.
 
 ## Skills
 
-Every skill runs only when you type its slash command (for example `/drafting-gmail`). Claude never starts them on its own.
+Every skill runs only when you type its slash command (for example `/drafting-poc-update-for-gmail`). Claude never starts them on its own.
 
 ### summarising-slack-channel
 
@@ -83,20 +85,17 @@ Recommended Slack channel: [#channel-name and link] — [brief reason]
 - `/refining-question-for-slack` (then paste the text in your next message)
 - `/refining-question-for-slack does the java tracer support log injection without a restart...`
 
-### drafting-gmail
+### drafting-poc-update-for-gmail
 
-Draft an email from a structured template. There is no Gmail MCP, so the finished email (with a `Subject:` line) is sent to your own Slack self-DM after you confirm it, ready to copy and paste into Gmail. Templates live in `skills/drafting-gmail/references/`:
-- `POC-STATUS-UPDATE-EMAIL-TEMPLATE.md`: PoC status updates and follow-ups after a meeting or call
-- `DIRECT-EMAIL-TEMPLATE.md`: a direct email to a colleague, prospect or customer about a specific topic
+Draft a PoC status update email to a prospect or customer from your sales notes, and save it as a draft in your own Gmail. You review it in Gmail and send it yourself. The skill never sends email.
 
-To add a template, create a new file in `references/` with the same structure and add a row to the template table in `SKILL.md`.
+The email follows `skills/drafting-poc-update-for-gmail/references/POC-STATUS-UPDATE-EMAIL-TEMPLATE.md`: a subject with the company name and date, the meeting mode and attendees, up to three **What's Achieved** points and up to three **What's Next** points with owners. It shows you the email for confirmation before saving the draft. The sign-off uses your Gmail display name, looked up at runtime, so no name is stored in this repo.
 
-**Note:** the skill only ever sends to your own Slack self-DM. Your Slack user ID is looked up from your Slack profile at runtime, so nothing personal is stored in this repo.
+Requires a Gmail MCP server with a create-draft tool. Without one, the email is shown in chat only.
 
 **Example prompts:**
-- `/drafting-gmail PoC update email to ACME after today's call`
-- `/drafting-gmail follow-up email to my colleague about the trial timeline`
-- `/drafting-gmail thank you email to the prospect for the workshop`
+- `/drafting-poc-update-for-gmail PoC update to ACME after today's Zoom call, notes: ...`
+- `/drafting-poc-update-for-gmail status update for the Globex trial, send to kim@example.com, notes: ...`
 
 ### drafting-daily-opp-update-for-slack
 
