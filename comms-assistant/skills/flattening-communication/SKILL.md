@@ -1,25 +1,11 @@
 ---
 name: flattening-communication
 description: >-
-  This skill should be used when the user wants to know what one or more people are
-  involved in (accounts, opportunities, projects, meetings and discussions across the
-  workspace, not only with the user) and how they are behaving. It gathers recent
-  Slack messages, emails, calendar events and the Google Drive files they created or
-  edited (the files they own can be filtered by name and type), and their Zoom meetings, chats and calls, into a readable per-person file with a
-  summary, involvements grouped by account or project, and a timeline, and analyses
-  the person's own words for character, asks, participation, behaviour (ranting,
-  complaining, bashing and so on) and sentiment. It takes a
-  table with SLACK_USER_ID, SLACK_DISPLAY_NAME and EMAIL_ADDRESS columns, runs every
-  Slack search type, searches Gmail, Calendar, Drive and Zoom, and writes a dated
-  analysis-{name}-{date}.md report. It applies when the user says "flatten my communication with
-  these people", "pull everything from and with @example-person", "build the analysis files for
-  this table", "run the daily people analysis", "catch me up on everything from these
-  people", "what is @example-person working on", "what docs has @example-person been working on", "what did @example-person discuss on Zoom", "list the sheets @example-person owns", "who has been complaining", or mentions a stakeholder analysis or
-  relationship tracker. Make
-  sure to use this skill whenever the user supplies a list of people with Slack IDs or
-  emails and wants their messages, emails or meetings pulled together, even if they
-  don't say "flatten".
-version: "0.11.2"
+  Build a dated per-person analysis report of what each person in a table is involved
+  in and how they behave, from Slack, Gmail, Calendar, Drive and Zoom. Run only when
+  the user explicitly types /flattening-communication.
+disable-model-invocation: true
+version: "0.12.0"
 author: productivity-plugins
 tags: slack, gmail, calendar, drive, google-drive, zoom, people, stakeholder, timeline, analysis, behaviour, daily
 ---

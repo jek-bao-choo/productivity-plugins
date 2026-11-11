@@ -18,6 +18,8 @@ Required MCP tools:
 
 ## Skills
 
+Every skill runs only when you type its slash command (for example `/drafting-gmail`). Claude never starts them on its own.
+
 ### summarising-slack-channel
 
 Summarise recent activity in one or more Slack channels into Q&A blocks with tags, then build a daily TIL FAQ newsletter from them. Start the agent in the folder where you want the files.
@@ -30,10 +32,9 @@ What it does:
 Default newsletter tags are `#new-feature #presentation #deadline`. Tags you supply replace the defaults. Blocks with a stated deadline are tagged `#deadline`.
 
 **Example prompts:**
-- "Summarise #general"
-- "What happened in #engineering today?"
-- "Catch me up on #announcements"
-- "Summarise #example-support for the past 3 days, newsletter tags #apm #breaking-change"
+- `/summarising-slack-channel #general`
+- `/summarising-slack-channel #engineering today`
+- `/summarising-slack-channel #example-support for the past 3 days, newsletter tags #apm #breaking-change`
 
 ### flattening-communication
 
@@ -53,10 +54,9 @@ What it does:
 Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when run on a Monday. It is built for a daily Monday to Friday schedule. Meetings are included up to 23:59 today, so you also see what is still coming up. Any period you supply overrides it. Slack, Gmail and Drive only cover what your own account can see. Drive records only the last editor of a file.
 
 **Example prompts:**
-- "Flatten my communication with the people in people.md"
-- "Run the daily people analysis for this table"
-- "Run the people analysis for the past week, Drive files: type sheet, name contains pipeline"
-- "What is @example-person involved in this week?"
+- `/flattening-communication people.md`
+- `/flattening-communication` (then paste the table)
+- `/flattening-communication people.md for the past week, Drive files: type sheet, name contains pipeline`
 
 ### refining-question-for-slack
 
@@ -92,6 +92,6 @@ To add a template, create a new file in `references/` with the same structure an
 **Note:** the skill only ever sends to your own Slack self-DM. Your Slack user ID is looked up from your Slack profile at runtime, so nothing personal is stored in this repo.
 
 **Example prompts:**
-- "Draft a PoC update email to ACME after today's call"
-- "Write a follow-up email to my colleague about the trial timeline"
-- "Compose a thank you email to the prospect for the workshop"
+- `/drafting-gmail PoC update email to ACME after today's call`
+- `/drafting-gmail follow-up email to my colleague about the trial timeline`
+- `/drafting-gmail thank you email to the prospect for the workshop`

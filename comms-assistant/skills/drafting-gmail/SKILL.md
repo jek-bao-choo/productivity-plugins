@@ -1,16 +1,11 @@
 ---
 name: drafting-gmail
 description: >-
-  This skill should be used when the user wants to draft an email or Gmail message.
-  It applies when the user says "draft an email to [person]", "write a follow-up
-  email after the meeting", "compose a PoC update email", "email [prospect] about
-  the status", "draft a thank you email", "write an email to my colleague", or
-  "prepare an email for [customer]". It also applies when the user mentions drafting,
-  composing, writing, or preparing an email, even if they don't explicitly say "Gmail"
-  or "email". This skill supports multiple email templates (PoC status update emails,
-  direct emails, and more in the future). Since no Gmail MCP is available, the composed
-  email is sent to the user's Slack self-DM for copy-paste into Gmail.
-version: "0.2.0"
+  Draft an email from a structured template (PoC status update or direct email) and
+  send it only to the user's own Slack self-DM for copy-paste into Gmail. Run only
+  when the user explicitly types /drafting-gmail.
+disable-model-invocation: true
+version: "0.3.0"
 author: productivity-plugins
 tags: gmail, email, draft, compose, poc, status, follow-up
 ---

@@ -1,21 +1,11 @@
 ---
 name: summarising-slack-channel
 description: >-
-  This skill should be used when the user wants to summarise Slack messages from a
-  channel over a specific timeframe, extract technical Q&A from Slack discussions,
-  catch up on what happened in a channel, or generate a structured knowledge summary
-  from Slack history. It applies when the user says "summarise #channel-name for the
-  past 5 days", "what technical questions were discussed in #support this week",
-  "catch me up on #engineering since Monday", "give me a digest of #announcements",
-  or "what did I miss in #team-updates". It also applies when the user mentions
-  channel summary, channel recap, Slack knowledge extraction, or technical Q&A
-  summary — even if they don't explicitly say "summarise". It also builds a daily
-  TIL FAQ newsletter from the summaries, so it applies when the user says "build
-  today's newsletter from #support", "summarise #channel and make a newsletter of
-  the #apm blocks", or mentions a TIL FAQ newsletter. Make sure to use this
-  skill whenever the user asks about Slack channel activity, wants to review
-  discussions, or needs to extract insights from Slack message history.
-version: "0.7.2"
+  Summarise Slack channel messages over a timeframe into technical Q&A blocks with
+  tags, and build a daily TIL FAQ newsletter from them. Run only when the user
+  explicitly types /summarising-slack-channel.
+disable-model-invocation: true
+version: "0.8.0"
 author: productivity-plugins
 tags: slack, summarise, channel, digest, recap, datadog, technical, Q&A, newsletter, til, faq
 ---
