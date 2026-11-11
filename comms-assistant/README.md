@@ -1,18 +1,18 @@
 # comms-assistant
 
-Draft and summarise Slack communications, build a daily TIL FAQ newsletter, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, build a daily TIL FAQ newsletter, refine questions for Slack with a recommended channel, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
 Slack MCP tools must be available in your Claude Code environment. These are typically provided by a Slack MCP server plugin (e.g., `plugin-dev@claude-plugins-official`).
 
 Required MCP tools:
-- `slack_search_channels` — find channels by name
+- `slack_search_channels` — find channels by name (also used by `refining-question-for-slack` to recommend a channel)
 - `slack_read_channel` — read recent messages in a channel
 - `slack_read_thread` — read a specific thread
 - `slack_send_message` — deliver composed content to your own self-DM for review
-- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `drafting-gmail` and `flattening-communication`)
-- `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`)
+- `slack_read_user_profile` — look up your own Slack user ID at runtime (used by `drafting-gmail`, `flattening-communication` and `refining-question-for-slack`)
+- `slack_search_public_and_private` (or `slack_search_public`) and `slack_search_users` — search messages and resolve people (used by `flattening-communication`; message search is also used by `refining-question-for-slack`)
 
 `flattening-communication` also uses Gmail, Google Calendar, Google Drive and Zoom MCPs when available. Without them it runs on Slack only and reports the gap.
 
@@ -57,6 +57,30 @@ Default timeframe is 00:00 GMT+8 yesterday until now, or from Friday 00:00 when 
 - "Run the daily people analysis for this table"
 - "Run the people analysis for the past week, Drive files: type sheet, name contains pipeline"
 - "What is @example-person involved in this week?"
+
+### refining-question-for-slack
+
+Refine rough question text so you can post it in a company Slack channel and get clear, relevant answers, with one recommended channel per question. Send the request first and paste the text in your next message, or include it straight away.
+
+What it does:
+1. Splits the text into distinct questions. Each becomes one sentence starting with `Hi,` and `Can`, `Does`, `What`, `When`, `Where`, `Why`, `Who` or `How`, with a standalone `Context:` block. Grammar is fixed, technical details and uncertainty are kept, nothing is invented and the questions are not answered.
+2. Searches Slack channels and messages to recommend one primary channel per question, with a link when the tools return one and a short reason. If no channel can be verified it says so instead of guessing.
+3. Returns each block as:
+
+```
+Hi, [refined question]?
+
+Context: [relevant background information]
+
+Recommended Slack channel: [#channel-name and link] — [brief reason]
+```
+
+4. Sends each block to your own Slack self-DM so it is easy to copy. Your user ID is looked up from your Slack profile at runtime. The skill never posts to a channel or anyone else.
+
+**Example prompts:**
+- "Refine my question for Slack" (then paste the text)
+- "Which channel should I ask this in? Does the Java tracer support log injection without a restart..."
+- "Clean up these questions before I post them on Slack"
 
 ### drafting-gmail
 
