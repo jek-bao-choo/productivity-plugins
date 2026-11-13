@@ -1,6 +1,6 @@
 # comms-assistant
 
-Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, draft technical questions to ask in Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
+Draft and summarise Slack communications, summarise long Slack threads into Q&A blocks, build a daily TIL FAQ newsletter, draft technical questions to ask in Slack with a recommended channel, draft daily opportunity updates, draft PoC status update emails as Gmail drafts, rewrite text in 16 communication frameworks to pick from, and flatten communication with people across Slack, Gmail, Calendar, Drive and Zoom using MCP tools.
 
 ## Prerequisites
 
@@ -137,3 +137,34 @@ Owners are written as plain `@Name` text, never as real Slack mentions, so nobod
 - `/drafting-daily-opp-update-for-slack Acme Corp`
 - `/drafting-daily-opp-update-for-slack Acme Corp, Globex for yesterday`
 - `/drafting-daily-opp-update-for-slack Initech (Initech Bank, initech.com) 9 to 11 Nov`
+
+### drafting-with-communication-frameworks
+
+Rewrite a piece of text once in each of 16 communication frameworks so you can compare them side by side, learn how each one is built, and pick the version to use. Paste the text with the command, and optionally say who it is for and where it will go (Slack, email, a meeting).
+
+Frameworks: BLUF, Minto Pyramid Principle, SCQA, PREP, STAR, CAR, What? So what? Now what?, PPP, RAG status, SBAR, SBI, DESC, AIDA, PAS, Before After Bridge and Monroe's Motivated Sequence.
+
+What it returns:
+1. A **Best fit** line naming the two or three frameworks that suit your audience and goal.
+2. For each framework, a table showing which element each sentence plays, then the assembled message with its word count:
+
+```
+### 1. BLUF
+_Decision → Reason / constraint → Action → Conditions → Contingency / fallback → Support_
+
+| Element | How the message uses it |
+|---|---|
+| **Decision** | {sentence} |
+| **Reason / constraint** | {sentence} |
+| **Action** | {sentence} |
+
+**Message (42 words):**
+> {the sentences joined, ready to send}
+```
+
+Sentences are short and succinct, with one sentence per element. It uses only facts from your text, and marks anything missing as a `[placeholder]`. Frameworks that fit poorly still get a draft with a short fit note. When you reply with a number, it returns that message alone in a code block, ready to copy. The drafts stay in chat and are not sent anywhere.
+
+**Example prompts:**
+- `/drafting-with-communication-frameworks` (then paste the text)
+- `/drafting-with-communication-frameworks quick update for #opp-acme: APM onboarded on 3 of 5 services, payments and ledger blocked on security approval...`
+- `/drafting-with-communication-frameworks for my mid year review: migrated a bank customer from Splunk to Log Management...`

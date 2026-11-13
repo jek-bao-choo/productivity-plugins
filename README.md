@@ -13,7 +13,7 @@ A Claude Code plugin marketplace of productivity plugins.
 
 | Plugin | Version | Description | Skills |
 |--------|---------|-------------|--------|
-| [comms-assistant](comms-assistant) | 0.12.0 | Draft and summarise Slack communications, summarise long Slack threads, draft technical questions to ask in Slack, draft daily opportunity updates and PoC update Gmail drafts, and flatten communication across tools | `summarising-slack-channel`, `summarising-a-long-slack-message`, `flattening-communication`, `drafting-technical-question-to-ask-in-slack`, `drafting-poc-update-for-gmail`, `drafting-daily-opp-update-for-slack` |
+| [comms-assistant](comms-assistant) | 0.13.0 | Draft and summarise Slack communications, summarise long Slack threads, draft technical questions to ask in Slack, draft daily opportunity updates and PoC update Gmail drafts, rewrite text in 16 communication frameworks, and flatten communication across tools | `summarising-slack-channel`, `summarising-a-long-slack-message`, `flattening-communication`, `drafting-technical-question-to-ask-in-slack`, `drafting-poc-update-for-gmail`, `drafting-daily-opp-update-for-slack`, `drafting-with-communication-frameworks` |
 | [sales-process](sales-process) | 0.2.1 | Sales process tools: RFP/RFI Responses, Lead Qualification, and more | `qualifying-lead`, `answering-rfp` |
 | [poc-process](poc-process) | 0.3.1 | Proof of Concept artifact generation tools: Evaluation Plans, TMAPs, Success Criteria, and Scoping Decks | `creating-eval-plan`, `converting-evalplan-to-tmap`, `formulate-success-criteria`, `creating-poc-scoping-deck` |
 | [product-demo](product-demo) | 0.3.0 | Product demo content generation tools | `create-demo-pptx`, `create-architecture-excalidraw` |
