@@ -1,5 +1,5 @@
 ---
-name: creating-architecture-via-excalidraw
+name: creating-solution-architecture
 description: >-
   Design an end-to-end Datadog monitoring architecture diagram and render it
   in Excalidraw, from sales discovery notes and technical plans. Use when the

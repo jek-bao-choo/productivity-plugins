@@ -17,13 +17,13 @@
       "name": "sales-process",
       "source": "./sales-process",
       "description": "Sales process tools: RFP/RFI Responses, Lead Qualification, and more",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "product-demo",
       "source": "./product-demo",
       "description": "Product demo content generation tools",
-      "version": "0.5.0"
+      "version": "0.6.0"
     },
     {
       "name": "poc-process",

@@ -12,7 +12,7 @@ Turn raw sales notes into a structured lead qualification document using BANT, M
 
 ### answering-rfp
 
-Turn an RFP, RFI or vendor questionnaire into a structured response CSV with Datadog supportability assessments, web-search-grounded answers, documentation URLs and demo links.
+Turn an RFP, RFI or vendor questionnaire into a structured response CSV with Datadog supportability assessments, web-search-grounded answers, documentation URLs and demo links. Anything a source does not confirm is marked Skipped, never guessed.
 
 **Usage:** `/sales-process:answering-rfp`
 
