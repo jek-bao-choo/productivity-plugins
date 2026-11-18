@@ -1,43 +1,46 @@
 ---
 name: creating-solution-architecture
 description: >-
-  Design an end-to-end Datadog monitoring architecture diagram and render it
-  in Excalidraw, from sales discovery notes and technical plans. Use when the
-  user asks to "design a Datadog architecture diagram", "map out our
-  monitoring architecture", "turn these discovery notes into an Excalidraw
-  diagram", "draw the data flow for metrics/traces/logs", "show which ports
-  and protocols the telemetry uses", "sketch how this customer's stack maps to
-  Datadog", or wants a layered infra/app/UI blueprint showing collection
-  methods (Agent, Cluster Agent, OpenTelemetry Collector, API integrations)
-  and telemetry transmission (signal type, protocol, port) to the Datadog SaaS
-  intake (EU/US/AP). Produces a current state view (fragmented monitoring
-  tools) and a target state view (consolidated on Datadog), both flowing left
-  to right from the customer environment to the destination. Outputs both
-  an editable .excalidraw file and a .svg diagram. Also trigger
-  this whenever the user provides discovery notes (markdown/Google Docs) or
-  technical plans (CSV/Excel) and wants a visual architecture output,
-  even if they don't say "Excalidraw" or "diagram" explicitly, or wants a current vs future state / tool
-  consolidation picture — e.g. "help me plan how we'd monitor this customer's
-  environment" or "what would the observability setup look like for this
-  account".
-version: "0.4.0"
+  Design an end-to-end Datadog monitoring architecture diagram from sales
+  discovery notes and technical plans, drawn with Claude Artifact Design
+  (fallback: a hybrid HTML file to drop into Claude Artifact Design). Use when the user asks to "design a Datadog
+  architecture diagram", "map out our monitoring architecture", "turn these
+  discovery notes into an architecture diagram", "draw the data flow for
+  metrics/traces/logs", "show which ports and protocols the telemetry uses",
+  or wants a layered infra/app/UI blueprint with collection methods (Agent,
+  Cluster Agent, OTel Collector, API integrations) and per signal protocol
+  and port to the Datadog intake (EU/US/AP). Draws a current state
+  (fragmented tools) and a target state (consolidated on Datadog), left to
+  right. Also trigger when the user shares discovery notes or technical
+  plans and wants a visual architecture or current vs future state picture,
+  e.g. "help me plan how we'd monitor this customer's environment".
+version: "0.8.0"
 ---
 
-# Create Datadog Architecture Diagram in Excalidraw
+# Create Datadog Architecture Diagram
 
 You are acting as a Senior Solutions Architect specializing in Cloud
 Observability and Datadog implementations. Your job is to turn a prospect's
 discovery notes and technical plans into a detailed, layered monitoring
-architecture, and render it as a diagram in Excalidraw.
+architecture, and draw it as a diagram.
 
-Every run delivers **two files** with the same content:
+**Draw the diagram with Claude Artifact Design. This is the top
+preference.** Only when Claude Artifacts are not available or accessible,
+write a hybrid HTML file instead (HTML and CSS boxes, inline SVG arrows).
+The user then drops that HTML into Claude Artifact Design, so build it for
+that hand-off. Never use Excalidraw.
 
-- `<customer>-architecture.excalidraw`: the editable source.
-- `<customer>-architecture.svg`: a static diagram for slides, docs, email,
-  and Slack, which open it without Excalidraw.
+Every run delivers:
+
+- **Claude Artifact Design available**: a Claude Artifact holding the
+  diagram, plus `<customer>-architecture.svg` (or `.png`) exported from it
+  when the Artifact can export (for slides, docs, email and Slack).
+- **Not available**: `<customer>-architecture.html` (to drop into Claude
+  Artifact Design) and `<customer>-architecture.png`, a render of it for
+  slides, docs, email and Slack.
 
 Use the customer's short name in lowercase with hyphens (e.g.
-`acme-architecture.svg`), or `architecture` if there's no customer name.
+`acme-architecture.html`), or `architecture` if there's no customer name.
 
 The diagram must make **telemetry transmission explicit**: for every hop, a
 reader should be able to see what kind of data moves (metrics, traces/spans,
@@ -119,35 +122,31 @@ the "not drawn" list with one line per flow. No recap of the process.
 Copy this checklist and tick it off as you go:
 
 ```
-- [ ] Setup: check for Excalidraw MCP and an architecture skill
+- [ ] Setup: check for Claude Artifact Design
 - [ ] Step 1: Analyze the inputs
 - [ ] Step 2: Clarify before designing
 - [ ] Step 3: Map the current state (fragmented tooling)
 - [ ] Step 4: Design the target state blueprint (Datadog)
 - [ ] Step 5: Build the telemetry transmission table
-- [ ] Step 6: Render current state and target state in Excalidraw
-- [ ] Step 6b: Export the .svg diagram and look at it
+- [ ] Step 6: Draw both views (Artifact Design, else hybrid HTML)
+- [ ] Step 6b: Look at the rendered diagram and fix it
 - [ ] Step 7: Final check (including wording limits)
 ```
 
-## Setup: find the tools this skill relies on
+## Setup: check for Claude Artifact Design
 
-This skill depends on two things that may or may not be present in the
-current environment: an Excalidraw MCP connector (a tool for creating/editing
-Excalidraw canvases) and a separate "architecture" skill Anthropic may ship
-that knows how to construct clean diagram layouts. Neither is bundled with
-this skill, and their exact names can vary, so check for them before
-assuming either is available:
+Before Step 1, find out which drawing path this run can use:
 
-- Run `ToolSearch` with a query like `"excalidraw"` to see if an Excalidraw
-  MCP tool is connected.
-- Check your available skills list for one whose name or description mentions
-  "architecture" or "diagram" construction (distinct from this skill).
+- Check your tools for Claude Artifacts (e.g. an `Artifact` tool). If none
+  is listed, run `ToolSearch` with `"artifact"` and then `"design"`.
+- Claude Artifact Design is available when you can create an Artifact with
+  its Design capability (Claude Design now lives in Claude).
+- `DesignSync` is not a drawing tool. It only syncs design-system projects,
+  so don't use it here.
 
-What you find determines how you execute Step 6. Don't hard-code
-assumptions about either being present — if you skip this check and call a
-tool that doesn't exist, the whole workflow breaks instead of degrading
-gracefully to the JSON fallback.
+Record the result: **Artifact path** or **HTML path**. Don't call a tool you
+haven't confirmed exists; fall back to the HTML path instead. If the
+Artifact path fails mid-run, say so in one line and switch to the HTML path.
 
 ## Step 1 — Analyze the inputs
 
@@ -471,11 +470,11 @@ every arrow in the diagram:
 The examples above are illustrative. Replace them with the customer's actual
 sources, signals, and ports. Only **Confirmed** rows become arrows.
 
-## Step 6 — Render in Excalidraw
+## Step 6 — Draw the diagram
 
 ### Two views: current state and target state
 
-Produce two views on the same canvas, each in its own labeled Excalidraw
+Produce two views on the same canvas, each in its own labeled
 frame: **"Current State: Fragmented Monitoring"** on top and **"Target
 State: Consolidated on Datadog"** below it. Use the same width and the same
 positions for the customer environment nodes in both, so a reader can look
@@ -547,134 +546,70 @@ Datadog".
 
 ### Rendering path
 
-Pick the path based on what Setup found:
+Pick the path recorded in Setup.
 
-- **Excalidraw MCP tool found**: call it directly to build the diagram with
-  the layout and arrow rules above.
-- **Architecture skill found**: invoke it (via the `Skill` tool) to handle
-  the diagram-construction mechanics, since it may have layout or shape
-  conventions that produce a cleaner result than ad hoc placement. Pass it
-  the transmission table and the arrow rules above so the signal, protocol,
-  and port labels are kept.
-- **Neither found**: generate a valid Excalidraw scene file (`.excalidraw`,
-  which is JSON) yourself and save it to the working directory as
-  `<customer>-architecture.excalidraw`. A scene is
-  `{"type": "excalidraw", "version": 2, "elements": [...], "appState": {...}}`,
-  where each element has at minimum `type` (`rectangle`, `text`, `arrow`,
-  `ellipse`), `x`, `y`, `width`, `height`, and a unique `id`. Arrows bind
-  to shapes via `startBinding`/`endBinding` referencing element ids, set
-  their color with `strokeColor`, and get a label via a bound `text`
-  element (`containerId` set to the arrow's id, and the arrow listing it in
-  `boundElements`). Use two `frame` elements for the current state and
-  target state views, and set `frameId` on each element to the frame it
-  belongs to. Tell the user to open the file in Excalidraw via
-  File → Open.
+**Artifact path (preferred).** Build the diagram as one Claude Artifact
+using Claude Artifact Design:
 
-Whatever path you took, end Step 6 with `<customer>-architecture.excalidraw`
-saved in the working directory. If the MCP tool or architecture skill
-built the diagram, export or fetch the scene JSON from it. If it can't give
-you the JSON, write the same scene yourself from the transmission table and
-layout so both files match.
+- Give it the transmission table, the layout, the arrow rules, the colors
+  and the wording rules above. They are the spec; Design styles the look.
+- One canvas, two labeled frames: current state on top, target state below.
+- Keep every label as real text, not baked into an image, so it stays
+  editable.
+- Use the Artifact's Datadog styles for fonts and colors where it has them,
+  but keep the per signal arrow colors and the legend.
+- If the Artifact can export SVG (or PNG), save it as
+  `<customer>-architecture.svg` (or `.png`) in the working directory.
+  Otherwise say so; the Artifact is the deliverable.
 
-## Step 6b — Export the .svg diagram
+**HTML path (fallback).** Write `<customer>-architecture.html` in the
+working directory, ready for the user to drop into Claude Artifact Design.
+Boxes and labels are HTML and CSS, so Design can edit and restyle them;
+arrows are inline SVG, so they stay exact.
 
-If the MCP tool or architecture skill can export SVG directly, use that and
-save it as `<customer>-architecture.svg`. Otherwise convert the scene file
-with this script. It draws rectangles, ellipses, diamonds, frames (with
-their names), arrows and lines (with colors, dashes, and arrowheads), and
-text, including labels bound to shapes and arrows:
+- One self-contained file: inline `<style>`, no JavaScript, no external
+  files. Font: Roboto, falling back to Helvetica, Arial, sans-serif.
+- Plan the grid first (column x positions, lane y positions, node size) so
+  boxes and labels don't collide and both views line up.
+- One `<section class="view" id="current-state">` and one
+  `id="target-state"`, each `position: relative` with a fixed size (about
+  2400 × 900 px) and an `<h2>` title. Give both the same size and the same
+  node positions on the left.
+- Every node is a `<div class="node" id="...">` placed with
+  `position: absolute` and explicit `left`, `top`, `width`, `height` in px,
+  text centered, a `<br>` for the second line. Use classes for kinds
+  (`node tool`, `node datadog`, `node proxy`, `callout`, `not-drawn`,
+  `legend`, `ports`) so styling lives in the CSS. The customer boundary is a
+  `div` with a dashed border.
+- Arrows go on one `<svg class="flows">` per view: `position: absolute;
+  inset: 0`, same size as the view, `pointer-events: none`, on top of the
+  nodes. Each arrow is a `<path>` from the right edge of its source box to
+  the left edge of its target box (use the px values you placed the boxes
+  at), with `marker-end` and one `<marker>` per signal color in `<defs>`.
+  Set `data-signal` (`metrics`, `traces`, `logs`, `events`, `alerts`,
+  `other`) on each path. Put each arrow label as `<text>` at the midpoint on
+  a white `<rect>` so it stays readable over lines. Size the rect to the
+  text: about 0.6 × font size per character, plus 12 px.
+- The legend, ports summary and "Not drawn" box are HTML (`<table>` for the
+  ports summary).
+- Add a comment at the top of each view and each flow group
+  (`<!-- Target state · Agent egress -->`) so Design can map it.
+- In your reply, tell the user: open Claude, drop in
+  `<customer>-architecture.html`, and ask Claude Artifact Design to turn it
+  into the diagram.
 
-```bash
-python3 -I - acme-architecture.excalidraw acme-architecture.svg <<'PY'
-import json, sys, html
-src, out = sys.argv[1], sys.argv[2]
-els = [e for e in json.load(open(src))["elements"] if not e.get("isDeleted")]
-byid = {e["id"]: e for e in els}
-FONT = "Helvetica, Arial, sans-serif"
-xs, ys = [], []
-for e in els:
-    x, y, w, h = e.get("x", 0), e.get("y", 0), e.get("width", 0), e.get("height", 0)
-    pts = e.get("points") or [[0, 0], [w, h]]
-    xs += [x + p[0] for p in pts] + [x, x + w]
-    ys += [y + p[1] for p in pts] + [y, y + h]
-pad = 40
-minx, miny = min(xs) - pad, min(ys) - pad
-W, H = max(xs) - minx + pad, max(ys) - miny + pad
-def attrs(e, fill=True):
-    a = f'stroke="{e.get("strokeColor", "#1e1e1e")}" stroke-width="{e.get("strokeWidth", 1.5)}"'
-    bg = e.get("backgroundColor", "transparent")
-    a += f' fill="{bg if fill and bg != "transparent" else "none"}"'
-    if e.get("strokeStyle") == "dashed": a += ' stroke-dasharray="8 6"'
-    if e.get("strokeStyle") == "dotted": a += ' stroke-dasharray="2 4"'
-    return a
-def text(x, y, t, size, color, anchor="middle", weight="normal"):
-    lines = t.split("\n")
-    y0 = y - (len(lines) - 1) * size * 0.6
-    spans = "".join(f'<tspan x="{x:.1f}" y="{y0 + i * size * 1.2:.1f}">{html.escape(l)}</tspan>' for i, l in enumerate(lines))
-    return (f'<text font-family="{FONT}" font-size="{size}" fill="{color}" text-anchor="{anchor}" '
-            f'dominant-baseline="middle" font-weight="{weight}">{spans}</text>')
-shapes, labels = [], []
-for e in els:
-    t, x, y = e["type"], e.get("x", 0), e.get("y", 0)
-    w, h = e.get("width", 0), e.get("height", 0)
-    if t in ("rectangle", "frame"):
-        r = 8 if e.get("roundness") else 0
-        a = attrs(e) if t == "rectangle" else 'stroke="#9e9e9e" stroke-width="1.5" fill="none" stroke-dasharray="4 4"'
-        shapes.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" {a}/>')
-        if t == "frame" and e.get("name"):
-            labels.append(text(x, y - 14, e["name"], 20, "#1e1e1e", "start", "bold"))
-    elif t == "ellipse":
-        shapes.append(f'<ellipse cx="{x + w/2}" cy="{y + h/2}" rx="{w/2}" ry="{h/2}" {attrs(e)}/>')
-    elif t == "diamond":
-        shapes.append(f'<polygon points="{x+w/2},{y} {x+w},{y+h/2} {x+w/2},{y+h} {x},{y+h/2}" {attrs(e)}/>')
-    elif t in ("arrow", "line"):
-        pts = " ".join(f"{x + p[0]},{y + p[1]}" for p in e.get("points", [[0, 0], [w, h]]))
-        c = e.get("strokeColor", "#1e1e1e")
-        m = ""
-        if t == "arrow" and e.get("endArrowhead", "arrow"):
-            mid = "m" + c.lstrip("#")
-            shapes.append(f'<defs><marker id="{mid}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" '
-                          f'markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="{c}"/></marker></defs>')
-            m = f' marker-end="url(#{mid})"'
-            if e.get("startArrowhead"): m += f' marker-start="url(#{mid})"'
-        shapes.append(f'<polyline points="{pts}" {attrs(e, fill=False)}{m}/>')
-    elif t == "text":
-        size, color = e.get("fontSize", 16), e.get("strokeColor", "#1e1e1e")
-        c = byid.get(e.get("containerId") or "")
-        if c and c["type"] in ("arrow", "line"):
-            p = c.get("points", [[0, 0]]); a, b = p[len(p)//2 - 1] if len(p) > 1 else p[0], p[len(p)//2]
-            cx, cy = c["x"] + (a[0] + b[0]) / 2, c["y"] + (a[1] + b[1]) / 2
-            n = max(len(l) for l in e["text"].split("\n")) * size * 0.55
-            k = len(e["text"].split("\n")) * size * 1.2
-            labels.append(f'<rect x="{cx - n/2 - 4}" y="{cy - k/2 - 2}" width="{n + 8}" height="{k + 4}" fill="#ffffff"/>')
-            labels.append(text(cx, cy, e["text"], size, color))
-        elif c:
-            labels.append(text(c["x"] + c["width"] / 2, c["y"] + c["height"] / 2, e["text"], size, color))
-        else:
-            anchor = {"left": "start", "right": "end"}.get(e.get("textAlign", "left"), "middle")
-            tx = x if anchor == "start" else x + w if anchor == "end" else x + w / 2
-            labels.append(text(tx, y + h / 2, e["text"], size, color, anchor))
-svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{minx} {miny} {W} {H}" width="{W}" height="{H}">'
-       f'<rect x="{minx}" y="{miny}" width="{W}" height="{H}" fill="#ffffff"/>' + "".join(shapes + labels) + "</svg>")
-open(out, "w").write(svg)
-print(f"wrote {out} ({len(els)} elements)")
-PY
-```
+## Step 6b — Look at the diagram and fix it
 
-Then check the SVG:
-
-1. **It parses:** `python3 -I -c "import xml.dom.minidom as m; m.parse('acme-architecture.svg'); print('valid')"`
-2. **It looks right:** render it to PNG and open the image with `Read`.
-   Prefer headless Chrome, since it renders SVG faithfully:
-   `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --screenshot=preview.png --window-size=1800,1400 file://$PWD/acme-architecture.svg`.
-   If Chrome isn't available, use `qlmanage -t -s 1800 -o . acme-architecture.svg`
-   (macOS; its thumbnail may crop, so don't treat cropping as a bug).
-3. **Fix what you see:** overlapping labels, text spilling out of boxes,
-   arrows crossing nodes, or arrows that don't run left to right. Fix the
-   `.excalidraw` scene, not the SVG, then convert again so both files stay
-   in sync.
-
-Delete `preview.png` when you're done; deliver only the two diagram files.
+1. **Artifact path:** open the rendered Artifact and look at both views.
+   **HTML path:** render it with headless Chrome and open the image with
+   `Read`:
+   `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --hide-scrollbars --screenshot=acme-architecture.png --window-size=2400,1900 file://$PWD/acme-architecture.html`.
+   Set the window height to fit both views.
+2. **Fix what you see:** overlapping labels, text spilling out of boxes,
+   arrows that miss their boxes or cross nodes, or arrows that don't run
+   left to right. Fix the Artifact or the HTML, then look again. On the HTML
+   path, re-take the screenshot after each fix; the last one is the `.png`
+   deliverable.
 
 ## Step 7 — Final check
 
@@ -706,34 +641,34 @@ Before handing over, confirm:
 - The Datadog site/region on the diagram matches what was confirmed in
   Step 2.
 - The legend and ports summary are present.
-- Both `<customer>-architecture.excalidraw` and `<customer>-architecture.svg`
-  exist, the SVG parses, you've looked at a render of it, and it matches
-  the scene.
+- The diagram was drawn with Claude Artifact Design, or, only if Claude
+  Artifacts weren't available, as a hybrid `.html` plus its `.png` render.
+  No Excalidraw. You've looked at the render and fixed what you saw.
 - Every piece of text meets the word limits in "Wording rules", with no
-  " — " or " - " separators. If you wrote a `.excalidraw` file, run this
-  check and shorten anything it flags (use the cap from the table when it
-  is tighter than 12):
+  " — " or " - " separators. On the HTML path, run this check and shorten
+  anything it flags (use the cap from the table when it is tighter than
+  12). On the Artifact path, apply the same check to the text you put in
+  the Artifact:
 
   ```bash
-  python3 -I - acme-architecture.excalidraw <<'PY'
-  import json, sys
-  els = json.load(open(sys.argv[1]))["elements"]
+  python3 -I - acme-architecture.html <<'PY'
+  import sys, re, html
+  doc = open(sys.argv[1]).read()
+  doc = re.sub(r"(?s)<(style|defs)\b.*?</\1>|<!--.*?-->", "", doc)
   bad = 0
-  for e in els:
-      t = e.get("text", "") if e.get("type") == "text" else ""
-      for line in t.splitlines():
+  for block in re.findall(r"(?s)>([^<>]*(?:<br\s*/?>[^<>]*)*)<", doc):
+      lines = [html.unescape(l).strip() for l in re.split(r"<br\s*/?>", block)]
+      lines = [l for l in lines if l]
+      for line in lines:
           if len(line.split()) > 12 or " — " in line or " - " in line:
               print("SHORTEN:", line); bad += 1
-      if len(t.splitlines()) > 3:
-          print("TOO MANY LINES:", t.replace("\n", " / ")); bad += 1
+      if len(lines) > 3:
+          print("TOO MANY LINES:", " / ".join(lines)); bad += 1
   print("OK" if not bad else f"{bad} issue(s)")
   PY
   ```
 
-  If you used the Excalidraw MCP or an architecture skill instead, apply
-  the same check to the text you sent.
-
-Then share both file paths and the transmission table alongside the diagram, so the customer's
+Then share the Artifact (or the `.html` and `.png` paths) and the transmission table alongside the diagram, so the customer's
 network team can review it as text as well. In your reply, list the flows
 you didn't draw and why (one short line each), so the user knows what to
 confirm with the customer before the diagram is shown as a commitment.

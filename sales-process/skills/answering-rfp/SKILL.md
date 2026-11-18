@@ -1,24 +1,27 @@
 ---
 name: answering-rfp
 description: >
-  Transforms raw sales notes into a structured RFP/RFI response CSV with Datadog supportability assessments,
+  Transforms raw sales notes into a structured RFP/RFI response built with Claude Artifact Sheets (fallback: Excel .xlsx or .csv)
+  with Datadog supportability assessments,
   web-search-grounded responses, documentation URLs, and demo links. Output follows a mandatory template embedded
   in this skill that CANNOT be reproduced without it.
 
   IMPORTANT: Always use this skill for ANY RFP, RFI, vendor questionnaire, compliance questionnaire, prospect
-  requirements, or technical capability mapping about Datadog. The exact CSV format this skill provides is required.
+  requirements, or technical capability mapping about Datadog. The exact sheet format this skill provides is required.
 
   Triggers: user pastes sales notes, meeting notes, emails, or requirements wanting an RFP/RFI response; mentions RFP,
   RFI, vendor assessment, or compliance questionnaire; asks about Datadog supportability for a prospect's tech stack;
   wants to organize prospect requirements into a structured response; needs Datadog capability mapping.
-version: "0.4.0"
+version: "0.5.0"
 author: Jek Bao
 tags: rfp, rfi, vendor-questionnaire, compliance, sales, datadog, supportability
 ---
 
 # Answering RFP Skill
 
-You help sales teams turn raw, unstructured notes into a structured RFP/RFI response CSV file. The output strictly follows the **Output Template** section below.
+You help sales teams turn raw, unstructured notes into a structured RFP/RFI response sheet. The output strictly follows the **Output Template** section below.
+
+**Always build the response with Claude Artifact Sheets. This is the top preference.** Only when Artifact Sheets is not available, save a file instead: `.csv` by default, or Excel `.xlsx` if the user asks for Excel. This holds even when the user says "CSV" or "Excel": build Artifact Sheets, and export a file from it only if the user asks for one.
 
 ## The #1 rule: Never fabricate, always quote
 
@@ -63,6 +66,15 @@ Before saving, reread every Response cell. If any has more than one sentence, mo
 
 ## Workflow
 
+### Setup: check for Claude Artifact Sheets
+
+Before Step 1, find out which output path this run can use:
+
+- Check your tools for Claude Artifacts (e.g. an `Artifact` tool). If none is listed, run `ToolSearch` with `"artifact"` and then `"sheets"`.
+- Claude Artifact Sheets is available when you can create an Artifact as a spreadsheet.
+
+Record the result: **Sheets path** or **File path**. Don't call a tool you haven't confirmed exists. If the Sheets path fails mid-run, say so in one line and switch to the File path.
+
 ### Step 1: Receive the notes
 
 Acknowledge the notes in one line. Extract the company or account name for the filename. If none is found, use `unnamed`. Do not ask.
@@ -74,7 +86,7 @@ Enter plan mode using the `EnterPlanMode` tool. In the plan:
 1. **Extract and categorize.** Identify every distinct requirement and map it to a category from the Category Taxonomy. Per category, list: quoted requirement, category, initial supportability, what needs research.
 2. **Build the tech stack inventory.** Follow "Extracting Technical Stack Details" below. Show it in the plan as a numbered table: `# | Item (with version) | Exact quote | Row category`. Total count at the bottom.
 3. **Identify gaps and ambiguities.** List vague, contradictory, or incomplete items with proposed clarification questions.
-4. **Propose the filename.** `rfp-response-[account-name]-[YYYY-MM-DDTHHMMSSZ].csv`, account name kebab-cased.
+4. **Propose the name.** `rfp-response-[account-name]-[YYYY-MM-DDTHHMMSSZ]`, account name kebab-cased. Sheets path: the sheet title. File path: add `.csv` (or `.xlsx`).
 
 Keep the plan terse. End with: **"Does this plan look good? Should I adjust anything before generating the final RFP response?"**
 
@@ -82,9 +94,9 @@ Keep the plan terse. End with: **"Does this plan look good? Should I adjust anyt
 
 Do not proceed until the user explicitly approves. If they request changes, update the plan and ask again.
 
-### Step 4: Generate the output CSV
+### Step 4: Generate the response
 
-Exit plan mode using `ExitPlanMode`, then produce the CSV file.
+Exit plan mode using `ExitPlanMode`, then build the response on the path recorded in Setup.
 
 Every inventory item from the approved plan becomes at least one row. For each requirement row:
 1. **Research.** Follow the tiered search escalation below.
@@ -92,7 +104,8 @@ Every inventory item from the approved plan becomes at least one row. For each r
 3. **Find demo URLs.** Use https://github.com/ChromeDevTools/chrome-devtools-mcp to discover relevant pages on `https://demo.datadoghq.com/`. Use only a page you opened that shows the claimed feature; otherwise `NA`. Skipped rows get no demo URL.
 
 The output must:
-- Be a `.csv` file, NOT markdown. Save as `rfp-response-[account-name]-[YYYY-MM-DDTHHMMSSZ].csv`.
+- **Sheets path (preferred):** be one Claude Artifact Sheets spreadsheet titled `rfp-response-[account-name]-[YYYY-MM-DDTHHMMSSZ]`, one sheet, header in row 1, frozen, wrapped text, URLs as plain text. If the user asks for a file, or another skill needs to read the rows (e.g. `creating-demo-deck`), also save a `.csv` export (or write the same rows as a `.csv`) and give its path.
+- **File path (fallback):** be a `.csv` file, NOT markdown, saved as `rfp-response-[account-name]-[YYYY-MM-DDTHHMMSSZ].csv`. If the user asked for Excel, save `.xlsx` instead (`openpyxl`, one sheet, same columns).
 - Use the Output Template header **exactly**: same columns, same order.
 - Quote directly from the notes using `"..."` in the Prospect's Requirement column.
 - Keep every Datadog's Response to **one sentence**.
@@ -100,11 +113,11 @@ The output must:
 - Never over-claim: unconfirmed rows are `Skipped`.
 - Not include the template's example rows.
 
-Before saving, run the **coverage check**: tick every inventory item against the CSV. Count of tech stack rows must be at least the inventory count. Add any missing row before saving. Never drop a row because it is Skipped, unclear, or minor. Never add a second row for an item already covered by another row; one item, one row.
+Before saving, run the **coverage check**: tick every inventory item against the sheet. Count of tech stack rows must be at least the inventory count. Add any missing row before saving. Never drop a row because it is Skipped, unclear, or minor. Never add a second row for an item already covered by another row; one item, one row.
 
 Then run the **over-claim check** on every `Yes`, `Partial`, and `Comply` row: does the cited page, opened in this session, explicitly state the exact claim in the Response? If not, or if you are unsure, change the row to `Skipped` with `NA` in the Response, Doc, and Demo columns.
 
-After saving, reply in chat with the file path, a **Clarification Summary**, and a **Skipped Summary**. One line each. Do not put either summary in the CSV.
+After saving, reply in chat with the Artifact (and any file path), a **Clarification Summary**, and a **Skipped Summary**. One line each. Do not put either summary in the sheet.
 
 - Clarification Summary: all Clarification questions as a numbered list, prioritized by business impact (contradictions and blockers first, then missing technical details).
 - Skipped Summary: every Skipped requirement, for a Datadog SE to verify before anyone answers it.
@@ -122,20 +135,23 @@ Skipped Summary: Needs Datadog SE Verification
 
 ## Output Template
 
-The CSV contains only a header row and one row per requirement. No title, no blank rows, no summary rows.
+The sheet (Artifact Sheets, `.xlsx` or `.csv`) contains only a header row and one row per requirement. No title, no blank rows, no summary rows. The header, as CSV:
 
 ```csv
 Category / Section / Area / Dimension / Domain,Prospect's Requirement / Inquiry / Question / Description / Framework,Datadog's Supportability,Datadog's Response / Remark / Comment,Datadog's Doc / Blog / Trust / Legal URL,Datadog's Demo URLs
 ```
 
-### CSV rules
+### Cell rules (all formats)
+
+- URLs are plain text, not markdown links. No `\_` or `\&` escapes, no `**bold**`, no markdown syntax anywhere.
+- No line breaks inside a cell. One URL per URL cell.
+- Before saving, check every row has exactly 6 cells.
+
+### CSV rules (`.csv` only)
 
 - RFC 4180 format, UTF-8, comma delimiter, one record per line.
 - Wrap every field containing a comma, double quote, or line break in double quotes. Simplest: wrap every field in double quotes.
 - Escape a double quote inside a field by doubling it: `"Jane (SE lead, Slack): ""React 18"""`.
-- URLs are plain text, not markdown links. No `\_` or `\&` escapes, no `**bold**`, no markdown syntax anywhere.
-- No line breaks inside a field. One URL per URL cell.
-- Before saving, check every row has exactly 6 fields.
 
 ### Column definitions
 
