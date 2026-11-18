@@ -6,3 +6,9 @@
 # Python bytecode (contains local absolute paths)
 __pycache__/
 *.pyc
+
+# admin-process: private timesheet outputs and opportunity lists
+timesheet-*.docx
+timesheet-*.md
+opportunities.md
+~$*.docx

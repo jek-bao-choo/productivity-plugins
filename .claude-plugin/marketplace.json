@@ -36,6 +36,12 @@
       "source": "./video-editing",
       "description": "Video editing workflow tools: OBS Studio recording setup, a pipeline orchestrator, ElevenLabs speech-to-text transcription, silence cutting, spoken-mistake cutting with lip-sync QA, visual story planning, overlay planning, section-by-section HyperFrames builds, and final assembly, QA and delivery for talking-head recordings",
       "version": "0.18.0"
+    },
+    {
+      "name": "admin-process",
+      "source": "./admin-process",
+      "description": "Admin process tools: build a tight 08:00 to 19:00 daily timesheet in 30 minute blocks from Google Calendar, Slack, Gmail, Google Drive and Claude activity, tag each block with a Homerun type, account and opportunity, propose entries for gaps, save it as an editable Word document, and submit it to Homerun only after you review it and confirm",
+      "version": "0.1.0"
     }
   ]
 }
