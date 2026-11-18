@@ -12,14 +12,15 @@ description: >-
   and telemetry transmission (signal type, protocol, port) to the Datadog SaaS
   intake (EU/US/AP). Produces a current state view (fragmented monitoring
   tools) and a target state view (consolidated on Datadog), both flowing left
-  to right from the customer environment to the destination. Also trigger
+  to right from the customer environment to the destination. Outputs both
+  an editable .excalidraw file and a .svg diagram. Also trigger
   this whenever the user provides discovery notes (markdown/Google Docs) or
   technical plans (CSV/Excel) and wants a visual architecture output,
   even if they don't say "Excalidraw" or "diagram" explicitly, or wants a current vs future state / tool
   consolidation picture — e.g. "help me plan how we'd monitor this customer's
   environment" or "what would the observability setup look like for this
   account".
-version: "0.3.0"
+version: "0.4.0"
 ---
 
 # Create Datadog Architecture Diagram in Excalidraw
@@ -28,6 +29,15 @@ You are acting as a Senior Solutions Architect specializing in Cloud
 Observability and Datadog implementations. Your job is to turn a prospect's
 discovery notes and technical plans into a detailed, layered monitoring
 architecture, and render it as a diagram in Excalidraw.
+
+Every run delivers **two files** with the same content:
+
+- `<customer>-architecture.excalidraw`: the editable source.
+- `<customer>-architecture.svg`: a static diagram for slides, docs, email,
+  and Slack, which open it without Excalidraw.
+
+Use the customer's short name in lowercase with hyphens (e.g.
+`acme-architecture.svg`), or `architecture` if there's no customer name.
 
 The diagram must make **telemetry transmission explicit**: for every hop, a
 reader should be able to see what kind of data moves (metrics, traces/spans,
@@ -116,6 +126,7 @@ Copy this checklist and tick it off as you go:
 - [ ] Step 4: Design the target state blueprint (Datadog)
 - [ ] Step 5: Build the telemetry transmission table
 - [ ] Step 6: Render current state and target state in Excalidraw
+- [ ] Step 6b: Export the .svg diagram and look at it
 - [ ] Step 7: Final check (including wording limits)
 ```
 
@@ -546,7 +557,8 @@ Pick the path based on what Setup found:
   the transmission table and the arrow rules above so the signal, protocol,
   and port labels are kept.
 - **Neither found**: generate a valid Excalidraw scene file (`.excalidraw`,
-  which is JSON) yourself and save it to the working directory. A scene is
+  which is JSON) yourself and save it to the working directory as
+  `<customer>-architecture.excalidraw`. A scene is
   `{"type": "excalidraw", "version": 2, "elements": [...], "appState": {...}}`,
   where each element has at minimum `type` (`rectangle`, `text`, `arrow`,
   `ellipse`), `x`, `y`, `width`, `height`, and a unique `id`. Arrows bind
@@ -557,6 +569,112 @@ Pick the path based on what Setup found:
   target state views, and set `frameId` on each element to the frame it
   belongs to. Tell the user to open the file in Excalidraw via
   File → Open.
+
+Whatever path you took, end Step 6 with `<customer>-architecture.excalidraw`
+saved in the working directory. If the MCP tool or architecture skill
+built the diagram, export or fetch the scene JSON from it. If it can't give
+you the JSON, write the same scene yourself from the transmission table and
+layout so both files match.
+
+## Step 6b — Export the .svg diagram
+
+If the MCP tool or architecture skill can export SVG directly, use that and
+save it as `<customer>-architecture.svg`. Otherwise convert the scene file
+with this script. It draws rectangles, ellipses, diamonds, frames (with
+their names), arrows and lines (with colors, dashes, and arrowheads), and
+text, including labels bound to shapes and arrows:
+
+```bash
+python3 -I - acme-architecture.excalidraw acme-architecture.svg <<'PY'
+import json, sys, html
+src, out = sys.argv[1], sys.argv[2]
+els = [e for e in json.load(open(src))["elements"] if not e.get("isDeleted")]
+byid = {e["id"]: e for e in els}
+FONT = "Helvetica, Arial, sans-serif"
+xs, ys = [], []
+for e in els:
+    x, y, w, h = e.get("x", 0), e.get("y", 0), e.get("width", 0), e.get("height", 0)
+    pts = e.get("points") or [[0, 0], [w, h]]
+    xs += [x + p[0] for p in pts] + [x, x + w]
+    ys += [y + p[1] for p in pts] + [y, y + h]
+pad = 40
+minx, miny = min(xs) - pad, min(ys) - pad
+W, H = max(xs) - minx + pad, max(ys) - miny + pad
+def attrs(e, fill=True):
+    a = f'stroke="{e.get("strokeColor", "#1e1e1e")}" stroke-width="{e.get("strokeWidth", 1.5)}"'
+    bg = e.get("backgroundColor", "transparent")
+    a += f' fill="{bg if fill and bg != "transparent" else "none"}"'
+    if e.get("strokeStyle") == "dashed": a += ' stroke-dasharray="8 6"'
+    if e.get("strokeStyle") == "dotted": a += ' stroke-dasharray="2 4"'
+    return a
+def text(x, y, t, size, color, anchor="middle", weight="normal"):
+    lines = t.split("\n")
+    y0 = y - (len(lines) - 1) * size * 0.6
+    spans = "".join(f'<tspan x="{x:.1f}" y="{y0 + i * size * 1.2:.1f}">{html.escape(l)}</tspan>' for i, l in enumerate(lines))
+    return (f'<text font-family="{FONT}" font-size="{size}" fill="{color}" text-anchor="{anchor}" '
+            f'dominant-baseline="middle" font-weight="{weight}">{spans}</text>')
+shapes, labels = [], []
+for e in els:
+    t, x, y = e["type"], e.get("x", 0), e.get("y", 0)
+    w, h = e.get("width", 0), e.get("height", 0)
+    if t in ("rectangle", "frame"):
+        r = 8 if e.get("roundness") else 0
+        a = attrs(e) if t == "rectangle" else 'stroke="#9e9e9e" stroke-width="1.5" fill="none" stroke-dasharray="4 4"'
+        shapes.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" {a}/>')
+        if t == "frame" and e.get("name"):
+            labels.append(text(x, y - 14, e["name"], 20, "#1e1e1e", "start", "bold"))
+    elif t == "ellipse":
+        shapes.append(f'<ellipse cx="{x + w/2}" cy="{y + h/2}" rx="{w/2}" ry="{h/2}" {attrs(e)}/>')
+    elif t == "diamond":
+        shapes.append(f'<polygon points="{x+w/2},{y} {x+w},{y+h/2} {x+w/2},{y+h} {x},{y+h/2}" {attrs(e)}/>')
+    elif t in ("arrow", "line"):
+        pts = " ".join(f"{x + p[0]},{y + p[1]}" for p in e.get("points", [[0, 0], [w, h]]))
+        c = e.get("strokeColor", "#1e1e1e")
+        m = ""
+        if t == "arrow" and e.get("endArrowhead", "arrow"):
+            mid = "m" + c.lstrip("#")
+            shapes.append(f'<defs><marker id="{mid}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" '
+                          f'markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="{c}"/></marker></defs>')
+            m = f' marker-end="url(#{mid})"'
+            if e.get("startArrowhead"): m += f' marker-start="url(#{mid})"'
+        shapes.append(f'<polyline points="{pts}" {attrs(e, fill=False)}{m}/>')
+    elif t == "text":
+        size, color = e.get("fontSize", 16), e.get("strokeColor", "#1e1e1e")
+        c = byid.get(e.get("containerId") or "")
+        if c and c["type"] in ("arrow", "line"):
+            p = c.get("points", [[0, 0]]); a, b = p[len(p)//2 - 1] if len(p) > 1 else p[0], p[len(p)//2]
+            cx, cy = c["x"] + (a[0] + b[0]) / 2, c["y"] + (a[1] + b[1]) / 2
+            n = max(len(l) for l in e["text"].split("\n")) * size * 0.55
+            k = len(e["text"].split("\n")) * size * 1.2
+            labels.append(f'<rect x="{cx - n/2 - 4}" y="{cy - k/2 - 2}" width="{n + 8}" height="{k + 4}" fill="#ffffff"/>')
+            labels.append(text(cx, cy, e["text"], size, color))
+        elif c:
+            labels.append(text(c["x"] + c["width"] / 2, c["y"] + c["height"] / 2, e["text"], size, color))
+        else:
+            anchor = {"left": "start", "right": "end"}.get(e.get("textAlign", "left"), "middle")
+            tx = x if anchor == "start" else x + w if anchor == "end" else x + w / 2
+            labels.append(text(tx, y + h / 2, e["text"], size, color, anchor))
+svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{minx} {miny} {W} {H}" width="{W}" height="{H}">'
+       f'<rect x="{minx}" y="{miny}" width="{W}" height="{H}" fill="#ffffff"/>' + "".join(shapes + labels) + "</svg>")
+open(out, "w").write(svg)
+print(f"wrote {out} ({len(els)} elements)")
+PY
+```
+
+Then check the SVG:
+
+1. **It parses:** `python3 -I -c "import xml.dom.minidom as m; m.parse('acme-architecture.svg'); print('valid')"`
+2. **It looks right:** render it to PNG and open the image with `Read`.
+   Prefer headless Chrome, since it renders SVG faithfully:
+   `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --screenshot=preview.png --window-size=1800,1400 file://$PWD/acme-architecture.svg`.
+   If Chrome isn't available, use `qlmanage -t -s 1800 -o . acme-architecture.svg`
+   (macOS; its thumbnail may crop, so don't treat cropping as a bug).
+3. **Fix what you see:** overlapping labels, text spilling out of boxes,
+   arrows crossing nodes, or arrows that don't run left to right. Fix the
+   `.excalidraw` scene, not the SVG, then convert again so both files stay
+   in sync.
+
+Delete `preview.png` when you're done; deliver only the two diagram files.
 
 ## Step 7 — Final check
 
@@ -588,13 +706,16 @@ Before handing over, confirm:
 - The Datadog site/region on the diagram matches what was confirmed in
   Step 2.
 - The legend and ports summary are present.
+- Both `<customer>-architecture.excalidraw` and `<customer>-architecture.svg`
+  exist, the SVG parses, you've looked at a render of it, and it matches
+  the scene.
 - Every piece of text meets the word limits in "Wording rules", with no
   " — " or " - " separators. If you wrote a `.excalidraw` file, run this
   check and shorten anything it flags (use the cap from the table when it
   is tighter than 12):
 
   ```bash
-  python3 -I - diagram.excalidraw <<'PY'
+  python3 -I - acme-architecture.excalidraw <<'PY'
   import json, sys
   els = json.load(open(sys.argv[1]))["elements"]
   bad = 0
@@ -612,7 +733,7 @@ Before handing over, confirm:
   If you used the Excalidraw MCP or an architecture skill instead, apply
   the same check to the text you sent.
 
-Then share the transmission table alongside the diagram, so the customer's
+Then share both file paths and the transmission table alongside the diagram, so the customer's
 network team can review it as text as well. In your reply, list the flows
 you didn't draw and why (one short line each), so the user knows what to
 confirm with the customer before the diagram is shown as a commitment.
