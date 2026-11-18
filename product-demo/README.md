@@ -6,18 +6,18 @@ Product demo content generation tools for Claude Code.
 
 ## Skills
 
-### creating-demo-pptx (v0.3.0)
+### creating-demo-pptx (v0.4.0)
 
-Create a Datadog-branded product demo PowerPoint from meeting notes, built on the bundled 2026 Datadog Presentation Template. Follows a fixed 26-slide customer-demo flow that opens with a six-part agenda table (Intro & Whiteboard, Observe, Act, Secure, Why Datadog, Next Steps & Close) built by `build_agenda.py`, and runs a mandatory visual QA loop. The agenda's third column shows customer questions when the notes have them, otherwise points from your notes. After each part, a benefits tracker repeats the table with the benefits to the customer so far, highlighting the part just covered. All deck text follows concise word limits (rule of 3, short fragments, no filler), checked by `check_wording.py`. Finishes by invoking the `creating-architecture-via-excalidraw` skill on the same discovery notes to also produce a matching Datadog architecture diagram.
+Create a Datadog-branded product demo deck from meeting notes, as the last step of a three-stage pipeline: first `answering-rfp` (sales-process plugin) turns the notes into an RFP response CSV that states, for every known tech stack item, whether Datadog supports it; then `creating-solution-architecture` draws the architecture from the notes and the RFP output; then the deck is built as a Claude Artifact using its Datadog presentation styles. The skill carries the structure of the 2026 Datadog Presentation Template (28-slide flow, layouts, palette, type) as instructions. The deck opens with a six-part agenda table (Intro & Whiteboard, Observe, Act, Secure, Why Datadog, Next Steps & Close), adds the architecture diagram in the Intro & Whiteboard part, returns to the agenda as a benefits tracker after each part, and ends with a "Your stack on Datadog" backup slide that covers every tech stack row in the RFP CSV. The deck never claims more than the RFP says. All text follows concise word limits (rule of 3, short fragments, no filler), checked in a mandatory review.
 
 **Example prompts:**
 - "Create a demo deck from these meeting notes for ACME Corp"
 - "Turn my meeting notes into a Datadog demo presentation"
 - "Build a customer demo pptx covering their 3 challenges and our use cases"
 
-**Prerequisites:** `python3`, `markitdown[pptx]`, `Pillow`, LibreOffice (`soffice`), and Poppler (`pdftoppm`). The editing scripts and template are bundled under `skills/creating-demo-pptx/scripts/` and `skills/creating-demo-pptx/assets/`.
+**Prerequisites:** the `sales-process` plugin (for `answering-rfp`), `creating-solution-architecture` from this plugin, and Claude Artifacts with the Datadog presentation styles. No scripts or template files: the skill is a single `SKILL.md`.
 
-### creating-architecture-via-excalidraw (v0.4.0)
+### creating-solution-architecture (v0.6.0)
 
 Design an end-to-end Datadog monitoring architecture from sales discovery notes and technical plans, and render it as a diagram in Excalidraw. Delivers two matching files: an editable `.excalidraw` scene and a `.svg` diagram for slides, docs and Slack. Draws a current state view (fragmented monitoring tools, silos and pain points) above a target state view (consolidated on Datadog), both flowing left to right from the customer environment to the destination. Covers Infrastructure/Application/UI layers, a per-signal telemetry transmission breakdown (metrics, traces/spans, logs, alert and other events) with the protocol and port for every hop to the Datadog SaaS intake (EU/US/AP), collection methods (Agent, Cluster Agent, OpenTelemetry Collector, API integrations), and security/networking overlays (proxy, firewall, PrivateLink). It only draws a telemetry flow when every hop is confirmed to work; anything uncertain or not possible (unsupported runtime, unknown egress, air-gapped network) is left off the diagram and called out in a "Not drawn: needs confirmation" box instead.
 
