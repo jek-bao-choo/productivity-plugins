@@ -1,178 +1,237 @@
 ---
 name: answering-rfp
 description: >
-  Transforms raw sales notes into a structured RFP/RFI response table with Datadog supportability assessments,
-  web-search-grounded responses, documentation URLs, and demo links — output follows a mandatory template in
-  reference files that CANNOT be reproduced without this skill.
+  Transforms raw sales notes into a structured RFP/RFI response CSV with Datadog supportability assessments,
+  web-search-grounded responses, documentation URLs, and demo links. Output follows a mandatory template embedded
+  in this skill that CANNOT be reproduced without it.
 
   IMPORTANT: Always use this skill for ANY RFP, RFI, vendor questionnaire, compliance questionnaire, prospect
-  requirements, or technical capability mapping about Datadog. The exact table format this skill provides is required.
+  requirements, or technical capability mapping about Datadog. The exact CSV format this skill provides is required.
 
-  Triggers: user pastes sales notes, meeting notes, emails, or requirements wanting an RFP/RFI table; mentions RFP,
+  Triggers: user pastes sales notes, meeting notes, emails, or requirements wanting an RFP/RFI response; mentions RFP,
   RFI, vendor assessment, or compliance questionnaire; asks about Datadog supportability for a prospect's tech stack;
   wants to organize prospect requirements into a structured response; needs Datadog capability mapping.
-version: "0.1.0"
+version: "0.3.0"
 author: Jek Bao
 tags: rfp, rfi, vendor-questionnaire, compliance, sales, datadog, supportability
 ---
 
 # Answering RFP Skill
 
-You help sales teams transform raw, unstructured notes from various sources into a structured RFP/RFI response table. The output strictly follows the template in `references/rfp-output-template.md`.
+You help sales teams turn raw, unstructured notes into a structured RFP/RFI response CSV file. The output strictly follows the **Output Template** section below.
 
 ## The #1 rule: Never fabricate, always quote
 
-This is the most important instruction in this entire skill. The sales team's trust in these documents depends on it:
+The sales team's trust in these documents depends on it:
 
-1. **If a requirement is mentioned in the input, quote it directly using `"..."`** — use the prospect's exact words, not your paraphrase. Attribution matters: always include who said it, via what channel, and when. Format as: `Jane Doe 1 (SE lead, Slack thread March 15): "their frontend is React 18"`. This tells the sales team how reliable the information is and who to follow up with.
-2. **Do NOT hallucinate, assume, or infer anything that was not explicitly mentioned** — if the notes don't say it, you don't know it. It doesn't matter how reasonable an inference seems. A plausible guess written with confidence is worse than a gap, because the sales team will act on it as if it were real.
-3. **If a requirement is not covered in the input, do not guess** — flag it for clarification with the customer or prospect. Set supportability to "Clarification" and write a specific question in the response column.
+1. **If a requirement is mentioned in the input, quote it directly using `"..."`**. Use the prospect's exact words, not your paraphrase. Include who said it, via what channel, and when. Format: `Jane Doe 1 (SE lead, Slack thread March 15): "their frontend is React 18"`.
+2. **Do NOT hallucinate, assume, or infer anything that was not explicitly mentioned.** A plausible guess written with confidence is worse than a gap, because the sales team will act on it.
+3. **If a requirement is not covered in the input, do not guess.** Set supportability to "Clarification" and write a specific question in the response column.
 
-These three rules override everything else. If you're ever unsure whether something was stated or inferred, treat it as a gap. The whole point of this document is to give the sales team an honest, research-grounded map of what the prospect needs and how Datadog addresses it. Fabricated information — even well-intentioned — can lead to embarrassing conversations with prospects and misaligned deal strategies.
+These rules override everything else. If unsure whether something was stated or inferred, treat it as a gap.
 
-## Why this matters
+## The #2 rule: Write only what is necessary
 
-Sales notes come from many sources — hallway conversations, Slack threads, emails, call summaries, CRM comments, requirement documents, vendor questionnaires — and they're rarely organized into a structured format. The prospect's functional requirements, non-functional requirements, technical stack details, and compliance questions are scattered across these notes.
+Every generated word must earn its place. Keep words short, concise, and succinct. Do NOT over-generate.
 
-Your job is to sift through the noise, extract every distinct requirement, research Datadog's ability to address it, and produce a clean RFP/RFI table that the sales team can hand to the prospect or use to prepare their response.
+- **Datadog's Response is exactly ONE sentence.** No second sentence, no lists, no marketing filler, no restating the requirement.
+- State the answer and the key product or mechanism. Nothing else.
+- Clarification rows: the one sentence is the question to ask.
+- Partial rows: the one sentence says what is supported and what is not.
+- OpenTelemetry rows: the one sentence says no native support, use OTel via OTLP ingestion.
+- Plan, chat messages, and Clarification Summary: short bullets, no preamble, no recap.
+- Cut words like "comprehensive", "robust", "seamless", "single pane of glass", "fully committed to".
+
+Before saving, reread every Response cell. If any has more than one sentence or filler, rewrite it.
 
 ## Workflow
 
-### Step 1: Receive and acknowledge the notes
+### Step 1: Receive the notes
 
-When the user provides unorganized sales notes (pasted text, a file, or multiple messages), acknowledge what you've received and confirm you'll begin processing.
-
-If the notes mention a company or account name, extract it for the output filename. If no account name can be identified from the notes, use `unnamed` as the account name — don't ask the user, just proceed.
+Acknowledge the notes in one line. Extract the company or account name for the filename. If none is found, use `unnamed`. Do not ask.
 
 ### Step 2: Enter planning mode
 
-Enter plan mode using the `EnterPlanMode` tool. This lets the user see and approve your approach before you produce the final table.
+Enter plan mode using the `EnterPlanMode` tool. In the plan:
 
-In your plan, do the following:
+1. **Extract and categorize.** Identify every distinct requirement and map it to a category from the Category Taxonomy. Per category, list: quoted requirement, category, initial supportability, what needs research.
+2. **Extract technical stack details.** Follow "Extracting Technical Stack Details" below. Watch for versions, rendering modes (SSR/CSR/SSG/ISR), and compilation modes (NativeAOT, GraalVM).
+3. **Identify gaps and ambiguities.** List vague, contradictory, or incomplete items with proposed clarification questions.
+4. **Propose the filename.** `rfp-response-[account-name]-[ISO8601-timestamp].csv`, account name kebab-cased.
 
-1. **Read the template** — Read `references/rfp-output-template.md` (located relative to this skill file) to understand the column definitions, category taxonomy, supportability values, and example output format.
-
-2. **Extract and categorize** — Go through the raw notes and identify every distinct requirement, mapping each to a category from the taxonomy. Organize your findings by category, showing:
-   - The quoted requirement from the notes
-   - The proposed category
-   - An initial supportability assessment
-   - Any notes on what needs research
-
-3. **Extract technical stack details** — Follow the extraction rules in the "Extracting Technical Stack Details" section below. Pay special attention to versions, rendering modes (SSR/CSR/SSG/ISR), and compilation modes (NativeAOT, GraalVM).
-
-4. **Identify gaps and ambiguities** — For requirements that are vague, contradictory, or missing critical details, note them explicitly and propose clarification questions.
-
-5. **Propose the account name and filename** — Based on the notes, propose: `rfp-response-[account-name]-[ISO8601-timestamp].md` where account-name is kebab-cased and the timestamp is the current date/time.
-
-Present this plan clearly, category by category, so the user can see exactly what will go into the output table. End by asking: **"Does this plan look good? Should I adjust anything before generating the final RFP response?"**
+Keep the plan terse. End with: **"Does this plan look good? Should I adjust anything before generating the final RFP response?"**
 
 ### Step 3: Wait for approval
 
-Do not proceed until the user explicitly approves the plan. If they request changes, update the plan accordingly and ask for approval again.
+Do not proceed until the user explicitly approves. If they request changes, update the plan and ask again.
 
-### Step 4: Generate the output document
+### Step 4: Generate the output CSV
 
-Once approved, exit plan mode using `ExitPlanMode`, then produce the markdown file.
+Exit plan mode using `ExitPlanMode`, then produce the CSV file.
 
 For each requirement row:
-1. **Research** — Follow the tiered search escalation below to find Datadog's response and supporting URLs
-2. **Populate the table** — Fill in all 6 columns following the format in `references/rfp-output-template.md`
-3. **Find demo URLs** — Use https://github.com/ChromeDevTools/chrome-devtools-mcp to discover relevant pages on `https://demo.datadoghq.com/`
+1. **Research.** Follow the tiered search escalation below.
+2. **Populate the row.** Fill all 6 columns per the Output Template.
+3. **Find demo URLs.** Use https://github.com/ChromeDevTools/chrome-devtools-mcp to discover relevant pages on `https://demo.datadoghq.com/`.
 
 The output must:
-- Follow the column structure of `references/rfp-output-template.md` **exactly** — same columns, same order, same formatting
-- **Quote directly** from the notes using `"..."` for the Prospect's Requirement column
-- **Never hallucinate, assume, or infer** anything not explicitly stated in the notes
-- For ambiguous requirements, set supportability to "Clarification" and write a specific question
-- Remove the example rows from the template — those are guidance for you, not part of the output
-- Remove the instruction blocks from the template — those are guidance for you, not part of the output
-- **Save the file as `rfp-response-[account-name]-[ISO8601-timestamp].md`** — use the account name from Step 1 (kebab-cased), or `unnamed` if no account name was identified
-- **End with a "Clarification Summary" section** after the table. Collect all clarification questions from the "Clarification" rows into a numbered, prioritized list. This gives the sales team a ready-made agenda for their next call with the prospect. Prioritize by business impact — contradictions and blockers first, then missing technical details. Example format:
+- Be a `.csv` file, NOT markdown. Save as `rfp-response-[account-name]-[ISO8601-timestamp].csv`.
+- Use the Output Template header **exactly**: same columns, same order.
+- Quote directly from the notes using `"..."` in the Prospect's Requirement column.
+- Keep every Datadog's Response to **one sentence**.
+- Never hallucinate, assume, or infer.
+- Not include the template's example rows.
+
+After saving, reply in chat with the file path and a **Clarification Summary**: all Clarification questions as a numbered list, prioritized by business impact (contradictions and blockers first, then missing technical details). One line each. Do not put the summary in the CSV.
 
 ```
-## Clarification Summary — Questions for Next Call
+Clarification Summary: Questions for Next Call
 
-1. **[Highest priority topic]** — [specific question from the table row]
-2. **[Next priority topic]** — [specific question]
-...
+1. **[Topic]**: [question]
+2. **[Topic]**: [question]
+```
+
+## Output Template
+
+The CSV contains only a header row and one row per requirement. No title, no blank rows, no summary rows.
+
+```csv
+Category / Section / Area / Dimension / Domain,Prospect's Requirement / Inquiry / Question / Description / Framework,Datadog's Supportability,Datadog's Response / Remark / Comment,Datadog's Doc / Blog / Trust / Legal URL,Datadog's Demo URLs
+```
+
+### CSV rules
+
+- RFC 4180 format, UTF-8, comma delimiter, one record per line.
+- Wrap every field containing a comma, double quote, or line break in double quotes. Simplest: wrap every field in double quotes.
+- Escape a double quote inside a field by doubling it: `"Jane (SE lead, Slack): ""React 18"""`.
+- URLs are plain text, not markdown links. No `\_` or `\&` escapes, no `**bold**`, no markdown syntax anywhere.
+- No line breaks inside a field. One URL per URL cell.
+- Before saving, check every row has exactly 6 fields.
+
+### Column definitions
+
+| Column | Guidance |
+| :---- | :---- |
+| **Category / Section / Area / Dimension / Domain** | A value from the Category Taxonomy. If it spans several, pick the primary one. |
+| **Prospect's Requirement / Inquiry / Question / Description / Framework** | Quoted from the notes with `"..."` and attribution. For tech stack, include language, version, framework. For infrastructure, include platform, version, orchestrator. |
+| **Datadog's Supportability** | One of `Yes`, `Partial`, `Comply`, `Clarification`. |
+| **Datadog's Response / Remark / Comment** | ONE sentence, sourced via the tiered search escalation. Never fabricate capabilities. |
+| **Datadog's Doc / Blog / Trust / Legal URL** | A real URL found via search, from whichever tier answered. `NA` if none. Never fabricate URLs. |
+| **Datadog's Demo URLs** | Must start with `https://demo.datadoghq.com/`. `NA` if none. |
+
+### Category taxonomy
+
+| Category | Covers | Example |
+| :---- | :---- | :---- |
+| **Observability** | Monitoring, APM, metrics, logs, traces, alerting | "Need unified view across all services" |
+| **Integration & Extensibility** | CI/CD, DevOps toolchain, APIs, webhooks, third-party integrations | "Must integrate with Jenkins and GitLab" |
+| **Frontend Technical Stack** | Frontend frameworks, languages, versions, mobile SDKs | "React 18", "Next.js 14", "Flutter" |
+| **Backend Technical Stack** | Backend languages, frameworks, versions, runtimes | ".NET 8", "Java Spring Boot 3.x" |
+| **Infrastructure Platform Technical Stack** | Cloud, container orchestration, serverless | "AWS Lambda", "Kubernetes 1.28 on EKS" |
+| **Database & Data Store Technical Stack** | Databases, caches, message queues, versions | "PostgreSQL 15", "Kafka 3.6" |
+| **Data Storage Location** | Data residency, on-premise, regions, sovereignty | "Data must stay in EU" |
+| **Security & Compliance** | Certifications, compliance frameworks, audit, encryption | "Need SOC 2 Type II compliance" |
+| **Lawfulness** | Legal, regulatory, AI ethics, data processing laws | "Does the AI have potential to violate laws?" |
+| **Data Protection Laws & Regulations** | Data protection regulations, DPAs, privacy frameworks | "Need a Data Processing Addendum" |
+| **Platform & Architecture Support** | Backup, DR, high availability, architecture patterns | "Backup integration with our backup platform" |
+| **Performance & Scalability** | SLAs, throughput, latency targets | "Must handle 10M events per second" |
+| **User Management & Access Control** | SSO, RBAC, multi-tenancy, identity providers | "Need SAML SSO with Okta" |
+| **Cost & Licensing** | Pricing model, licensing terms, cost optimization | "Need per-host pricing model" |
+| **Other** | Anything else | Suggest a more specific category in the response |
+
+### Supportability values
+
+- **Yes**: Datadog fully supports it out of the box or with standard configuration, confirmed by docs or blog.
+- **Partial**: Supported with limitations or workarounds. The response says what is and is not covered.
+- **Comply**: A compliance, legal, regulatory, or policy question and Datadog meets the standard.
+- **Clarification**: Ambiguous, incomplete, or needs a deeper conversation. The response is a specific question.
+
+Decision tree:
+1. Compliance/legal/policy question and Datadog meets it? → **Comply**
+2. Clear and fully supported? → **Yes**
+3. Clear but partially supported? → **Partial**
+4. Unclear, ambiguous, or missing critical detail? → **Clarification**
+
+### Example rows (format and length reference only; do not copy into output)
+
+```csv
+Category / Section / Area / Dimension / Domain,Prospect's Requirement / Inquiry / Question / Description / Framework,Datadog's Supportability,Datadog's Response / Remark / Comment,Datadog's Doc / Blog / Trust / Legal URL,Datadog's Demo URLs
+"Observability","""End-to-end visibility across applications, infrastructure, and services.""","Yes","Datadog correlates traces, metrics, and logs across frontend, backend, and infrastructure in one trace view.","https://www.datadoghq.com/blog/end-to-end-application-monitoring/","https://demo.datadoghq.com/software?env=prod&view=map"
+"Integration & Extensibility","""CI/CD pipeline integration and DevOps toolchain compatibility.""","Yes","Datadog CI Visibility integrates with Jenkins, GitLab, CircleCI, and other CI/CD tools.","https://docs.datadoghq.com/continuous_integration/","https://demo.datadoghq.com/ci/pipelines/health"
+"Platform & Architecture Support","""Backup and disaster recovery integration with the existing enterprise backup platform.""","Clarification","Which backup platform do you use, and what outcome do you expect from Datadog?","NA","NA"
+"Data Storage Location","""Preference for data to be stored on-premise""","Partial","Logs can stay on-premise with CloudPrem, but metrics and traces are stored in Datadog's SOC 2 certified SaaS regions.","https://docs.datadoghq.com/cloudprem/","https://demo.datadoghq.com/cloudprem"
+"Lawfulness","""Does the Datadog AI have any potential to violate laws and regulations?""","Comply","Datadog is independently audited against SOC 2, ISO 27001, HIPAA, and PCI DSS.","https://trust.datadoghq.com/","NA"
+"Data Protection Laws & Regulations","""Are processes implemented to ensure personal data is processed per applicable laws?""","Comply","Datadog's Data Processing Addendum covers this.","https://www.datadoghq.com/legal/data-processing-addendum/","NA"
+"Frontend Technical Stack","""The marketing sites are built on Next.js.""","Yes","Datadog Browser RUM supports Next.js and links sessions to backend traces.","https://docs.datadoghq.com/real_user_monitoring/guide/monitor-your-nextjs-app-with-rum/","https://demo.datadoghq.com/rum/performance-monitoring"
+"Backend Technical Stack","""The backend services are mainly .NET 8.""","Yes","Datadog APM auto-instruments .NET 8 including ASP.NET Core.","https://docs.datadoghq.com/tracing/trace_collection/dd_libraries/dotnet-core/","https://demo.datadoghq.com/software?query=language%3Adotnet&env=prod"
+"Infrastructure Platform Technical Stack","""Some workloads run on AWS Lambda.""","Yes","Datadog Serverless Monitoring collects Lambda metrics, logs, and traces via the Lambda extension.","https://docs.datadoghq.com/serverless/aws_lambda/","https://demo.datadoghq.com/serverless"
 ```
 
 ## Tiered search escalation
 
-When researching Datadog's response and finding URLs for each requirement, follow this escalation. Move to the next tier only when the previous tier yields no relevant results:
+Move to the next tier only when the previous one yields nothing relevant.
 
-### Tier 1 — Datadog Official Docs & Content (`datadoghq.com`)
+### Tier 1: Datadog official content (`datadoghq.com`)
 
-Search first using queries like: `site:datadoghq.com [technology or topic]`
+Query: `site:datadoghq.com [technology or topic]`. URL priority:
+1. `docs.datadoghq.com` (technical docs, highest priority)
+2. `www.datadoghq.com/blog/`
+3. `trust.datadoghq.com` (security and compliance)
+4. `www.datadoghq.com/legal/` (legal, DPA, policy)
 
-URL priority within this tier:
-1. `docs.datadoghq.com` — technical documentation (highest priority)
-2. `www.datadoghq.com/blog/` — blog posts with deeper explanations
-3. `trust.datadoghq.com` — security and compliance questions
-4. `www.datadoghq.com/legal/` — legal, DPA, and policy questions
+### Tier 2: Datadog GitHub (`github.com/DataDog/`)
 
-### Tier 2 — Datadog GitHub Repositories (`github.com/DataDog/`)
+For capabilities, supported versions, framework compatibility, compilation modes:
+- `DataDog/datadog-agent` (infrastructure, integrations)
+- `DataDog/dd-trace-{language}` (java, py, dotnet, rb, go, js)
+- `DataDog/browser-sdk` (Browser RUM and Logs)
+- `DataDog/dd-sdk-ios`, `DataDog/dd-sdk-android`, `DataDog/dd-sdk-reactnative`
+- Otherwise `github.com/DataDog/` + technology keyword
 
-If Tier 1 does not confirm supportability, search Datadog's GitHub repositories for technical capabilities, supported versions, framework compatibility, and compilation mode support. Key repositories:
-- `github.com/DataDog/datadog-agent` — infrastructure monitoring (Agent capabilities, supported integrations)
-- `github.com/DataDog/dd-trace-{language}` — APM tracing libraries (dd-trace-java, dd-trace-py, dd-trace-dotnet, dd-trace-rb, dd-trace-go, dd-trace-js)
-- `github.com/DataDog/browser-sdk` — Browser RUM and Logs SDK
-- `github.com/DataDog/dd-sdk-ios` and `github.com/DataDog/dd-sdk-android` — mobile RUM SDKs
-- `github.com/DataDog/dd-sdk-reactnative` — React Native SDK
-- For other capabilities, search `github.com/DataDog/` + technology keyword
+### Tier 3: Datadog internal knowledge base
 
-### Tier 3 — Datadog Internal Knowledge Base
+### Tier 4: OpenTelemetry (`opentelemetry.io`, `github.com/open-telemetry/`)
 
-If Tier 1 and Tier 2 are exhausted, consult Datadog's internal knowledge base or resources for additional supportability information.
+If no native Datadog support exists, check OpenTelemetry. Set supportability to "Partial" and say native support is unavailable but OTel with Datadog OTLP ingestion works.
 
-### Tier 4 — OpenTelemetry (`opentelemetry.io` and `github.com/open-telemetry/`)
+### Terminate search
 
-If Tiers 1–3 yield no native Datadog support, search OpenTelemetry as a fallback. Datadog supports OTLP ingestion, so OpenTelemetry instrumentation can bridge the gap for technologies without native Datadog libraries. Search:
-- `opentelemetry.io` — official OpenTelemetry documentation
-- `github.com/open-telemetry/opentelemetry.io` — OpenTelemetry documentation source
-- `github.com/open-telemetry/` + language or technology keyword
+If OpenTelemetry also has nothing, set "Clarification" and say neither native Datadog nor OTel instrumentation was found; recommend Datadog sales engineering.
 
-When using OpenTelemetry as the answer, set supportability to "Partial" and clearly state in the response that native Datadog instrumentation is not available but the technology can be monitored via OpenTelemetry with Datadog's OTLP ingestion.
+### General rules
 
-### Terminate Search
-
-If even OpenTelemetry does not support the technology, stop searching. Set supportability to "Clarification" and note in the response column that neither native Datadog nor OpenTelemetry instrumentation was found, and recommend discussing with Datadog's sales engineering team.
-
-### General Rules
-
-- The response column content should be based on what you find in these sources. Quote or closely paraphrase the documentation.
+- Base the response on what the sources say.
 - **Never fabricate or guess URLs.** A broken link is worse than `NA`.
-- If no relevant URL is found at any tier, write `NA` for the URL column.
+- No URL found at any tier: write `NA`.
 
 ## Extracting Technical Stack Details
 
-Raw sales notes often mention technologies in passing or in lists. Follow these rules when extracting them:
-
-- **Programming languages** — Always capture the language name AND version if mentioned. Example: ".NET 8", "Java 17", "Python 3.11". If no version is mentioned, extract as-is (e.g., "Java") and note in the response that the version was not specified.
-- **Frameworks** — Capture framework AND version. Example: "Spring Boot 3.2", "React 18", "Next.js 14", "FastAPI 0.100".
-- **Infrastructure** — Capture platform, version, and configuration details. Example: "Kubernetes 1.28 on EKS", "AWS Lambda with Node.js 20 runtime".
-- **Databases** — Capture database type and version. Example: "PostgreSQL 15", "MongoDB 7.0", "Redis 7".
-- **Rendering and execution modes** — For frontend frameworks, capture the rendering mode if mentioned or probe for it. This affects which Datadog instrumentation applies. Common modes: Server-Side Rendering (SSR), Client-Side Rendering (CSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR). Example: "Next.js 14 with SSR" vs "Next.js as a static site (SSG)". If the rendering mode is not mentioned, flag it for clarification — SSR requires server-side APM tracing while CSR/SSG only needs Browser RUM.
-- **Compilation and runtime modes** — For backend and infrastructure technologies, capture compilation or runtime modes that affect observability and tracer compatibility. Examples: ".NET 8 with NativeAOT" (ahead-of-time compilation may limit dynamic instrumentation), "Java with GraalVM native-image" (affects dd-trace-java compatibility), "AWS Lambda with SnapStart" (affects cold start instrumentation), "Lambda with Provisioned Concurrency". If not mentioned, flag for clarification — these modes can significantly affect Datadog's instrumentation approach.
-- **One technology per row** — Do not combine multiple technologies into a single row. If the notes say "Angular on the web, with mobile moving from Ionic to Swift", create separate rows for Angular (web), Ionic (current mobile), and Swift (target mobile).
-- **Version matters** — If the notes specify a version, include it. Datadog's support can vary by version. If no version is given, note this and mention the supported version range in the response.
+- **Languages**: capture name AND version (".NET 8", "Java 17"). If no version, note it.
+- **Frameworks**: capture framework AND version ("Spring Boot 3.2", "Next.js 14").
+- **Infrastructure**: platform, version, configuration ("Kubernetes 1.28 on EKS").
+- **Databases**: type and version ("PostgreSQL 15").
+- **Rendering modes**: for frontend frameworks, capture SSR/CSR/SSG/ISR. If missing, flag it: SSR needs server-side APM, CSR/SSG only needs Browser RUM.
+- **Compilation and runtime modes**: NativeAOT, GraalVM native-image, Lambda SnapStart, Provisioned Concurrency. If missing, flag it: these affect instrumentation.
+- **One technology per row**: "Angular on web, mobile moving from Ionic to Swift" becomes three rows.
+- **Version matters**: include it if given; if not, note the supported range.
 
 ## Handling Ambiguous or Incomplete Requirements
 
-- **Vague requirements** (e.g., "need good monitoring") — Still create a row. Set supportability to "Clarification" and write a specific question in the response column (e.g., "What specific systems or services need monitoring? What metrics matter most?").
-- **Contradictory requirements** (e.g., "must be fully on-premise" and later "cloud-first approach") — Create rows for both, flag the contradiction in the response column, and set both to "Clarification".
-- **Missing technical details** (e.g., "need Kubernetes support" without version or provider) — Extract what exists, set supportability based on what is known (likely "Yes" for general K8s support), and note in the response that specific version/provider details should be confirmed.
-- **Out-of-scope requirements** (e.g., "need a new CRM system") — Still capture with "Clarification" supportability and a response noting this appears outside Datadog's scope but should be discussed for context.
-- **Duplicate or overlapping requirements** from different sources — Create one row, quote both sources with attribution, and reconcile if consistent or flag if contradictory.
+- **Vague** ("need good monitoring"): create a row, "Clarification", one specific question.
+- **Contradictory** ("fully on-premise" vs "cloud-first"): one row each, both "Clarification", flag the conflict.
+- **Missing details** ("need Kubernetes support"): assess what is known, note what to confirm.
+- **Out of scope** ("need a new CRM"): "Clarification", note it looks outside Datadog's scope.
+- **Duplicates** from different sources: one row, quote both with attribution, flag if they conflict.
 
 ## Important principles
 
-- **Direct quotes over paraphrasing.** When notes say something relevant, quote the exact words and attribute them. The original voice matters — it tells the reader what language the prospect actually uses and whether the information is first-hand or second-hand.
-- **Gaps are valuable — fabrication is dangerous.** An RFP response with 10 honest "Clarification" rows is far more useful than one that looks complete but contains 5 plausible-sounding fabrications. Gaps tell the sales team exactly what to discuss next. Fabrications lead to embarrassing conversations when the sales rep references something the prospect never said.
-- **Contradictions should surface, not hide.** If two sources said conflicting things, show both with direct quotes and flag the conflict. Do not pick a side. Let the user decide which is accurate.
-- **The template is the contract.** Don't add extra columns, don't skip columns, don't reorder. The sales team relies on a consistent format across all RFP response documents.
-- **"Comply" is not "Yes".** Use "Comply" for compliance, legal, regulatory, and policy questions where Datadog meets the standard (SOC 2, ISO 27001, GDPR, FedRAMP, DPA, etc.). Use "Yes" for functional and technical capabilities. This distinction matters because it tells the sales team which rows are about meeting a standard vs providing a feature. Never use "Yes" for compliance questions — even if Datadog fully meets the requirement, "Comply" is the correct supportability value.
-- **One requirement, one row.** Each distinct requirement, technology, or question gets its own row. Do not combine React and React Native into one row. If two people said contradictory things, create separate rows for each statement (not one combined row). If a requirement has both a technical and a compliance dimension, create separate rows. More granular rows are always better than lumped rows — they're easier for the sales team to act on individually.
-- **When in doubt, it's a "Clarification".** If you're unsure whether something was explicitly stated or you're connecting dots from separate pieces of information, treat it as a gap. It's always better to under-claim than over-claim.
-- **Proactively flag technical gaps the prospect didn't ask about.** If a technology is mentioned without a rendering mode (e.g., Next.js without SSR/CSR), compilation mode (e.g., .NET without specifying NativeAOT), or version — create the row with the information given but add a note flagging what's missing and why it matters for Datadog's instrumentation. The sales team benefits from knowing what questions to ask even if the prospect didn't raise the issue.
-- **Research is mandatory, not optional.** Every response must be grounded in actual Datadog documentation, GitHub repos, or OpenTelemetry docs found via web search. Never write a response based solely on your training data — always verify via the tiered search escalation.
+- **Direct quotes over paraphrasing**, with attribution.
+- **Gaps are valuable, fabrication is dangerous.** Ten honest Clarification rows beat five plausible fabrications.
+- **Surface contradictions.** Show both quotes; do not pick a side.
+- **The template is the contract.** No extra, skipped, or reordered columns.
+- **"Comply" is not "Yes".** Use Comply for compliance, legal, regulatory, and policy questions (SOC 2, ISO 27001, GDPR, FedRAMP, DPA). Never use Yes for these.
+- **One requirement, one row.** Split React and React Native; split technical and compliance dimensions.
+- **When in doubt, Clarification.** Under-claim rather than over-claim.
+- **Flag technical gaps proactively**: missing version, rendering mode, or compilation mode.
+- **Research is mandatory.** Ground every response in docs, GitHub, or OTel found via search, never training data alone.
+- **One sentence per Response. Do not over-generate.**

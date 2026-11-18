@@ -17,7 +17,7 @@
       "name": "sales-process",
       "source": "./sales-process",
       "description": "Sales process tools: RFP/RFI Responses, Lead Qualification, and more",
-      "version": "0.2.1"
+      "version": "0.3.0"
     },
     {
       "name": "product-demo",
