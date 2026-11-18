@@ -1,8 +1,9 @@
 ---
 name: creating-demo-deck
 description: >-
-  Create a Datadog-branded product demo deck from meeting notes, built as a
-  Claude Artifact with its Datadog presentation styles. Use when the user asks
+  Create a Datadog-branded product demo deck from meeting notes, built with
+  Claude Artifact Slides in its Datadog presentation styles (fallback: an
+  HTML deck to drop into Claude Artifacts when Artifacts aren't available). Use when the user asks
   to "create a demo deck", "generate a pptx", "build a Datadog presentation",
   "turn my meeting notes into slides", or mentions producing a customer demo
   presentation. Runs a fixed pipeline: answering-rfp first (every tech stack
@@ -11,7 +12,7 @@ description: >-
   Whiteboard, Observe, Act, Secure, Why Datadog, Next Steps & Close), a
   benefits tracker after each part, the architecture diagram, a tech stack
   backup slide, concise wording limits, and a mandatory review.
-version: "0.5.0"
+version: "0.7.1"
 ---
 
 # Create Datadog Demo Deck
@@ -19,12 +20,19 @@ version: "0.5.0"
 Turn customer meeting notes into a Datadog-branded demo deck. The deck is the last of
 three deliverables, always produced in this order:
 
-1. **`answering-rfp`** turns the notes into an RFP response CSV that states, for **every
+1. **`answering-rfp`** turns the notes into an RFP response sheet that states, for **every
    known tech stack item**, whether Datadog supports it.
 2. **`creating-solution-architecture`** draws the architecture diagram from the notes and
    the RFP output.
-3. **This skill** builds the deck as a **Claude Artifact**, using the Artifact's Datadog
+3. **This skill** builds the deck with **Claude Artifact Slides**, using its Datadog
    presentation styles and format, from the notes, the RFP output and the architecture.
+
+**Always build the deck with Claude Artifact Slides. This is the top preference.** Only
+when Claude Artifacts are not available or accessible, build the deck as one HTML file
+instead. The user then drops that HTML into Claude Artifacts to make the Artifact Slides
+deck, so build it for that hand-off. Never build PowerPoint or `.pptx`, even when the user
+says "pptx": build Artifact Slides, and export a `.pptx` from it only if the user asks
+for the file.
 
 Never start a later stage before the earlier one has finished and saved its output. This
 file holds everything the deck stage needs: the pipeline, the slide flow and layouts from
@@ -36,21 +44,34 @@ slide in seconds and then listen. Follow [Writing rules](#writing-rules) on ever
 When text does not fit, cut it; never shrink the font or pad empty space.
 
 **The deck never claims more than the RFP says.** Datadog capabilities on any slide must
-match a `Yes`, `Partial` or `Comply` row in the RFP CSV. `Partial` items name their limit.
+match a `Yes`, `Partial` or `Comply` row in the RFP sheet. `Partial` items name their limit.
 `Clarification` (prospect side unclear) and `Skipped` (no source confirms Datadog support)
 items are never presented as supported.
 
 ## Workflow
 
 ```
-- [ ] Step 1: answering-rfp on the notes → RFP CSV + tech stack coverage check
-- [ ] Step 2: creating-solution-architecture on the notes + RFP output → .excalidraw + .svg
+- [ ] Setup: check for Claude Artifact Slides
+- [ ] Step 1: answering-rfp on the notes → RFP sheet + tech stack coverage check
+- [ ] Step 2: creating-solution-architecture on the notes + RFP output → architecture Artifact (or .html + .png)
 - [ ] Step 3: Ask the remaining deck questions
 - [ ] Step 4: Slide plan with every slide's final wording, agenda, benefits and stack tables
-- [ ] Step 5: Collect the images (architecture .svg, any mock-ups)
-- [ ] Step 6: Build the deck as a Claude Artifact
+- [ ] Step 5: Collect the images (architecture diagram, any mock-ups)
+- [ ] Step 6: Build the deck (Artifact Slides, else HTML)
 - [ ] Step 7: Review against the checklist → fix → re-review
 ```
+
+### Setup: check for Claude Artifact Slides
+
+Before Step 1, find out which build path this run can use:
+
+- Check your tools for Claude Artifacts (e.g. an `Artifact` tool). If none is listed, run
+  `ToolSearch` with `"artifact"` and then `"slides"`.
+- Claude Artifact Slides is available when you can create an Artifact as a slide deck.
+
+Record the result: **Slides path** or **HTML path**. Don't call a tool you haven't
+confirmed exists. If the Slides path fails mid-run, say so in one line and switch to the
+HTML path.
 
 ### Step 1: Answer the RFP first (answering-rfp)
 
@@ -63,16 +84,17 @@ this instruction:
 > supports it (Yes, Partial, Comply, Clarification, or Skipped).
 
 Let `answering-rfp` run its own workflow to the end, including its plan approval with the
-user. Continue only when it has saved the CSV (`rfp-response-<account>-<timestamp>.csv`)
-and given its Clarification Summary and Skipped Summary.
+user. Continue only when it has built the RFP sheet (Claude Artifact Sheets, with a
+`rfp-response-<account>-<timestamp>.csv` copy so later stages can read the rows; or just
+the `.csv` when Artifact Sheets wasn't available) and given its Clarification Summary and Skipped Summary.
 
 **Tech stack coverage check (very important).** Before moving on:
 
 1. From the notes, list every known tech stack item yourself, one technology per line.
-2. Match each item to its CSV row. Every item needs its own row with a supportability
+2. Match each item to its RFP sheet row. Every item needs its own row with a supportability
    verdict and a one-sentence response.
 3. If any item is missing, merged with another, or has no verdict, go back to
-   `answering-rfp` and have it add or split the rows in the same CSV. Repeat until every
+   `answering-rfp` and have it add or split the rows in the same RFP sheet. Repeat until every
    item is covered.
 4. Show the user the coverage as a table: `| Tech stack item | Datadog support | How |`,
    with Partial, Clarification and Skipped items called out. Skipped items need a Datadog
@@ -81,16 +103,18 @@ and given its Clarification Summary and Skipped Summary.
 ### Step 2: Draw the architecture (creating-solution-architecture)
 
 Invoke the `creating-solution-architecture` skill with the `Skill` tool. Pass the original
-notes as-is, the RFP CSV path, the Clarification Summary and the Skipped Summary, plus this
+notes as-is, the RFP sheet (and its `.csv` path), the Clarification Summary and the Skipped Summary, plus this
 instruction:
 
-> Use the RFP CSV as the source of truth for Datadog support. Draw collection and
+> Use the RFP sheet as the source of truth for Datadog support. Draw collection and
 > telemetry flows only for items marked Yes, Partial or Comply (Partial with its
 > workaround, for example OpenTelemetry). Put every Clarification and Skipped item in the
 > "Not drawn: needs confirmation" box.
 
 Let it run its own workflow, including its clarifying questions. Continue only when it has
-saved `<customer>-architecture.excalidraw` and `<customer>-architecture.svg`.
+drawn the architecture: a Claude Artifact Design diagram (plus its `.svg` or `.png` export
+if any), or `<customer>-architecture.html` and `.png` when Claude Artifacts weren't
+available.
 
 ### Step 3: Ask the remaining deck questions
 
@@ -112,7 +136,6 @@ again for anything they cover. Never fabricate content. Confirm what is still mi
   value / ROI** (slide 21), a **customer story** and **next steps** (slide 24)
 - Whether to keep the optional **reference resources** slide (slide 28)
 - Which use cases need a **screenshot mock-up** (slides 9, 12, 15)
-- Whether the user also needs a **.pptx export** of the Artifact
 
 Use the AskQuestion tool when available; otherwise ask conversationally. Ask only what is
 genuinely missing.
@@ -126,41 +149,65 @@ length within the [word limits](#word-limits). Add three content tables:
 - **Agenda**: one row per part with use case, column 3 items (and their style: quote,
   question or note), attribution, and What Demonstrates It.
 - **Benefits**: one row per part, two or three benefit lines each.
-- **Stack**: one row per tech stack item with its RFP CSV row number, Datadog support
-  (copied from the CSV) and a short "how" (see [Tech stack slide](#tech-stack-slide)).
+- **Stack**: one row per tech stack item with its RFP sheet row number, Datadog support
+  (copied from the RFP sheet) and a short "how" (see [Tech stack slide](#tech-stack-slide)).
 
 The user reviews the real wording before anything is built. Use the earlier outputs:
 
-- **RFP CSV**: capabilities on the use-case slides (9, 12, 15), the capability recap
+- **RFP sheet**: capabilities on the use-case slides (9, 12, 15), the capability recap
   table (19) and What Demonstrates It come from its `Yes`, `Partial` and `Comply` rows.
   Demo URLs (slides 9, 12, 15) come from its Demo URL column; reference links (slide 28)
   from its Doc URL column. Its open Clarification questions and Skipped items (for
   Datadog to verify) become technical next steps on slide 24.
-- **Architecture**: the `.svg` goes on slide 6. Current vs target state (slides 5, 18)
+- **Architecture**: the diagram goes on slide 6. Current vs target state (slides 5, 18)
   must match its two views; its "Not drawn" items must not appear as working on any slide.
 
 ### Step 5: Collect the images
 
-The architecture `.svg` from Step 2 goes on slide 6 as is. Generate other images only for
+The architecture diagram from Step 2 goes on slide 6 as is: its `.svg` or `.png`, or the
+diagram rebuilt from the architecture Artifact if it had no export. Generate other images only for
 slides that still need a screenshot mock-up (usually the use-case detail slides 9, 12,
 15).
 
-### Step 6: Build the deck as a Claude Artifact
+### Step 6: Build the deck
 
-Build all slides in one Claude Artifact, using its Datadog presentation styles and format
-for backgrounds, colours, type, logo and footer. Follow the [slide flow](#slide-flow) and
-[slide layouts](#slide-layouts) for what goes on each slide and where, and the
-[agenda](#agenda-and-tracker-design) and [stack](#tech-stack-slide) designs for the custom
-slides. Use the approved wording from Step 4 exactly; do not add text while building.
+Follow the [slide flow](#slide-flow) and [slide layouts](#slide-layouts) for what goes on
+each slide and where, and the [agenda](#agenda-and-tracker-design) and
+[stack](#tech-stack-slide) designs for the custom slides. Use the approved wording from
+Step 4 exactly; do not add text while building. Keep each slide's text in real text
+elements, not images, so it stays editable.
+
+**Slides path (preferred).** Build all slides in one Claude Artifact Slides deck, using
+its Datadog presentation styles and format for backgrounds, colours, type, logo and footer.
 
 - Where the Artifact's styles and the layouts below disagree, the Artifact's styles win
   on look (colours, fonts, backgrounds); the layouts win on content and order.
-- Keep each slide's text in real text elements, not images, so it stays editable.
-- If the user wants a `.pptx`, export it from the Artifact if it can; otherwise say so.
+- Export a `.pptx` from it only if the user asks for the file. If it can't export, say so.
+
+**HTML path (fallback).** Write `<customer>-demo-deck.html` in the working directory,
+ready for the user to drop into Claude Artifacts:
+
+- One self-contained file: inline CSS, no JavaScript frameworks, no external files.
+  Embed images inline (the architecture `.png` or `.svg` and any mock-ups as data URIs),
+  so nothing breaks when the file is moved. Font: Roboto, falling back to Arial.
+- One `<section class="slide">` per slide, in [slide flow](#slide-flow) order, each a
+  fixed 16:9 box (1280 × 720 px), stacked vertically. Add
+  `@page { size: 13.333in 7.5in; margin: 0 }` and a page break after each slide so it
+  prints one slide per page.
+- Place every box at the positions given in [slide layouts](#slide-layouts) (1 in = 96 px),
+  with the brand colours, the Datadog logo and slide number on light slides.
+- Agenda, trackers and the stack slide are real `<table>`s. Every word is real text.
+- Put a comment at the top of each slide with its number and layout name
+  (`<!-- Slide 6 · Title + image -->`) so Claude Artifacts can map it.
+- In your reply, tell the user: open Claude, drop in `<customer>-demo-deck.html`, and ask
+  for Claude Artifact Slides in the Datadog presentation styles.
 
 ### Step 7: Review (mandatory)
 
-Look at every slide in the rendered Artifact and check:
+Look at every slide of the rendered deck and check. On the HTML path, render it first:
+`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --print-to-pdf=preview.pdf --no-pdf-header-footer file://$PWD/<customer>-demo-deck.html`,
+then open the PDF with `Read` (20 pages per call) and delete `preview.pdf` when done.
+
 
 | Check | Pass when |
 |---|---|
@@ -169,17 +216,18 @@ Look at every slide in the rendered Artifact and check:
 | Fit | No text cut off, overflowing a card, or running into the footer; nothing shrunk below the layout sizes |
 | Agenda | Title "Agenda for <Customer>"; six parts in order; correct column 3 header; quotes verbatim with roles; no invented quotes |
 | Trackers | Six of them, at slides 7, 10, 13, 16, 22, 25; the highlighted row is the part just covered; earlier rows show benefits, later rows dimmed; rows in the same place on every tracker |
-| Architecture | Slide 6 shows the Step 2 `.svg`, readable and uncut; slides 5 and 18 match its two views |
-| Stack coverage | Every tech stack row in the RFP CSV is on the stack slide, with the same verdict as the CSV |
+| Architecture | Slide 6 shows the Step 2 diagram, readable and uncut; slides 5 and 18 match its two views |
+| Stack coverage | Every tech stack row in the RFP sheet is on the stack slide, with the same verdict as the RFP sheet |
 | Overclaiming | No slide shows a capability the RFP marks Clarification or Skipped; every Partial item states its limit |
 | Use cases | Titles match on slides 2, 4, 8, 11, 14; demo URLs start with `https://demo.datadoghq.com/` |
 
-Write a fix table (`| Slide | Issue | Fix |`), fix the Artifact, and review the changed
+Write a fix table (`| Slide | Issue | Fix |`), fix the deck, and review the changed
 slides again. Repeat until every check passes. Static template text you did not write
 (for example "Relatable Customer Success & Next Steps for <Customer>") may stay.
 
-One request ends with all three deliverables: the RFP CSV, the architecture diagram
-(`.excalidraw` + `.svg`), and the deck Artifact (plus its `.pptx` export if asked).
+One request ends with all three deliverables: the RFP sheet, the architecture diagram
+(Artifact Design diagram, or `.html` + `.png`), and the deck in Claude Artifact Slides (or
+`<customer>-demo-deck.html` to drop into Claude Artifacts when they weren't available).
 
 ## Slide flow
 
@@ -190,7 +238,7 @@ One request ends with all three deliverables: the RFP CSV, the architecture diag
 | 3 | Top 3 challenges | Stacked cards | Intro & Whiteboard | Customer pains |
 | 4 | 3 proposed use cases | Three cards | Intro & Whiteboard | Use cases mapped to challenges |
 | 5 | Current vs target state | Two cards | Intro & Whiteboard | Matches the architecture's two views |
-| 6 | Solution architecture | Title + image | Intro & Whiteboard | The Step 2 `.svg` |
+| 6 | Solution architecture | Title + image | Intro & Whiteboard | The Step 2 diagram |
 | 7 | Benefits tracker | Agenda table | Intro & Whiteboard | After Intro & Whiteboard |
 | 8 | Use Case 1 divider | Divider (blue) | Observe | "Use Case 1" + use case title |
 | 9 | Use Case 1 details + demo | Title + content | Observe | Supported capabilities, demo points, demo URL |
@@ -221,7 +269,7 @@ One request ends with all three deliverables: the RFP CSV, the architecture diag
 
 ## Slide layouts
 
-The gist of the 2026 Datadog Presentation Template (theme "2025_DD_v1"), for the Artifact
+The gist of the 2026 Datadog Presentation Template (theme "2025_DD_v1"), for the deck
 to follow. Canvas 16:9 (13.33 × 7.5 in). Positions are inches from the top left.
 
 **Brand.** Primary purple `#8000FF`; accents green `#00E37D`, blue `#0060FF`, orange
@@ -337,7 +385,7 @@ the rows sit in the same place on every tracker.
 ## Tech stack slide
 
 A backup slide after Thank you: one row per tech stack item, with Datadog's support taken
-from the RFP CSV. It answers "do you support X?" without breaking the demo flow.
+from the RFP sheet. It answers "do you support X?" without breaking the demo flow.
 
 - Title "Your stack on Datadog". A plain table: TECHNOLOGY · DATADOG SUPPORT · HOW DATADOG
   COVERS <CUSTOMER>, header 11pt bold grey caps, rows 14pt with a thin bottom border.
@@ -345,12 +393,12 @@ from the RFP CSV. It answers "do you support X?" without breaking the demo flow.
   `#B4621A`, Clarification purple `#6D28D9`, Skipped grey `#80868B`.
 - Legend under the table, 11pt grey: "Partial: supported with limits. Clarification: to
   confirm with you. Skipped: Datadog to verify."
-- **Coverage is mandatory.** Every RFP CSV row in a tech stack category (Frontend,
+- **Coverage is mandatory.** Every RFP sheet row in a tech stack category (Frontend,
   Backend, Infrastructure Platform, Database & Data Store Technical Stack, or Integration
-  & Extensibility) gets a row, and the support value is copied from the CSV, never
-  changed. Check this row by row against the CSV before building and again in Step 7.
+  & Extensibility) gets a row, and the support value is copied from the RFP sheet, never
+  changed. Check this row by row against the RFP sheet before building and again in Step 7.
 - Technology names the item and version (5 words max); "how" is the Datadog product or the
-  open question (10 words max), shortened from the CSV response. Skipped rows have no CSV
+  open question (10 words max), shortened from the RFP sheet response. Skipped rows have no sheet
   response; write "Datadog SE to verify".
 - Order rows frontend, backend, infrastructure, data stores, integrations. Over 10 rows
   continue on a second slide, "Your stack on Datadog (2/2)".
@@ -417,10 +465,10 @@ Use these to check the skill after changes. Every run must also pass the Step 7 
    unknown: Clarification), the checkout and payment services (language unknown:
    Clarification), Prometheus, Grafana and ELK, each Yes/Partial only with a cited source
    (otherwise Skipped); shows the coverage table; then `creating-solution-architecture`
-   with the notes and the CSV, leaving unclear flows in "Not drawn"; then asks how to map
+   with the notes and the RFP sheet, leaving unclear flows in "Not drawn"; then asks how to map
    the use cases to Observe/Act/Secure (none is security); FROM MY NOTES column; benefits
-   use the 40% MTTR figure and invent no others; a 28-slide Artifact with the architecture
-   on slide 6 and every CSV tech stack row on the stack slide.
+   use the 40% MTTR figure and invent no others; a 28-slide Artifact Slides deck with the architecture
+   on slide 6 and every RFP sheet tech stack row on the stack slide.
 2. **Thin notes.** "Customer runs everything on Azure VMs, wants better log monitoring, no
    APM yet, unhappy with Splunk licensing. Challenges: costly Splunk logs, no tracing. One
    use case: log management to replace Splunk. Presenter: me. No date, competitor or ROI."
@@ -439,4 +487,4 @@ Use these to check the skill after changes. Every run must also pass the Step 7 
    *Expect:* the RFP and architecture stages run first; "Agenda for Bitsburg Bank" with
    CUSTOMER QUESTION, verbatim quotes with role attribution, italic questions for unquoted
    concerns, no invented quotes; six trackers with BENEFITS TO BITSBURG, the right row
-   highlighted on each; nothing on any slide claims more than the RFP CSV.
+   highlighted on each; nothing on any slide claims more than the RFP sheet.
