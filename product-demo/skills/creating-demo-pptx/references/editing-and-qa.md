@@ -13,6 +13,12 @@ python3 $SCRIPTS/office/unpack.py "$TEMPLATE" unpacked/
 # 2. Duplicate a source slide (e.g. slide7.xml = section-divider)
 python3 $SCRIPTS/add_slide.py unpacked/ slide7.xml
 # → prints <p:sldId id="XXX" r:id="rIdYYY"/> — insert into ppt/presentation.xml at desired position
+#   Insert it BEFORE the next add_slide.py call: the next ID is read from presentation.xml,
+#   so back-to-back duplicates otherwise share an ID and pack.py fails validation.
+
+# 3a. Rebuild the agenda (slide 2) and each benefits tracker from agenda.json — see agenda.md
+python3 $SCRIPTS/build_agenda.py unpacked/ agenda.json
+python3 $SCRIPTS/build_agenda.py unpacked/ agenda.json --benefits intro --slide slide21.xml
 
 # 3. Edit unpacked/ppt/slides/slide{N}.xml with StrReplace
 
@@ -54,10 +60,11 @@ Read each slide image using the Read tool. Look for:
 | Issue type | What to look for |
 |---|---|
 | **Font too large** | Text wrapping to 3+ lines in a narrow column; text bleeding past its text box; bottom lines cut off with strikethrough or truncation artefacts |
-| **Font too small** | Huge empty space in lower half of slide; content clustered in the top 30-40% |
+| **Font too small** | Text far below the template's sizes (for example body under 16pt). Fix by raising the font, never by adding words. Empty space under short text is fine. |
 | **Text overflow** | Characters or words cut off at the edge of a text box or slide boundary |
 | **Leftover placeholders** | `Body, 16pt Normal`, `Heading, 20pt Bold`, `00%`, `lorem ipsum`, `Main text`, `Subtext` visible on any slide |
-| **Missing content** | Slide has only 2-3 bullets when you know you set 5-7; bottom half totally blank |
+| **Missing content** | A bullet or line you wrote in the plan is not on the rendered slide |
+| **Too many words** | More than 3-4 bullets in a box, lines wrapping to 3+ lines, or anything `check_wording.py` flags. Cut the weakest points. |
 | **Subtitle/title overlap** | On cover or section-divider slides: subtitle text box sitting on top of a multi-line title |
 | **Column swap** | The left/right column content is reversed from intended (common with text-2col slides) |
 
@@ -67,7 +74,7 @@ After reviewing all slides, write a compact issue table before fixing anything:
 
 | Slide # | Issue | Fix |
 |---|---|---|
-| S7 | Only 3 of 7 criteria shown; bottom 60% blank | Add 4 more `<a:p>` elements to text box in slide27.xml |
+| S8 | 6 bullets, each 15-20 words; text runs off the card | Keep the 3 strongest, cut each to 12 words or fewer |
 | S11 | Title font ~60pt, overflows text box; bullets cut off | Reduce title `sz` to `2400` (24pt); bullets to `1600` (16pt) |
 | S14 | Same overflow as S11 | Same fix |
 | S1 | Subtitle overlaps multi-line title | Shorten title OR reduce title font size |
@@ -103,19 +110,18 @@ xml = re.sub(r'(sz=")([3-9]\d{3}|[1-9]\d{4,})(">)', r'\g<1>2000\3', xml, count=2
 (BASE / "slide5.xml").write_text(xml)
 ```
 
-## Add missing content (extra bullet points)
+## Add a missing bullet
 
-When a text box only has 3 bullet-level slots but you need 7 items, insert additional
-`<a:p>` paragraphs after the last existing one. Copy the `<a:pPr>` formatting from an
-adjacent paragraph to keep consistent indentation and line spacing:
+The template's text boxes usually have three bullet slots, which matches the rule of 3.
+Only add a paragraph when the plan has a fourth point that truly earns its place (four is
+the maximum). Copy the `<a:pPr>` formatting from an adjacent paragraph to keep consistent
+indentation and line spacing, and keep each item within the limits in
+[writing-style.md](writing-style.md):
 
 ```python
-# After the last <a:p> in the text box, insert additional paragraphs
+# After the last <a:p> in the text box, insert the extra paragraph
 EXTRA_ITEMS = [
-    "Pipeline overhead: Visible scan step via CI Visibility — minimal impact",
-    "Critical findings: 100% trigger Slack/email alert",
-    "Developer disruption: 0 merge blocks in Year 1 (PR Gate informational mode)",
-    "CISO report: Weekly PDF delivered — at least 2 consecutive confirmed",
+    "Critical findings alert in Slack",
 ]
 NEW_PARAS = ""
 for item in EXTRA_ITEMS:
@@ -139,6 +145,12 @@ Do not declare success until a full pass reveals no new issues. One fix often
 creates another problem, so re-verify affected slides after each change.
 
 ## Content QA
+
+Run the wording check first; it also catches leftover placeholders:
+
+```bash
+python3 $SCRIPTS/check_wording.py output.pptx
+```
 
 ```bash
 python -m markitdown output.pptx
@@ -166,4 +178,8 @@ If grep returns results, fix them before declaring success.
 - `pip install "markitdown[pptx]"` — text extraction
 - `pip install Pillow` — thumbnail grids
 - LibreOffice (`soffice`) — PDF conversion (auto-configured via `scripts/office/soffice.py`)
+- Roboto font (optional, `brew install --cask font-roboto`) — the template uses Roboto. Without
+  it LibreOffice renders a wider serif fallback, so text wraps earlier than in PowerPoint and
+  some glyphs look different (for example "+" can render as a star). Layouts that fit the
+  fallback will fit Roboto.
 - Poppler (`pdftoppm`) — PDF to images
