@@ -1,5 +1,5 @@
 ---
-name: creating-demo-pptx
+name: creating-demo-deck
 description: >-
   Create a Datadog-branded product demo deck from meeting notes, built as a
   Claude Artifact with its Datadog presentation styles. Use when the user asks
@@ -11,7 +11,7 @@ description: >-
   Whiteboard, Observe, Act, Secure, Why Datadog, Next Steps & Close), a
   benefits tracker after each part, the architecture diagram, a tech stack
   backup slide, concise wording limits, and a mandatory review.
-version: "0.4.0"
+version: "0.5.0"
 ---
 
 # Create Datadog Demo Deck

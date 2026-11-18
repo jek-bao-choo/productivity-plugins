@@ -6,7 +6,7 @@ Product demo content generation tools for Claude Code.
 
 ## Skills
 
-### creating-demo-pptx (v0.4.0)
+### creating-demo-deck (v0.5.0)
 
 Create a Datadog-branded product demo deck from meeting notes, as the last step of a three-stage pipeline: first `answering-rfp` (sales-process plugin) turns the notes into an RFP response CSV that states, for every known tech stack item, whether Datadog supports it; then `creating-solution-architecture` draws the architecture from the notes and the RFP output; then the deck is built as a Claude Artifact using its Datadog presentation styles. The skill carries the structure of the 2026 Datadog Presentation Template (28-slide flow, layouts, palette, type) as instructions. The deck opens with a six-part agenda table (Intro & Whiteboard, Observe, Act, Secure, Why Datadog, Next Steps & Close), adds the architecture diagram in the Intro & Whiteboard part, returns to the agenda as a benefits tracker after each part, and ends with a "Your stack on Datadog" backup slide that covers every tech stack row in the RFP CSV. The deck never claims more than the RFP says. All text follows concise word limits (rule of 3, short fragments, no filler), checked in a mandatory review.
 
